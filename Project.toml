@@ -2,3 +2,17 @@ name = "BitemporalReactive"
 uuid = "2fc36f50-c0f6-442e-a77c-cf0acc93eef6"
 authors = ["mf "]
 version = "0.1.0"
+
+[deps]
+BitemporalPostgres = "e513cd14-23e6-48df-acf1-d9bc8fa5674b"
+SearchLight = "340e8cb6-72eb-11e8-37ce-c97ebeb32050"
+SearchLightPostgreSQL = "4327cdd6-4902-11ea-0272-430cea0431bd"
+Stipple = "4acbeb90-81a0-11ea-1966-bdaff8155998"
+StippleUI = "a3c5d34a-b254-4859-a8fa-b86abb7e84a3"
+
+[compat]
+BitemporalPostgres = "≥1.0.4"
+SearchLight = "2"
+SearchLightPostgreSQL = "2"
+Stipple = "≥0.11.2"
+StippleUI = "≥0.17.0"
