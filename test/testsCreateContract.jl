@@ -1,13 +1,4 @@
 import Base: @kwdef
-Pkg.add("BitemporalPostgres")
-Pkg.add("HTTP")
-Pkg.add("JSON")
-Pkg.add("TimeZones")
-Pkg.add("ToStruct")
-Pkg.add("Intervals")
-Pkg.add("SearchLight")
-Pkg.add("SearchLightPostgreSQL")
-Pkg.add("Test")
 using Test
 import InsuranceContractsController
 using InsuranceContractsController.InsuranceContracts
@@ -23,9 +14,9 @@ using HTTP
 @testset "CreateContract" begin
 
     SearchLight.Configuration.load() |> SearchLight.connect
-    SearchLight.Migrations.create_migrations_table()
-    BitemporalPostgres.up()
-    SearchLight.Migrations.up()
+    # SearchLight.Migrations.create_migrations_table()
+    # BitemporalPostgres.up()
+    # SearchLight.Migrations.up()
 # create Partner
     p = Partner()
     pr = PartnerRevision(description = "blue")
