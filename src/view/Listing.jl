@@ -6,8 +6,7 @@ using SearchLight, InsuranceContracts
 
 @reactive mutable struct Model <: ReactiveModel
     process::R{Bool} = false
-    contracts::R{Vector{Integer}} = [43, 56]
-
+    contracts::R{Vector{Integer}} = []
 end
 
 function ui(model)
