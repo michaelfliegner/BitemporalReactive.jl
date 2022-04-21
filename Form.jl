@@ -55,7 +55,7 @@ myform() = xelem(
 
 import Stipple.js_methods
 js_methods(m::FormComponent) = raw"""
-    onSubmit () {
+    onbmit () {
       if (this.accept !== true) {
         this.$q.notify({
           color: 'red-5',

@@ -1,2 +1,2 @@
-This is intended to become a life insurance contract management prototype based [a Julia REST server]((https://github.com/michaelfliegner/RestInsured.jl)) and [ a QUASAR Framework based UI]
+This is intended to become a life insurance contract management prototype based [a Julia REST server](https://github.com/michaelfliegner/RestInsured.jl) and [ a QUASAR Framework based UI]
 (https://github.com/michaelfliegner/BitemporalReactive.jl)

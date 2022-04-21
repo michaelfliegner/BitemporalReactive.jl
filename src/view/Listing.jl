@@ -13,6 +13,7 @@ function ui(model)
     page(
         model,
         class="container",
+        
         list(
             bordered=true,
             separator=true,
