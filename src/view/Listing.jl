@@ -1,6 +1,4 @@
 module Listing
-
-push!(LOAD_PATH, "src")
 using Stipple, StippleUI
 using SearchLight, InsuranceContracts
 

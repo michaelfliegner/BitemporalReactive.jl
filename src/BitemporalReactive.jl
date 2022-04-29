@@ -1,27 +1,39 @@
 module BitemporalReactive
-using SearchLight, Stipple
-
 push!(LOAD_PATH,"src/model")
+push!(LOAD_PATH,"src/view")
+println(LOAD_PATH)
+using JSON, SearchLight, Stipple
 include("model/InsuranceContracts.jl")
-using .InsuranceContracts
+include("model/InsuranceContractsController.jl")
+include("view/ContractSection.jl")
+include("view/Listing.jl")
 
 SearchLight.Configuration.load() |> SearchLight.connect
-contracts=find(Contract)
 
 
-include("view/Listing.jl")
-using .Listing
-
-model = Listing.handlers(Stipple.init(Listing.Model))
-for c in contracts
-    push!(model.contracts[], c.id.value)
+function initContractSection()
+    model = ContractSection.handlers(Stipple.init(ContractSection.Model))
+    csectDict=csectDict=JSON.parse(JSON.json(InsuranceContractsController.csection(3,4)), dicttype=Dict{Symbol,Any})
+    model.csect=csectDict
+    println("init")
+    println(model)
+    ContractSection.routeContractSection(model)
 end
 
-model.contracts=(map(c->c.id.value, contracts))
+function initListing()
+    contracts = find(InsuranceContracts.Contract)
+    model = Listing.handlers(Stipple.init(Listing.Model))
+    for c in contracts
+        push!(model.contracts[], c.id.value)
+    end
 
-Listing.routeListing(model)
+    model.contracts = (map(c -> c.id.value, contracts))
 
+    Listing.routeListing(model)
+end
 
+initContractSection()
+# initListing()
 
 Stipple.up()
 
