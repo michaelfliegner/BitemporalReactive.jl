@@ -2,8 +2,8 @@ module ContractSection
 using Stipple, StippleUI
 
 @reactive mutable struct Model <: ReactiveModel
-    process:: R{Bool} = false
-    csect :: R{Dict{Symbol,Any}} = Dict{Symbol,Any}(:dummy => 1)
+    process::R{Bool} = false
+    csect::R{Dict{Symbol,Any}} = Dict{Symbol,Any}(:dummy => 1)
 end
 
 function ui(model)
@@ -13,41 +13,43 @@ function ui(model)
         list(
             bordered=true,
             separator=true,
-            template(
+            template([
                 item(
-                    clickable=true,
-                    vripple=true,
                     [
                         itemsection(
-                            p("""
-                            key {{index}} = {{sym}} {{index =='contract_revision'}}
+                            itemlabel("""
+                            val key {{key}}
                             """
-                            )                             
-                        )
-
-                        list(
-                            bordered=true,
-                            separator=true,
-                            template(
-                                item(
-                                    clickable=true,
-                                    vripple=true,
-                                    [
-                                        itemsection(
-                                            p("""
-                                            key {{index}} = {{sym}} 
-                                            """
-                                            )                             
-                                        )
-                                    ], @click("process=true")
-                                ),
-                                @recur(:"(sym,index) in csect[index]")
                             )
                         )
-                    ], @click("process=true")
+                    ]
                 ),
-                @recur(:"(sym,index) in csect"),
-                """v-if ="index=='contract_revision'"
+                item(
+                    clickable=true,
+                    [
+                        itemsection(
+                            list(
+                                bordered=true,
+                                separator=true,
+                                template(
+                                    item(
+                                        clickable=true,
+                                        [
+                                            itemsection(
+                                                p("""
+                                                val key {{key}} = {{val}} 
+                                                """
+                                                )
+                                            )
+                                        ], @click("process=true")
+                                    ),
+                                    @recur(:"(val,key) in csect[key]")
+                                )
+                            ))
+                    ], @click("process=true")
+                )],
+                @recur(:"(val,key) in csect"),
+                """v-if ="key=='contract_revision'"
                 """
             )
         )
