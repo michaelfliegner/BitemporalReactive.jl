@@ -3,7 +3,7 @@ using Stipple, StippleUI
 
 @reactive mutable struct Model <: ReactiveModel
     process::R{Bool} = false
-    csect::R{Dict{Symbol,Any}} = Dict{Symbol,Any}(:dummy => 1)
+    csect::R{Dict{Symbol,Any}} = Dict{Symbol,Any}(:contract_revision => 1)
 end
 
 function ui(model)
@@ -14,40 +14,24 @@ function ui(model)
             bordered=true,
             separator=true,
             template([
-                item(
-                    [
-                        itemsection(
-                            itemlabel("""
-                            val key {{key}}
-                            """
-                            )
+                    item(itemsection(
+                        itemlabel("Contract {{csect['contract_revision']['description']}}" 
                         )
-                    ]
-                ),
-                item(
-                    clickable=true,
-                    [
-                        itemsection(
-                            list(
-                                bordered=true,
-                                separator=true,
-                                template(
-                                    item(
-                                        clickable=true,
-                                        [
-                                            itemsection(
-                                                p("""
-                                                val key {{key}} = {{val}} 
-                                                """
-                                                )
-                                            )
-                                        ], @click("process=true")
-                                    ),
-                                    @recur(:"(val,key) in csect[key]")
-                                )
-                            ))
-                    ], @click("process=true")
-                )],
+                    )),
+                    item(itemsection(
+                        list(
+                            bordered=true,
+                            separator=true,
+                            template(
+                                item(itemsection(
+                                    """
+                                    <p>
+                                        Description
+                                        <input v-model="csect['contract_revision']['description']" v-on:keyup.enter="process=true"/>
+                                    </p>
+                                    """))
+                            )
+                        )))],
                 @recur(:"(val,key) in csect"),
                 """v-if ="key=='contract_revision'"
                 """
@@ -60,13 +44,13 @@ function handlers(model)
     on(model.process) do _
         if (model.process[])
             println("huhuhuhu")
-            println(model.csection[:ref_history])
+            println(model.csect[:contract_revision])
             model.process[] = false
         end
     end
     on(model.isready) do _
         println("pushing")
-        println(model.csect)
+        println(model.csect[:contract_revision])
         push!(model)
     end
     model
