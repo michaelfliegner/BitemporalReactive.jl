@@ -15,7 +15,7 @@ function ui(model)
             separator=true,
             template([
                     item(itemsection(
-                        itemlabel("Contract {{csect['contract_revision']['description']}}" 
+                        itemlabel("Contract {{csect['contract_revision']['description']}}"
                         )
                     )),
                     item(itemsection(
@@ -44,7 +44,8 @@ function handlers(model)
     on(model.process) do _
         if (model.process[])
             println("huhuhuhu")
-            println(model.csect[:contract_revision])
+            bubu=model.csect[:contract_revision]
+            println(bubu)
             model.process[] = false
         end
     end

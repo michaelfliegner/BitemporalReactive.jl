@@ -14,9 +14,9 @@ using HTTP
 @testset "CreateContract" begin
 
     SearchLight.Configuration.load() |> SearchLight.connect
-    # SearchLight.Migrations.create_migrations_table()
-    # BitemporalPostgres.up()
-    # SearchLight.Migrations.up()
+    SearchLight.Migrations.create_migrations_table()
+    BitemporalPostgres.up()
+    SearchLight.Migrations.up()
 # create Partner
     p = Partner()
     pr = PartnerRevision(description = "blue")
@@ -27,7 +27,7 @@ using HTTP
     create_component!(p, pr, w)
     commit_workflow!(w)
 
-# create Tariff
+# create Tariffs
 t = Tariff()
 tr = TariffRevision(description = "blue")
 w0 = Workflow(
@@ -35,6 +35,15 @@ w0 = Workflow(
 )
 create_entity!(w0)
 create_component!(t, tr, w0)
+commit_workflow!(w0)
+
+t2 = Tariff()
+tr = TariffRevision(description = "blue")
+w0 = Workflow(
+    tsw_validfrom = ZonedDateTime(2014, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),
+)
+create_entity!(w0)
+create_component!(t2, tr, w0)
 commit_workflow!(w0)
 
 # create Contract
@@ -48,10 +57,15 @@ commit_workflow!(w0)
     
     pitr = ProductItemTariffRef(ref_super = cpi.id)
     pitrr = ProductItemTariffRefRevision(ref_tariff = t.id, description = "blue")
-
-        
     pipr = ProductItemPartnerRef(ref_super = cpi.id)
     piprr = ProductItemPartnerRefRevision(ref_partner = p.id, description = "blue")
+
+    cpi2 = ProductItem(ref_super = c.id)
+    cpi2r = ProductItemRevision(position=2,description="pink")
+    pi2tr = ProductItemTariffRef(ref_super = cpi2.id)
+    pi2trr = ProductItemTariffRefRevision(ref_tariff = t2.id, description = "pink")
+    pi2pr = ProductItemPartnerRef(ref_super = cpi2.id)
+    pi2prr = ProductItemPartnerRefRevision(ref_partner = p.id, description = "pink")
 
     w1 = Workflow(
         tsw_validfrom = ZonedDateTime(2014, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),
@@ -61,6 +75,12 @@ commit_workflow!(w0)
     create_subcomponent!(c, cpr, cprr, w1)
     create_subcomponent!(c, cpi, cpir, w1)
     create_subcomponent!(cpi, pitr, pitrr, w1)
+    create_subcomponent!(cpi, pipr, piprr, w1)
+
+    create_subcomponent!(c, cpi2, cpi2r, w1)
+    create_subcomponent!(cpi2, pi2tr, pi2trr, w1)
+    create_subcomponent!(cpi2, pipr, piprr, w1)
+
     create_subcomponent!(cpi, pipr, piprr, w1)
     commit_workflow!(w1)
 

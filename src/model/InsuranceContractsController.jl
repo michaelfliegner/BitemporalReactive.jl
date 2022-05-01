@@ -56,19 +56,13 @@ end
     ref_version::SearchLight.DbId = MaxVersion
     contract_revision::ContractRevision = ContractRevision()
     contract_partnerref_revision::ContractPartnerRefRevision = ContractPartnerRefRevision()
-    productitem_revision::ProductItemRevision = ProductItemRevision(position = 0)
-    productitem_tariffref_revision::ProductItemTariffRefRevision =
-        ProductItemTariffRefRevision()
-    productitem_partnerref_revision::ProductItemPartnerRefRevision =
-        ProductItemPartnerRefRevision()
+    productitem_revision::Vector{ProductItemRevision} = [ProductItemRevision(position = 0)]
+    productitem_tariffref_revision::Vector{ProductItemTariffRefRevision} =
+        [ProductItemTariffRefRevision()]
+    productitem_partnerref_revision::Vector{ProductItemPartnerRefRevision} =
+        [ProductItemPartnerRefRevision()]
     ref_entities::Dict{DbId,Union{PartnerSection,ContractSection,TariffSection}} =
         Dict{DbId,Union{PartnerSection,ContractSection,TariffSection}}()
-end
-
-
-function csection()
-    psection = PartnerSection()
-    ContractSection(ref_entities = (Dict(DbId(1) => psection)))
 end
 
 function insurancecontracts_view()
@@ -137,6 +131,22 @@ function get_revision(
     )[1]
 end
 
+function get_revisions(
+    ctype::Type{CT},
+    rtype::Type{RT},
+    hid::DbId,
+    vid::DbId
+) where {CT<:Component,RT<:ComponentRevision}
+    f = cid -> find(
+        rtype,
+        SQLWhereExpression(
+            "ref_component = ? and ref_valid  @> BIGINT ?",
+            cid,
+            vid
+        ))[1]
+    map(f, map((i -> i.id), find(ctype, SQLWhereExpression("ref_history=?", 4))))
+end
+
 function csection(history_id::Integer, version_id::Integer)::ContractSection
     ContractSection(
         ref_history = DbId(history_id),
@@ -153,19 +163,19 @@ function csection(history_id::Integer, version_id::Integer)::ContractSection
             DbId(history_id),
             DbId(version_id),
         ),
-        productitem_revision = get_revision(
+        productitem_revision = get_revisions(
             ProductItem,
             ProductItemRevision,
             DbId(history_id),
             DbId(version_id),
         ),
-        productitem_tariffref_revision = get_revision(
+        productitem_tariffref_revision = get_revisions(
             ProductItemTariffRef,
             ProductItemTariffRefRevision,
             DbId(history_id),
             DbId(version_id),
         ),
-        productitem_partnerref_revision = get_revision(
+        productitem_partnerref_revision = get_revisions(
             ProductItemPartnerRef,
             ProductItemPartnerRefRevision,
             DbId(history_id),
