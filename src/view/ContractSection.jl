@@ -20,7 +20,7 @@ function ui(model)
                       <q-item-label overline>Contract</q-item-label>
                       <q-item-label>Description</q-item-label>
                       <input v-model="csect['contract_revision']['description']" v-on:keyup.enter="modContractRevision=true"/>
-                    </q-item-section>b
+                    </q-item-section>
                   </q-item>
                 </q-list>
                 <p><q-btn color="primary" icon="mail" label="On Left" @click="addProductItem=true" /></p>
@@ -31,8 +31,11 @@ function ui(model)
                                 <q-item-label overline>Product item {{index}} </q-item-label>
                                 <q-item-label>Description</q-item-label>
                                 <input v-model="csect['product_items'][index]['productitem_revision']['description']" v-on:keyup.enter="modProductitemRevision=true"/>
+                                <q-item-label>Tariff</q-item-label>
+                                <input v-model="csect['product_items'][index]['productitem_tariffref_revision']['ref_tariff']['value']" v-on:keyup.enter="modProductitemRevision=true"/>
+                                <q-item-label>Partner</q-item-label>
+                                <input v-model="csect['product_items'][index]['productitem_partnerref_revision']['ref_partner']['value']" v-on:keyup.enter="modProductitemRevision=true"/>
                           </q-item-section>
-                        </q-item>
                     </q-list>
                 <div>
             </div>
