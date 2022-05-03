@@ -49,6 +49,14 @@ end
     tariff_revision::TariffRevision = TariffRevision()
 end
 
+@kwdef mutable struct ProductItemSection
+    productitem_revision::ProductItemRevision = ProductItemRevision(position=0)
+    productitem_tariffref_revision::ProductItemTariffRefRevision =
+        ProductItemTariffRefRevision()
+    productitem_partnerref_revision::ProductItemPartnerRefRevision =
+        ProductItemPartnerRefRevision()
+end
+
 @kwdef mutable struct ContractSection
     tsdb_validfrom::TimeZones.ZonedDateTime = now(tz"UTC")
     tsw_validfrom::TimeZones.ZonedDateTime = now(tz"UTC")
@@ -56,17 +64,125 @@ end
     ref_version::SearchLight.DbId = MaxVersion
     contract_revision::ContractRevision = ContractRevision()
     contract_partnerref_revision::ContractPartnerRefRevision = ContractPartnerRefRevision()
-    productitem_revision::Vector{ProductItemRevision} = [ProductItemRevision(position = 0)]
-    productitem_tariffref_revision::Vector{ProductItemTariffRefRevision} =
-        [ProductItemTariffRefRevision()]
-    productitem_partnerref_revision::Vector{ProductItemPartnerRefRevision} =
-        [ProductItemPartnerRefRevision()]
+    product_items::Vector{ProductItemSection} = []
     ref_entities::Dict{DbId,Union{PartnerSection,ContractSection,TariffSection}} =
         Dict{DbId,Union{PartnerSection,ContractSection,TariffSection}}()
 end
 
 function insurancecontracts_view()
-    html(:insurancecontracts, :insurancecontracts, contracts = all(Contract))
+    html(:insurancecontracts, :insurancecontracts, contracts=all(Contract))
+end
+
+function get_revision(
+    ctype::Type{CT},
+    rtype::Type{RT},
+    hid::DbId,
+    vid::DbId,
+) where {CT<:Component,RT<:ComponentRevision}
+    find(
+        rtype,
+        SQLWhereExpression(
+            "ref_component=? and ref_valid  @> BIGINT ?",
+            find(ctype, SQLWhereExpression("ref_history=?", hid))[1].id,
+            vid,
+        ),
+    )[1]
+end
+
+function get_revisions(
+    rtype::Type{RT},
+    cid::DbId,
+    vid::DbId,
+) where {RT<:ComponentRevision}
+    find(
+        rtype,
+        SQLWhereExpression(
+            "ref_component=? and ref_valid  @> BIGINT ?",
+            cid,
+            vid
+        ),
+    )[1]
+end
+
+
+function pisection(history_id::Integer, version_id::Integer)::Vector{ProductItemSection}
+    pis = find(ProductItem, SQLWhereExpression(
+        "ref_history = BIGINT ? ", DbId(history_id)))
+
+    map(pis) do pi
+        pir = get_revisions(
+            ProductItemRevision,
+            pi.id,
+            DbId(version_id),
+        )
+        pitr = get_revisions(
+            ProductItemTariffRefRevision,
+            pi.id,
+            DbId(version_id),
+        )
+        pipr = get_revisions(
+            ProductItemPartnerRefRevision,
+            pi.id,
+            DbId(version_id),
+        )
+        ProductItemSection(
+            productitem_revision=pir,
+            productitem_tariffref_revision=pitr,
+            productitem_partnerref_revision=pipr
+        )
+    end
+
+end
+
+function csection(history_id::Integer, version_id::Integer)::ContractSection
+    ContractSection(
+        ref_history=DbId(history_id),
+        ref_version=DbId(version_id),
+        contract_revision=get_revision(
+            Contract,
+            ContractRevision,
+            DbId(history_id),
+            DbId(version_id),
+        ),
+        contract_partnerref_revision=get_revision(
+            ContractPartnerRef,
+            ContractPartnerRefRevision,
+            DbId(history_id),
+            DbId(version_id),
+        ),
+        product_items=pisection(history_id, version_id),
+        ref_entities=Dict{DbId,Union{PartnerSection,ContractSection,TariffSection}}(),
+    )
+end
+
+function psection(history_id::Integer, version_id::Integer)::PartnerSection
+    PartnerSection(
+        partner_revision=get_revision(
+            Partner,
+            PartnerRevision,
+            DbId(history_id),
+            DbId(version_id),
+        ),
+    )
+end
+
+function tsection(history_id::Integer, version_id::Integer)::Tariffsection
+    TariffSection(
+        tariff_revision=get_revision(
+            Tariff,
+            TariffRevision,
+            DbId(history_id),
+            DbId(version_id),
+        ),
+    )
+end
+
+function csection_view(history_id::Int, version_id::Int)
+    html(
+        :insurancecontracts,
+        :insurancecontract,
+        csect=csection(history_id, version_id)
+    )
 end
 
 function renderhistory(history_id::Int)
@@ -95,7 +211,7 @@ function renderhnode(node, i)
             <a href="csection?history_id=$(node.interval.ref_history.value)&version_id=$(node.interval.ref_version.value)">as of $(node.interval.tsworld_validfrom) created $(node.interval.tsdb_validfrom)</a>
         """ *
         if length(node.shadowed) > 0
-            Html.span(class = "caret") * Html.ul(class = "nested") do
+            Html.span(class="caret") * Html.ul(class="nested") do
                 renderhforest(node.shadowed, i + 1)
             end
         else
@@ -109,111 +225,10 @@ function historyforest_view(history_id::Int)
     html(
         :insurancecontracts,
         :historyforest,
-        hforest = renderhistory(history_id),
-        hid = history_id,
-        entitytype = "Contract",
+        hforest=renderhistory(history_id),
+        hid=history_id,
+        entitytype="Contract",
     )
 end
-
-function get_revision(
-    ctype::Type{CT},
-    rtype::Type{RT},
-    hid::DbId,
-    vid::DbId,
-) where {CT<:Component,RT<:ComponentRevision}
-    find(
-        rtype,
-        SQLWhereExpression(
-            "ref_component=? and ref_valid  @> BIGINT ?",
-            find(ctype, SQLWhereExpression("ref_history=?", hid))[1].id,
-            vid,
-        ),
-    )[1]
-end
-
-function get_revisions(
-    ctype::Type{CT},
-    rtype::Type{RT},
-    hid::DbId,
-    vid::DbId
-) where {CT<:Component,RT<:ComponentRevision}
-    f = cid -> find(
-        rtype,
-        SQLWhereExpression(
-            "ref_component = ? and ref_valid  @> BIGINT ?",
-            cid,
-            vid
-        ))[1]
-    map(f, map((i -> i.id), find(ctype, SQLWhereExpression("ref_history=?", 4))))
-end
-
-function csection(history_id::Integer, version_id::Integer)::ContractSection
-    ContractSection(
-        ref_history = DbId(history_id),
-        ref_version = DbId(version_id),
-        contract_revision = get_revision(
-            Contract,
-            ContractRevision,
-            DbId(history_id),
-            DbId(version_id),
-        ),
-        contract_partnerref_revision = get_revision(
-            ContractPartnerRef,
-            ContractPartnerRefRevision,
-            DbId(history_id),
-            DbId(version_id),
-        ),
-        productitem_revision = get_revisions(
-            ProductItem,
-            ProductItemRevision,
-            DbId(history_id),
-            DbId(version_id),
-        ),
-        productitem_tariffref_revision = get_revisions(
-            ProductItemTariffRef,
-            ProductItemTariffRefRevision,
-            DbId(history_id),
-            DbId(version_id),
-        ),
-        productitem_partnerref_revision = get_revisions(
-            ProductItemPartnerRef,
-            ProductItemPartnerRefRevision,
-            DbId(history_id),
-            DbId(version_id),
-        ),
-        ref_entities = Dict{DbId,Union{PartnerSection,ContractSection,TariffSection}}(),
-    )
-end
-
-function psection(history_id::Integer, version_id::Integer)::PartnerSection
-    PartnerSection(
-        partner_revision = get_revision(
-            Partner,
-            PartnerRevision,
-            DbId(history_id),
-            DbId(version_id),
-        ),
-    )
-end
-
-function tsection(history_id::Integer, version_id::Integer)::Tariffsection
-    TariffSection(
-        tariff_revision = get_revision(
-            Tariff,
-            TariffRevision,
-            DbId(history_id),
-            DbId(version_id),
-        ),
-    )
-end
-
-function csection_view(history_id::Int,version_id::Int)
-    html(
-        :insurancecontracts,
-        :insurancecontract,
-        csect = csection(history_id,version_id)
-    )
-end
-
 end #module
 

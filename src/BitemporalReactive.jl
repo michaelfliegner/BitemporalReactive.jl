@@ -12,7 +12,7 @@ SearchLight.Configuration.load() |> SearchLight.connect
 
 
 function initContractSection()
-    model = ContractSection.handlers(Stipple.init(ContractSection.Model))
+    model::ContractSection.Model = ContractSection.handlers(Stipple.init(ContractSection.Model))
     csectDict=JSON.parse(JSON.json(InsuranceContractsController.csection(4,4)), dicttype=Dict{Symbol,Any})
     model.csect=csectDict
     println("init")
