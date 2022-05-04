@@ -1,6 +1,6 @@
 module BitemporalReactive
-push!(LOAD_PATH,"src/model")
-push!(LOAD_PATH,"src/view")
+push!(LOAD_PATH, "src/model")
+push!(LOAD_PATH, "src/view")
 println(LOAD_PATH)
 using JSON, SearchLight, Stipple
 include("model/InsuranceContracts.jl")
@@ -13,8 +13,8 @@ SearchLight.Configuration.load() |> SearchLight.connect
 
 function initContractSection()
     model::ContractSection.Model = ContractSection.handlers(Stipple.init(ContractSection.Model))
-    csectDict=JSON.parse(JSON.json(InsuranceContractsController.csection(4,4)), dicttype=Dict{Symbol,Any})
-    model.csect=csectDict
+    csectDict = JSON.parse(JSON.json(InsuranceContractsController.csection(4, 4)), dicttype=Dict{String,Any})
+    model.csect = csectDict
     println("init")
     println(model)
     ContractSection.routeContractSection(model)

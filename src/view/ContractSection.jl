@@ -1,11 +1,11 @@
 module ContractSection
-using Stipple, StippleUI
+using InsuranceContractsController, JSON, Stipple, StippleUI
 
 @reactive mutable struct Model <: ReactiveModel
     modContractRevision::R{Bool} = false
     modProductitemRevision::R{Bool} = false
     addProductItem::R{Bool} = false
-    csect::R{Dict{Symbol,Any}} = Dict{Symbol,Any}(:contract_revision => 1)
+    csect::R{Dict{String,Any}} = Dict{String,Any}("contract_revision" => 1)
 end
 
 function ui(model)
@@ -23,7 +23,7 @@ function ui(model)
                     </q-item-section>
                   </q-item>
                 </q-list>
-                <p><q-btn color="primary" icon="mail" label="On Left" @click="addProductItem=true" /></p>
+                <p><q-btn bg-grey-5 icon="add" label="add item" @click="addProductItem=true" /></p>
                 <div v-for="(item,index) in csect['product_items']">
                     <q-list dark bordered separator style="max-width: 318px">
                         <q-item v-ripple>
@@ -48,7 +48,7 @@ function handlers(model)
     on(model.modContractRevision) do _
         if (model.modContractRevision[])
             println("mod contract")
-            println(model.csect[:contract_revision])
+            println(model.csect["contract_revision"])
             model.modContractRevision[] = false
         end
     end
@@ -61,15 +61,16 @@ function handlers(model)
     on(model.addProductItem) do _
         if (model.addProductItem[])
             println("add pi2")
-            newItem = Dict{String,Any}("ref_validfrom" => Dict{String,Any}("value" => 4), "ref_invalidfrom" => Dict{String,Any}("value" => 5), "ref_component" => Dict{String,Any}("value" => 1), "id" => Dict{String,Any}("value" => 1), "description" => "blue898")
-            currentItems = model.csect[:productitem_revision]
-            newItems = append!(currentItems, newItem)
+            newItem = JSON.parse(JSON.json(ProductItemSection()), dicttype=Dict{String,Any})
+            println("newItem ")
+            println(newItem)
+            currentItems = model.csect["product_items"]
+            println("curritems")
             println(currentItems)
+            newItems = [currentItems; newItem]
             println("newItems")
             println(newItems)
-            model.csect[:productitem_revision] = newItems
-            println("neue pis")
-            println(model.csect[:productitem_revision])
+            model.csect["product_items"] = newItems
             println("f'ddich")
             model.addProductItem[] = false
             push!(model)
@@ -78,7 +79,7 @@ function handlers(model)
 
     on(model.isready) do _
         println("pushing")
-        println(model.csect[:contract_revision])
+        println(model.csect["contract_revision"])
         push!(model)
     end
     model

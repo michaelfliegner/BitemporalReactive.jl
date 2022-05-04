@@ -25,11 +25,12 @@ export Contract,
     ProductItemPartnerRefRevision
 include("InsurancePartners.jl")
 using .InsurancePartners
+
 export Partner, PartnerRevision
 include("InsuranceTariffs.jl")
 using .InsuranceTariffs
 export Tariff, TariffRevision
-export ContractSection, PartnerSection, TariffSection, csection, tsection, psection
+export ContractSection, ProductItemSection, PartnerSection, TariffSection, csection, pisection, tsection, psection
 export insurancecontracts_view
 
 @kwdef mutable struct PartnerSection
