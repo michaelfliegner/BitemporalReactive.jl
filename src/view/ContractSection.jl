@@ -3,6 +3,7 @@ using InsuranceContractsController, JSON, Stipple, StippleUI
 
 @reactive mutable struct Model <: ReactiveModel
     modContractRevision::R{Bool} = false
+    modContractPartnerRefRevision::R{Bool} = false
     modProductitemRevision::R{Bool} = false
     addProductItem::R{Bool} = false
     csect::R{Dict{String,Any}} = Dict{String,Any}("contract_revision" => 1)
@@ -12,34 +13,43 @@ function ui(model)
     page(
         model,
         class="container",
-        """
-            <div class="q-pa-md bg-grey-10 text-white">
-                <q-list dark bordered separator style="max-width: 318px">
-                  <q-item v-ripple>
-                    <q-item-section>
-                      <q-item-label overline>Contract</q-item-label>
-                      <q-item-label>Description</q-item-label>
-                      <input v-model="csect['contract_revision']['description']" v-on:keyup.enter="modContractRevision=true"/>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-                <p><q-btn bg-grey-5 icon="add" label="add item" @click="addProductItem=true" /></p>
-                <div v-for="(item,index) in csect['product_items']">
-                    <q-list dark bordered separator style="max-width: 318px">
-                        <q-item v-ripple>
-                            <q-item-section>
-                                <q-item-label overline>Product item {{index}} </q-item-label>
-                                <q-item-label>Description</q-item-label>
-                                <input v-model="csect['product_items'][index]['productitem_revision']['description']" v-on:keyup.enter="modProductitemRevision=true"/>
-                                <q-item-label>Tariff</q-item-label>
-                                <input v-model="csect['product_items'][index]['productitem_tariffref_revision']['ref_tariff']['value']" v-on:keyup.enter="modProductitemRevision=true"/>
-                                <q-item-label>Partner</q-item-label>
-                                <input v-model="csect['product_items'][index]['productitem_partnerref_revision']['ref_partner']['value']" v-on:keyup.enter="modProductitemRevision=true"/>
-                          </q-item-section>
-                    </q-list>
-                <div>
-            </div>
-            """
+        Genie.Renderer.Html.div(class="q-pa-md bg-grey-10 text-white",
+            list(dark=true, bordered=true, separator=true, style="max-width: 318px",
+                [item(vripple=true,
+                        item_section([
+                            item_label(overline=true, "Contract"),
+                            item_label(overline=true, "Description"),
+                            """ <input v-model="csect['contract_revision']['description']" v-on:keyup.enter="modContractRevision=true"/> """,
+                            item_label(overline=true, "Policy Holder description"),
+                            """ <input v-model="csect['contract_partnerref_revision']['description']" v-on:keyup.enter="modContractPartnerRefRevision=true"/> """,
+                            item_label(overline=true, "Policy Holder id"),
+                            """ <input v-model="csect['contract_partnerref_revision']['partner_ref']" v-on:keyup.enter="modContractPartnerRefRevision=true"/> """,
+                        ])),
+                    p(btn("add item", class="bg-grey-5", icon="add", @click("addProductItem=true"))),
+                    list(template(
+                        item(
+                            clickable=true,
+                            vripple=true, itemsection([
+                                itemlabel("Product item {{index}}", overline=true),
+                                itemlabel("Description"),
+                                """
+                                <input v-model="csect['product_items'][index]['productitem_revision']['description']" v-on:keyup.enter="modProductitemRevision=true"/>      
+                                """,
+                                itemlabel("Tariff"),
+                                """
+                                <input v-model="csect['product_items'][index]['productitem_revision']['ref_tariff']" v-on:keyup.enter="modProductitemRevision=true"/>      
+                                """,
+                                itemlabel("Insured Person id"),
+                                """
+                                <input v-model="csect['product_items'][index]['productitem_revision']['ref_partner']" v-on:keyup.enter="modProductitemRevision=true"/>      
+                                """],
+                            )),
+                        """
+                        v-for="(item,index) in csect['product_items']"
+                        """)
+                    ),
+                ])
+        )
     )
 
 end
@@ -52,6 +62,14 @@ function handlers(model)
             model.modContractRevision[] = false
         end
     end
+    on(model.modContractPartnerRefRevision) do _
+        if (model.modContractPartnerRefRevision[])
+            println("mod contractpartnerref")
+            println(model.csect["contract_partnerref_revision"])
+            model.modContractPartnerRefRevision[] = false
+        end
+    end
+
     on(model.modProductitemRevision) do _
         if (model.modProductitemRevision[])
             println("mod Productitem")
@@ -59,6 +77,7 @@ function handlers(model)
         end
     end
     on(model.addProductItem) do _
+        println("on add pi2")
         if (model.addProductItem[])
             println("add pi2")
             newItem = JSON.parse(JSON.json(ProductItemSection()), dicttype=Dict{String,Any})
