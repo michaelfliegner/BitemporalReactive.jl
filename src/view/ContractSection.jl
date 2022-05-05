@@ -23,7 +23,7 @@ function ui(model)
                             item_label(overline=true, "Policy Holder description"),
                             """ <input v-model="csect['contract_partnerref_revision']['description']" v-on:keyup.enter="modContractPartnerRefRevision=true"/> """,
                             item_label(overline=true, "Policy Holder id"),
-                            """ <input v-model="csect['contract_partnerref_revision']['partner_ref']" v-on:keyup.enter="modContractPartnerRefRevision=true"/> """,
+                            """ <input v-model="csect['contract_partnerref_revision']['ref_partner']['value']" v-on:keyup.enter="modContractPartnerRefRevision=true"/> """,
                         ])),
                     p(btn("add item", class="bg-grey-5", icon="add", @click("addProductItem=true"))),
                     list(template(
@@ -37,11 +37,11 @@ function ui(model)
                                 """,
                                 itemlabel("Tariff"),
                                 """
-                                <input v-model="csect['product_items'][index]['productitem_revision']['ref_tariff']" v-on:keyup.enter="modProductitemRevision=true"/>      
+                                <input v-model="csect['product_items'][index]['productitem_tariffref_revision']['ref_tariff']['value']" v-on:keyup.enter="modProductitemRevision=true"/>      
                                 """,
                                 itemlabel("Insured Person id"),
                                 """
-                                <input v-model="csect['product_items'][index]['productitem_revision']['ref_partner']" v-on:keyup.enter="modProductitemRevision=true"/>      
+                                <input v-model="csect['product_items'][index]['productitem_partnerref_revision']['ref_partner']['value']" v-on:keyup.enter="modProductitemRevision=true"/>      
                                 """],
                             )),
                         """
