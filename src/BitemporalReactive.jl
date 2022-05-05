@@ -1,6 +1,5 @@
 module BitemporalReactive
-push!(LOAD_PATH, "src/model")
-push!(LOAD_PATH, "src/view")
+b
 println(LOAD_PATH)
 using JSON, SearchLight, Stipple
 include("model/InsuranceContracts.jl")
