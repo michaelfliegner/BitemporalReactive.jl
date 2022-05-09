@@ -45,10 +45,13 @@ function ui(model)
                             clickable=true,
                             vripple=true, itemsection([
                                 itemlabel("Product item {{index}}", overline=true),
-                                itemlabel("Description"),
-                                """
-                                <input v-model="csect['product_items'][index]['productitem_revision']['description']" v-on:keyup.enter="modProductitemRevision=true"/>      
-                                """,
+                                textfield("HHDescription", dense=true, label__color="orange", bg__color="white", R"""csect['product_items'][index]['productitem_revision']['description']""", @on("keyup.enter", "modProductitemRevision=true")),
+                                itemlabel("HHDescription"),
+                                input(@bind("""csect["product_items"][index]["productitem_revision"]["description"]"""), @on("keyup.enter", "modProductitemRevision=true")),
+                                # itemlabel("Description"),
+                                # """
+                                # <input v-model="csect['product_items'][index]['productitem_revision']['description']" v-on:keyup.enter="modProductitemRevision=true"/>      
+                                # """,
                                 itemlabel("Tariff"),
                                 """
                                 <input v-model="csect['product_items'][index]['productitem_tariffref_revision']['ref_tariff']['value']" v-on:keyup.enter="modProductitemRevision=true"/>      
@@ -58,9 +61,11 @@ function ui(model)
                                 <input v-model="csect['product_items'][index]['productitem_partnerref_revision']['ref_partner']['value']" v-on:keyup.enter="modProductitemRevision=true"/>      
                                 """],
                             )),
-                        """
-                        v-for="(item,index) in csect['product_items']"
-                        """)
+                        var"v-for"="(item,index) in csect['product_items']"
+                        # """
+                        # v-for="(item,index) in csect['product_items']"
+                        # """
+                    )
                     ),
                 ])
         )
