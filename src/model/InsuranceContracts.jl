@@ -1,8 +1,8 @@
 module InsuranceContracts
 import BitemporalPostgres
-import SearchLight: DbId
+import SearchLight: DbId, AbstractModel
 import Base: @kwdef
-export Contract, ContractRevision, ContractPartnerRef, ContractPartnerRefRevision, ProductItem, ProductItemRevision, ProductItemTariffRef, ProductItemTariffRefRevision, ProductItemPartnerRef, ProductItemPartnerRefRevision
+export Contract, ContractRevision, ContractPartnerRole, ContractPartnerRef, ContractPartnerRefRevision, ProductItem, ProductItemTariffRole, ProductItemRevision, ProductItemTariffRef, ProductItemTariffRefRevision, ProductItemPartnerRole, ProductItemPartnerRef, ProductItemPartnerRefRevision
 using BitemporalPostgres
 
 """
@@ -59,6 +59,36 @@ ProductItemRevision
   description::String = ""
 end
 
+"""
+Role
+
+  role of a relationship 
+
+"""
+abstract type Role <: AbstractModel end
+
+function get_id(role::Role)::DbId
+  role.id
+end
+function get_domain(role::Role)::DbId
+  role.domain
+end
+function get_value(role::Role)::DbId
+  role.value
+end
+
+
+"""
+ContractPartnerRole
+
+  role e.g. policy holder or premium payer
+
+"""
+@kwdef mutable struct ContractPartnerRole <: Role
+  id::DbId = DbId()
+  domain::String = "ContractPartner"
+  value::String = ""
+end
 
 """
 ContractPartnerRef
@@ -82,12 +112,24 @@ ContractPartnerRefRevision
 @kwdef mutable struct ContractPartnerRefRevision <: BitemporalPostgres.ComponentRevision
   id::DbId = DbId()
   ref_component::DbId = InfinityKey
+  ref_role::DbId = InfinityKey
   ref_validfrom::DbId = InfinityKey
   ref_invalidfrom::DbId = InfinityKey
   description::String = ""
   ref_partner::DbId = DbId()
 end
 
+"""
+ProductItemTariffRole
+
+  role e.g. main or supplemental risk like life and occupational disabilty
+
+"""
+@kwdef mutable struct ProductItemTariffRole <: Role
+  id::DbId = DbId()
+  domain::String = "ProductItemTariff"
+  value::String = ""
+end
 
 """
 ProductItemTariffRef
@@ -111,12 +153,24 @@ ProductItemTariffRefRevision
 @kwdef mutable struct ProductItemTariffRefRevision <: BitemporalPostgres.ComponentRevision
   id::DbId = DbId()
   ref_component::DbId = InfinityKey
+  ref_role::DbId = InfinityKey
   ref_validfrom::DbId = InfinityKey
   ref_invalidfrom::DbId = InfinityKey
   description::String = ""
   ref_tariff::DbId = DbId()
 end
 
+"""
+ProductItemPartnerRole
+
+  role e.g. main or supplemental risk like life and occupational disabilty
+
+"""
+@kwdef mutable struct ProductItemPartnerRole <: Role
+  id::DbId = DbId()
+  domain::String = "ProductItemPartner"
+  value::String = ""
+end
 
 """
 ProductItemPartnerRef
@@ -140,6 +194,7 @@ ProductItemPartnerRefRevision
 @kwdef mutable struct ProductItemPartnerRefRevision <: BitemporalPostgres.ComponentRevision
   id::DbId = DbId()
   ref_component::DbId = InfinityKey
+  ref_role::DbId = InfinityKey
   ref_validfrom::DbId = InfinityKey
   ref_invalidfrom::DbId = InfinityKey
   description::String = ""

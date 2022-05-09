@@ -15,12 +15,15 @@ include("InsuranceContracts.jl")
 using .InsuranceContracts
 export Contract,
     ContractRevision,
+    ContractPartnerRole,
     ContractPartnerRef,
     ContractPartnerRefRevision,
     ProductItem,
     ProductItemRevision,
+    ProductItemTariffRole,
     ProductItemTariffRef,
     ProductItemTariffRefRevision,
+    ProductItemPartnerRole,
     ProductItemPartnerRef,
     ProductItemPartnerRefRevision
 include("InsurancePartners.jl")

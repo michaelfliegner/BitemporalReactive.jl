@@ -1,9 +1,7 @@
 import Base: @kwdef
 using Test
 import InsuranceContractsController
-using InsuranceContractsController.InsuranceContracts
-using InsuranceContractsController.InsurancePartners
-using InsuranceContractsController.InsuranceTariffs
+using InsuranceContractsController
 using BitemporalPostgres
 using SearchLight
 using TimeZones
@@ -15,8 +13,21 @@ using HTTP
 
     SearchLight.Configuration.load() |> SearchLight.connect
     SearchLight.Migrations.create_migrations_table()
-    BitemporalPostgres.up()
     SearchLight.Migrations.up()
+
+    cpRole = Dict{String,Int64}()
+    map(find(ContractPartnerRole)) do entry
+        cpRole[entry.value] = entry.id.value
+    end
+    piprRole = Dict{String,Int64}()
+    map(find(ProductItemPartnerRole)) do entry
+        piprRole[entry.value] = entry.id.value
+    end
+    pitrRole = Dict{String,Int64}()
+    map(find(ProductItemTariffRole)) do entry
+        pitrRole[entry.value] = entry.id.value
+    end
+
     # create Partner
     p = Partner()
     pr = PartnerRevision(description="blue")
@@ -50,22 +61,22 @@ using HTTP
     c = Contract()
     cr = ContractRevision(description="blue")
     cpr = ContractPartnerRef(ref_super=c.id)
-    cprr = ContractPartnerRefRevision(ref_partner=p.id, description="blue")
+    cprr = ContractPartnerRefRevision(ref_partner=p.id, ref_role=cpRole["Policy Holder"], description="blue")
 
     cpi = ProductItem(ref_super=c.id)
     cpir = ProductItemRevision(position=1, description="blue")
 
     pitr = ProductItemTariffRef(ref_super=cpi.id)
-    pitrr = ProductItemTariffRefRevision(ref_tariff=t.id, description="blue")
+    pitrr = ProductItemTariffRefRevision(ref_tariff=t.id, ref_role=pitrRole["Main Coverage - Life"], description="blue")
     pipr = ProductItemPartnerRef(ref_super=cpi.id)
-    piprr = ProductItemPartnerRefRevision(ref_partner=p.id, description="blue")
+    piprr = ProductItemPartnerRefRevision(ref_partner=p.id, ref_role=piprRole["Insured Person"], description="blue")
 
     cpi2 = ProductItem(ref_super=c.id)
     cpi2r = ProductItemRevision(position=2, description="pink")
     pi2tr = ProductItemTariffRef(ref_super=cpi2.id)
-    pi2trr = ProductItemTariffRefRevision(ref_tariff=t2.id, description="pink")
-    pi2pr = ProductItemPartnerRef(ref_super=cpi2.id)
-    pi2prr = ProductItemPartnerRefRevision(ref_partner=p.id, description="pink")
+    pi2trr = ProductItemTariffRefRevision(ref_tariff=t2.id, ref_role=pitrRole["Supplementary Coverage - Occupational Disablity"], description="pink")
+    pi2pr = ProductItemPartnerRef(ref_super=cpi.id)
+    pi2prr = ProductItemPartnerRefRevision(ref_partner=p.id, ref_role=piprRole["Insured Person"], description="pink")
 
     w1 = Workflow(
         tsw_validfrom=ZonedDateTime(2014, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),

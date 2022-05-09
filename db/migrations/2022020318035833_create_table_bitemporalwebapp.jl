@@ -4,9 +4,11 @@ import SearchLight.Migrations:
     create_table, column, columns, primary_key, add_index, drop_table, add_indices
 import SearchLightPostgreSQL
 import Base: @kwdef
-import Intervals, Dates, TimeZones
-using Intervals,
+import Intervals, Dates, TimeZones, BitemporalPostgres
+using BitemporalPostgres, Intervals,
     Dates, SearchLight, SearchLight.Transactions, SearchLightPostgreSQL, TimeZones
+import InsuranceContracts
+using InsuranceContracts
 export up, down
 
 function createRevisionsTriggerAndConstraint(
@@ -28,7 +30,7 @@ function createRevisionsTriggerAndConstraint(
 end
 
 function up()
-
+    BitemporalPostgres.up()
     create_table(:contracts) do
         [
             column(:id, :bigserial, "PRIMARY KEY")
@@ -110,6 +112,15 @@ function up()
         :partnerRevisions,
     )
 
+    create_table(:contractPartnerRoles) do
+        [
+            column(:id, :bigserial, "PRIMARY KEY")
+            column(:domain, :string)
+            column(:value, :string)
+        ]
+    end
+
+
     create_table(:contractPartnerRefs) do
         [
             column(:id, :bigserial, "PRIMARY KEY")
@@ -127,6 +138,7 @@ function up()
                 :bigint,
                 "REFERENCES contractPartnerRefs(id) ON DELETE CASCADE",
             )
+            column(:ref_role, :bigint, "REFERENCES contractpartnerroles(id) ON DELETE CASCADE")
             column(:ref_validfrom, :bigint, "REFERENCES versions(id) ON DELETE CASCADE")
             column(:ref_invalidfrom, :bigint, "REFERENCES versions(id) ON DELETE CASCADE")
             column(:ref_valid, :int8range)
@@ -166,6 +178,14 @@ function up()
         :tariffRevisions,
     )
 
+    create_table(:productItemTariffRoles) do
+        [
+            column(:id, :bigserial, "PRIMARY KEY")
+            column(:domain, :string)
+            column(:value, :string)
+        ]
+    end
+
     create_table(:productItemTariffRefs) do
         [
             column(:id, :bigserial, "PRIMARY KEY")
@@ -178,11 +198,8 @@ function up()
     create_table(:productItemTariffRefRevisions) do
         [
             column(:id, :bigserial, "PRIMARY KEY")
-            column(
-                :ref_component,
-                :bigint,
-                "REFERENCES productItemTariffRefs(id) ON DELETE CASCADE",
-            )
+            column(:ref_component, :bigint, "REFERENCES productItemTariffRefs(id) ON DELETE CASCADE",)
+            column(:ref_role, :bigint, "REFERENCES productitemtariffroles(id) ON DELETE CASCADE")
             column(:ref_validfrom, :bigint, "REFERENCES versions(id) ON DELETE CASCADE")
             column(:ref_invalidfrom, :bigint, "REFERENCES versions(id) ON DELETE CASCADE")
             column(:ref_valid, :int8range)
@@ -196,6 +213,14 @@ function up()
         :pitrr_versionrange,
         :productItemTariffRefRevisions,
     )
+
+    create_table(:productItemPartnerRoles) do
+        [
+            column(:id, :bigserial, "PRIMARY KEY")
+            column(:domain, :string)
+            column(:value, :string)
+        ]
+    end
 
     create_table(:productItemPartnerRefs) do
         [
@@ -214,6 +239,7 @@ function up()
                 :bigint,
                 "REFERENCES productItemPartnerRefs(id) ON DELETE CASCADE",
             )
+            column(:ref_role, :bigint, "REFERENCES productitempartnerroles(id) ON DELETE CASCADE")
             column(:ref_validfrom, :bigint, "REFERENCES versions(id) ON DELETE CASCADE")
             column(:ref_invalidfrom, :bigint, "REFERENCES versions(id) ON DELETE CASCADE")
             column(:ref_valid, :int8range)
@@ -227,6 +253,19 @@ function up()
         :piprr_versionrange,
         :productItemPartnerRefRevisions,
     )
+
+    contractpartnerroles = map(["Policy Holder" "Premium Payer"]) do val
+        save!(ContractPartnerRole(value=val))
+    end
+
+
+    productitemtariffroles = map(["Main Coverage - Life" "Supplementary Coverage - Occupational Disablity"]) do val
+        save!(ProductItemTariffRole(value=val))
+    end
+
+    productitempartnerroles = map(["Insured Person" "2nd Insured Person"]) do val
+        save!(ProductItemPartnerRole(value=val))
+    end
 
 end
 

@@ -6,6 +6,7 @@ using InsuranceContractsController, JSON, Stipple, StippleUI
     modContractPartnerRefRevision::R{Bool} = false
     modProductitemRevision::R{Bool} = false
     addProductItem::R{Bool} = false
+    options:["Policy Holder", "Premium Payer"]
     csect::R{Dict{String,Any}} = Dict{String,Any}("contract_revision" => 1)
 end
 
@@ -23,6 +24,7 @@ function ui(model)
                             item_label(overline=true, "Policy Holder description"),
                             """ <input v-model="csect['contract_partnerref_revision']['description']" v-on:keyup.enter="modContractPartnerRefRevision=true"/> """,
                             item_label(overline=true, "Policy Holder id"),
+                            """<q-select filled v-model="csect" :options="options" label="Filled" />"""
                             """ <input v-model="csect['contract_partnerref_revision']['ref_partner']['value']" v-on:keyup.enter="modContractPartnerRefRevision=true"/> """,
                         ])),
                     p(btn("add item", class="bg-grey-5", icon="add", @click("addProductItem=true"))),
