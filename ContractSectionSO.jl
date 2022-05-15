@@ -16,6 +16,41 @@ Dict(["Policy Holder" => 1, "Premium Payer => 2"])
     csect::R{Dict{String,Any}} = Dict{String,Any}("contract_revision" => 1)
     data::R{DataTable} = DataTable(DataFrame(rand(100000, 2), ["x1", "x2"]), DataTableOptions(columns=[Column("x1"), Column("x2", align=:right)]))
     data_pagination::DataTablePagination = DataTablePagination(rows_per_page=50)
+    leftDrawerOpen::R{Bool} = false
+    tab::R{String} = "three"
+end
+
+function layout(drawer, page)
+    """
+    <q-layout view="hHh lpR fFf">
+      <q-header elevated class="bg-primary text-white" height-hint="98">
+        <q-toolbar>
+          <q-btn dense flat round icon="menu" @click="leftDrawerOpen = !leftDrawerOpen" />
+
+          <q-toolbar-title>
+            <q-avatar>
+              <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
+            </q-avatar>
+            Title
+          </q-toolbar-title>
+        </q-toolbar>
+
+        <q-tabs align="left">
+          <q-route-tab name="one" to="/page1" label="Page One" />
+          <q-route-tab name="two" to="/page2" label="Page Two" />
+          <q-route-tab name="three" to="/page3" label="Page Three" />
+        </q-tabs>
+      </q-header>
+
+      <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
+        $(drawer)
+      </q-drawer>
+
+      <q-page-container>
+        $(page)
+      </q-page-container>
+    </q-layout>
+    """
 end
 
 function ui(model)
@@ -51,10 +86,6 @@ function ui(model)
                                     textfield("HHDescription", dense=true, label__color="orange", bg__color="white", R"""csect['product_items'][index]['productitem_revision']['description']""", @on("keyup.enter", "modProductitemRevision=true")),
                                     itemlabel("HHDescription"),
                                     input(@bind("""csect["product_items"][index]["productitem_revision"]["description"]"""), @on("keyup.enter", "modProductitemRevision=true")),
-                                    # itemlabel("Description"),
-                                    # """
-                                    # <input v-model="csect['product_items'][index]['productitem_revision']['description']" v-on:keyup.enter="modProductitemRevision=true"/>      
-                                    # """,
                                     itemlabel("Tariff"),
                                     """
                                     <input v-model="csect['product_items'][index]['productitem_tariffref_revision']['ref_tariff']['value']" v-on:keyup.enter="modProductitemRevision=true"/>      
@@ -65,9 +96,6 @@ function ui(model)
                                     """],
                                 )),
                             var"v-for"="(item,index) in csect['product_items']"
-                            # """
-                            # v-for="(item,index) in csect['product_items']"
-                            # """
                         )
                         ),
                     ])
