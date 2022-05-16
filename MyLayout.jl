@@ -17,13 +17,65 @@ Dict(["Policy Holder" => 1, "Premium Payer => 2"])
   data::R{DataTable} = DataTable(DataFrame(rand(100000, 2), ["x1", "x2"]), DataTableOptions(columns=[Column("x1"), Column("x2", align=:right)]))
   data_pagination::DataTablePagination = DataTablePagination(rows_per_page=50)
   leftDrawerOpen::R{Bool} = false
-  tab::R{String} = "three"
+  tab::R{String} = "movies"
+  splitterModel::R{Integer} = 20
+
 end
 
 
 function ui(model)
   drawer = table(title="Random numbers", :data; pagination=:data_pagination, style="height: 350px;")
-  pagecontent = [table(title="Random numbers", :data; pagination=:data_pagination, style="height: 350px;"),
+  pagecontent = [
+    """
+              <div>
+      <q-splitter
+        v-model="splitterModel"
+        style="height: 250px"
+      >
+        <template v-slot:before>
+        <q-tabs
+          v-model="tab"
+          vertical
+          class="text-teal"
+        >
+          <q-tab name="mails" icon="mail" label="Mails"></q-tab>
+          <q-tab name="alarms" icon="alarm" label="Alarms"></q-tab>
+          <q-tab name="movies" icon="movie" label="Movies"></q-tab>
+        </q-tabs>
+        </template>
+
+        <template v-slot:after>
+          <q-tab-panels
+            v-model="tab"
+            animated
+            swipeable
+            horizontal
+            transition-prev="jump-up"
+            transition-next="jump-up"
+          >
+            <q-tab-panel name="mails">
+              <div class="text-h4 q-mb-md">Mails</div>
+              <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quis praesentium cumque magnam odio iure quidem, quod illum numquam possimus obcaecati commodi minima assumenda consectetur culpa fuga nulla ullam. In, libero.</p>
+              <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quis praesentium cumque magnam odio iure quidem, quod illum numquam possimus obcaecati commodi minima assumenda consectetur culpa fuga nulla ullam. In, libero.</p>
+            </q-tab-panel>
+
+            <q-tab-panel name="alarms">
+    """ * table(title="Random numbers", :data; pagination=:data_pagination, style="height: 350px;") *
+    """
+            </q-tab-panel>
+
+            <q-tab-panel name="movies">
+              <div class="text-h4 q-mb-md">Movies</div>
+              <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quis praesentium cumque magnam odio iure quidem, quod illum numquam possimus obcaecati commodi minima assumenda consectetur culpa fuga nulla ullam. In, libero.</p>
+              <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quis praesentium cumque magnam odio iure quidem, quod illum numquam possimus obcaecati commodi minima assumenda consectetur culpa fuga nulla ullam. In, libero.</p>
+              <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quis praesentium cumque magnam odio iure quidem, quod illum numquam possimus obcaecati commodi minima assumenda consectetur culpa fuga nulla ullam. In, libero.</p>
+            </q-tab-panel>
+          </q-tab-panels>
+        </template>
+
+      </q-splitter>
+``  </div>
+    """,
     list(dark=true, bordered=true, separator=true, style="max-width: 318px",
       [item(vripple=true,
           item_section([
@@ -126,6 +178,16 @@ function ui(model)
 end
 
 function handlers(model)
+  on(model.tab) do _
+    println("tab = " * model.tab[])
+  end
+  on(model.leftDrawerOpen) do _
+    if (model.leftDrawerOpen[])
+      println("Drawer is open ")
+    else
+      println("Drawer is closed ")
+    end
+  end
   on(model.modContractRevision) do _
     if (model.modContractRevision[])
       println("mod contract")
