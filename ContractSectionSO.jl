@@ -17,94 +17,173 @@ Dict(["Policy Holder" => 1, "Premium Payer => 2"])
     data::R{DataTable} = DataTable(DataFrame(rand(100000, 2), ["x1", "x2"]), DataTableOptions(columns=[Column("x1"), Column("x2", align=:right)]))
     data_pagination::DataTablePagination = DataTablePagination(rows_per_page=50)
     leftDrawerOpen::R{Bool} = false
-    tab::R{String} = "three"
+    tab::R{String} = "contracts"
+    splitterModel::R{Integer} = 20
+
 end
 
-function layout(drawer, page)
-    """
-    <q-layout view="hHh lpR fFf">
-      <q-header elevated class="bg-primary text-white" height-hint="98">
-        <q-toolbar>
-          <q-btn dense flat round icon="menu" @click="leftDrawerOpen = !leftDrawerOpen" />
+function contract_version(model)
+    list(dark=true, bordered=true, separator=true, style="max-width: 318px",
+        [item(vripple=true,
+                item_section([
+                    item_label(overline=true, "Contract"),
+                    item_label(overline=true, "Description"),
+                    """ <input v-model="csect['contract_revision']['description']" v-on:keyup.enter="modContractRevision=true"/> """,
+                    item_label(overline=true, "Policy Holder description"),
+                    """ <input v-model="csect['contract_partnerref_revision']['description']" v-on:keyup.enter="modContractPartnerRefRevision=true"/> """,
+                    """ <q-select class="bg-grey-5" filled outlined v-model="csect['contract_partnerref_revision']['ref_role']['value']"
+                            :options="roles" label="Partner role" :display-value="rolesText[csect['contract_partnerref_revision']['ref_role']['value']]" />
+                                      <template v-slot:append>
+                                                <q-icon name="handshake" />
+                                            </template>
+                                        </q-select>        
+                    """,
+                    item_label(overline=true, "Policy Holder id"),
+                    """ <input v-model="csect['contract_partnerref_revision']['ref_partner']['value']" v-on:keyup.enter="modContractPartnerRefRevision=true"/> """,
+                ])),
+            p(btn("add item", class="bg-grey-5", icon="add", @click("addProductItem=true"))),
+            list(template(
+                item(
+                    clickable=true,
+                    vripple=true, itemsection([
+                        itemlabel("Product item {{index}}", overline=true),
+                        textfield("HHDescription", dense=true, label__color="orange", bg__color="white", R"""csect['product_items'][index]['productitem_revision']['description']""", @on("keyup.enter", "modProductitemRevision=true")),
+                        itemlabel("HHDescription"),
+                        input(@bind("""csect["product_items"][index]["productitem_revision"]["description"]"""), @on("keyup.enter", "modProductitemRevision=true")),
+                        itemlabel("Tariff"),
+                        """
+                        <input v-model="csect['product_items'][index]['productitem_tariffref_revision']['ref_tariff']['value']" v-on:keyup.enter="modProductitemRevision=true"/>      
+                        """,
+                        itemlabel("Insured Person id"),
+                        """
+                        <input v-model="csect['product_items'][index]['productitem_partnerref_revision']['ref_partner']['value']" v-on:keyup.enter="modProductitemRevision=true"/>      
+                        """],
+                    )),
+                var"v-for"="(item,index) in csect['product_items']"
+            )
+            ),
+        ])
+end
 
-          <q-toolbar-title>
-            <q-avatar>
-              <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
-            </q-avatar>
-            Title
-          </q-toolbar-title>
-        </q-toolbar>
+function page_content(model)
+    join([
+        """
 
-        <q-tabs align="left">
-          <q-route-tab name="one" to="/page1" label="Page One" />
-          <q-route-tab name="two" to="/page2" label="Page Two" />
-          <q-route-tab name="three" to="/page3" label="Page Three" />
-        </q-tabs>
-      </q-header>
+              <q-tab-panels
+                v-model="tab"
+                animated
+                swipeable
+                horizontal
+                transition-prev="jump-up"
+                transition-next="jump-up"
+              >
+                <q-tab-panel name="contracts">
+                    <div class="text-h4 q-mb-md">Contracts</div>
+        """,
+        "hier kommp COntracts hin",
+        """       
+                </q-tab-panel>
+                <q-tab-panel name="history">
+                    <div class="text-h4 q-mb-md">History</div>
+        """,
+        "hier kommp History hin",
+        """ 
+                </q-tab-panel>
+                <q-tab-panel name="csection">
+                  <div class="text-h4 q-mb-md">CSection</div>
+        """,
+        contract_version(model),
+        """
+                </q-tab-panel>
+            </q-tab-panels>
+        """
+    ])
+end
 
-      <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
-        $(drawer)
-      </q-drawer>
-
-      <q-page-container>
-        $(page)
-      </q-page-container>
-    </q-layout>
-    """
+function drawer_content()
+    table(title="Random numbers", :data; pagination=:data_pagination, style="height: 350px;")
 end
 
 function ui(model)
     page(
         model,
         class="container",
-        Genie.Renderer.Html.div(class="q-pa-md bg-grey-10 text-white",
-            [table(title="Random numbers", :data; pagination=:data_pagination, style="height: 350px;"),
-                list(dark=true, bordered=true, separator=true, style="max-width: 318px",
-                    [item(vripple=true,
-                            item_section([
-                                item_label(overline=true, "Contract"),
-                                item_label(overline=true, "Description"),
-                                """ <input v-model="csect['contract_revision']['description']" v-on:keyup.enter="modContractRevision=true"/> """,
-                                item_label(overline=true, "Policy Holder description"),
-                                """ <input v-model="csect['contract_partnerref_revision']['description']" v-on:keyup.enter="modContractPartnerRefRevision=true"/> """,
-                                """ <q-select class="bg-grey-5" filled outlined v-model="csect['contract_partnerref_revision']['ref_role']['value']"
-                                        :options="roles" label="Partner role" :display-value="rolesText[csect['contract_partnerref_revision']['ref_role']['value']]" />
-                                                  <template v-slot:append>
-                                                            <q-icon name="handshake" />
-                                                        </template>
-                                                    </q-select>        
-                                """,
-                                item_label(overline=true, "Policy Holder id"),
-                                """ <input v-model="csect['contract_partnerref_revision']['ref_partner']['value']" v-on:keyup.enter="modContractPartnerRefRevision=true"/> """,
-                            ])),
-                        p(btn("add item", class="bg-grey-5", icon="add", @click("addProductItem=true"))),
-                        list(template(
-                            item(
-                                clickable=true,
-                                vripple=true, itemsection([
-                                    itemlabel("Product item {{index}}", overline=true),
-                                    textfield("HHDescription", dense=true, label__color="orange", bg__color="white", R"""csect['product_items'][index]['productitem_revision']['description']""", @on("keyup.enter", "modProductitemRevision=true")),
-                                    itemlabel("HHDescription"),
-                                    input(@bind("""csect["product_items"][index]["productitem_revision"]["description"]"""), @on("keyup.enter", "modProductitemRevision=true")),
-                                    itemlabel("Tariff"),
-                                    """
-                                    <input v-model="csect['product_items'][index]['productitem_tariffref_revision']['ref_tariff']['value']" v-on:keyup.enter="modProductitemRevision=true"/>      
-                                    """,
-                                    itemlabel("Insured Person id"),
-                                    """
-                                    <input v-model="csect['product_items'][index]['productitem_partnerref_revision']['ref_partner']['value']" v-on:keyup.enter="modProductitemRevision=true"/>      
-                                    """],
-                                )),
-                            var"v-for"="(item,index) in csect['product_items']"
-                        )
-                        ),
-                    ])
-            ])
-    )
+        Genie.Renderer.Html.div(join([
+            """
+              <q-layout view="hHh lpR fFf">
+                <q-header elevated class="bg-primary text-white" >
+                  <q-toolbar>
+                    <q-btn dense flat icon="drawer" @click="leftDrawerOpen=!leftDrawerOpen" />
+                    </q-btn>
+                    <q-btn color="primary" icon="menu" >
+                      <q-menu>
+                        <q-list style="min-width: 100px">
+                          <q-item clickable v-close-popup>
+                            <q-item-section>New tab</q-item-section>
+                          </q-item>
+                          <q-item clickable v-close-popup>
+                            <q-item-section>New incognito tab</q-item-section>
+                          </q-item>
+                          <q-item clickable v-close-popup>
+                            <q-item-section>Recent tabs</q-item-section>
+                          </q-item>
+                          <q-item clickable v-close-popup>
+                            <q-item-section>History</q-item-section>
+                          </q-item>
+                          <q-item clickable v-close-popup>
+                            <q-item-section>Downloads</q-item-section>
+                          </q-item>
+                          <q-separator />
+                          <q-item clickable v-close-popup>
+                            <q-item-section>Settings</q-item-section>
+                          </q-item>
+                          <q-separator />
+                          <q-item clickable v-close-popup>
+                            <q-item-section>Help &amp; Feedback</q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-btn>
+                    <q-toolbar-title>
+                    BitemporalReactive
+                    </q-toolbar-title>
+                  </q-toolbar>
+                        <q-tabs
+              v-model="tab"
+              class="bg-primary text-white shadow-2" align="left"
+            >
+              <q-tab name="contracts" icon="format_list_bulleted" label="Search Contract"></q-tab>
+              <q-tab name="history" icon="history" label="Contract History"></q-tab>
+              <q-tab name="csection" icon="verified_user" label="Contract Version"></q-tab>
+            </q-tabs>
+                </q-header>
+                <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
+            """,
+            drawer_content(),
+            """
+               </q-drawer>
+               <q-page-container>
+           """,
+            page_content(model),
+            """
+                </q-page-container>
+              </q-layout>
+            """]
+        )))
 
 end
 
 function handlers(model)
+    on(model.tab) do _
+        println("tab = " * model.tab[])
+    end
+    on(model.leftDrawerOpen) do _
+        if (model.leftDrawerOpen[])
+            println("Drawer is open ")
+        else
+            println("Drawer is closed ")
+        end
+    end
     on(model.modContractRevision) do _
         if (model.modContractRevision[])
             println("mod contract")
