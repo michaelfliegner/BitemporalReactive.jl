@@ -27,24 +27,7 @@ function ui(model)
   drawer = table(title="Random numbers", :data; pagination=:data_pagination, style="height: 350px;")
   pagecontent = [
     """
-              <div>
-      <q-splitter
-        v-model="splitterModel"
-        style="height: 250px"
-      >
-        <template v-slot:before>
-        <q-tabs
-          v-model="tab"
-          vertical
-          class="text-teal"
-        >
-          <q-tab name="mails" icon="mail" label="Mails"></q-tab>
-          <q-tab name="alarms" icon="alarm" label="Alarms"></q-tab>
-          <q-tab name="movies" icon="movie" label="Movies"></q-tab>
-        </q-tabs>
-        </template>
 
-        <template v-slot:after>
           <q-tab-panels
             v-model="tab"
             animated
@@ -71,10 +54,6 @@ function ui(model)
               <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quis praesentium cumque magnam odio iure quidem, quod illum numquam possimus obcaecati commodi minima assumenda consectetur culpa fuga nulla ullam. In, libero.</p>
             </q-tab-panel>
           </q-tab-panels>
-        </template>
-
-      </q-splitter>
-``  </div>
     """,
     list(dark=true, bordered=true, separator=true, style="max-width: 318px",
       [item(vripple=true,
@@ -160,6 +139,17 @@ function ui(model)
               BitemporalReactive
               </q-toolbar-title>
             </q-toolbar>
+                  <q-tabs
+        v-model="tab"
+        class="bg-primary text-white shadow-2" align="left"
+      >
+        <q-tab name="mails" icon="mail" label="Mails"></q-tab>
+        <q-tab name="alarms" icon="alarm" label="Alarms"></q-tab>
+        <q-tab name="movies" icon="movie" label="Movies"></q-tab>
+        <q-tab name="photos" icon="photo" label="Photos"></q-tab>
+        <q-tab name="videos" icon="slow_motion_video" label="Videos"></q-tab>
+        <q-tab name="addressbook" icon="people" label="Address Book"></q-tab>
+      </q-tabs>
           </q-header>
           <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
       """
