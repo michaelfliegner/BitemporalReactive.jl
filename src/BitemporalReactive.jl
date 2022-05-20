@@ -1,6 +1,6 @@
 module BitemporalReactive
 import SearchLight
-using JSON, Stipple, StippleUI
+using Stipple, StippleUI
 push!(LOAD_PATH, "src/model")
 push!(LOAD_PATH, "src/view")
 import InsuranceContractsController
@@ -70,13 +70,17 @@ function handlers(model::ContractSection.Model)
     model
 end
 
-model = handlers(Stipple.init(ContractSection.Model))
-SearchLight.Configuration.load() |> SearchLight.connect
-csectDict = JSON.parse(JSON.json(InsuranceContractsController.csection(4, 4)), dicttype=Dict{String,Any})
-model.csect = csectDict
-println("init")
-println(model)
+function run()
+    model = handlers(Stipple.init(ContractSection.Model))
+    SearchLight.Configuration.load() |> SearchLight.connect
+    csectDict = InsuranceContractsController.csectionDict(4, 4)
+    model.csect = csectDict
+    println("init")
+    println(model)
 
-ContractSection.startup(model)
+    ContractSection.startup(model)
+end
+
+run()
 
 end

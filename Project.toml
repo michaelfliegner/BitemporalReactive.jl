@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 BitemporalPostgres = "e513cd14-23e6-48df-acf1-d9bc8fa5674b"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 SearchLight = "340e8cb6-72eb-11e8-37ce-c97ebeb32050"
 SearchLightPostgreSQL = "4327cdd6-4902-11ea-0272-430cea0431bd"
 Stipple = "4acbeb90-81a0-11ea-1966-bdaff8155998"

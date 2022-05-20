@@ -159,6 +159,10 @@ function csection(history_id::Integer, version_id::Integer)::ContractSection
     )
 end
 
+function csectionDict(history_id::Integer, version_id::Integer)::Dict{String,Any}
+    JSON.parse(JSON.json(csection(4, 4)), dicttype=Dict{String,Any})
+end
+
 function psection(history_id::Integer, version_id::Integer)::PartnerSection
     PartnerSection(
         partner_revision=get_revision(
