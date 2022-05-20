@@ -13,6 +13,7 @@ StippleUI = "a3c5d34a-b254-4859-a8fa-b86abb7e84a3"
 
 [compat]
 BitemporalPostgres = "≥1.0.4"
+JSON = "≥0.8.6""
 SearchLight = "2"
 SearchLightPostgreSQL = "2"
 Stipple = "≥0.11.2"
