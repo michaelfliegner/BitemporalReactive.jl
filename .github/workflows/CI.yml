@@ -41,4 +41,4 @@ jobs:
         with:
           version: "1.7.1"
       - run: GENIE_ENV="test" julia --project=$(pwd) -e'using Pkg;Pkg.test("BitemporalReactive")'
-        shell: bash
+        shell: bash 

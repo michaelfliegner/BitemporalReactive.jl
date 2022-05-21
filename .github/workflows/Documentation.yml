@@ -33,4 +33,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
       - working-directory: ./docs
-        run: julia --project=$(pwd) -e'using Pkg;Pkg.instantiate(); include("make.jl")'
+        run: julia --project=$(pwd) -e'using Pkg;Pkg.instantiate(); include("make.jl")' 
