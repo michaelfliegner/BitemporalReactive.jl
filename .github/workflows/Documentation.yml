@@ -4,11 +4,7 @@ on:
   #  schedule:
   #    - cron: '0 2 * * *'  # Daily at 2 AM UTC (8 PM CST)
   push:
-<<<<<<< HEAD
-    branches: [main]
-=======
-    branches: [ master ]
->>>>>>> a84e17bfd015aa768acbf08c4a4f9a05a2d5752a
+    branches: [master]
     tags: ["*"]
   pull_request:
 concurrency:
@@ -33,4 +29,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
       - working-directory: ./docs
-        run: julia --project=$(pwd) -e'using Pkg;Pkg.instantiate(); include("make.jl")' 
+        run: julia --project=$(pwd) -e'using Pkg;Pkg.instantiate(); include("make.jl")'
