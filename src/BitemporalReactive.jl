@@ -79,6 +79,6 @@ function run()
     ContractSection.startup(model)
 end
 
-run()
+# run()
 
 end
