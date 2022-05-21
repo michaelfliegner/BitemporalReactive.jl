@@ -42,8 +42,8 @@ function contract_version(model)
           clickable=true,
           vripple=true, itemsection([
             itemlabel("Product item {{index}}", overline=true),
-            textfield("HHDescription", dense=true, label__color="orange", bg__color="white", R"""csect['product_items'][index]['productitem_revision']['description']""", @on("keyup.enter", "modProductitemRevision=true")),
-            itemlabel("HHDescription"),
+            textfield("Description", dense=true, bg__color="white", R"""csect['product_items'][index]['productitem_revision']['description']""", @on("keyup.enter", "modProductitemRevision=true")),
+            itemlabel("Description"),
             input(@bind("""csect["product_items"][index]["productitem_revision"]["description"]"""), @on("keyup.enter", "modProductitemRevision=true")),
             itemlabel("Tariff"),
             """
