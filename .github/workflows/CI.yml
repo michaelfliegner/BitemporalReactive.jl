@@ -2,11 +2,10 @@ name: CI
 on:
   push:
     # Sequence of patterns matched against refs/heads
-    branches:  
+    branches:
       - main
-      - 'releases/**'
+      - "releases/**"
 jobs:
-
   runner-job:
     # You must use a Linux environment when using service containers or container jobs
     runs-on: ubuntu-latest
@@ -34,7 +33,6 @@ jobs:
       - name: "Set up Julia"
         uses: julia-actions/setup-julia@v1
         with:
-          version: '1.7.1'
-      - run: 
-          GENIE_ENV="test" julia -e 'push!(LOAD_PATH,"src"); import Pkg; Pkg.add("Genie"); using Genie; Pkg.add("LoggingExtras"); include("test/runtests.jl")'
-        shell: bash 
+          version: "1.7.1"
+      - run: GENIE_ENV="test" julia --project=$(pwd) -e'using Pkg;Pkg.test("BitemporalReactive")'
+        shell: bash
