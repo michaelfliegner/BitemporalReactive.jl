@@ -2,9 +2,15 @@ name: CI
 on:
   push:
     # Sequence of patterns matched against refs/heads
+<<<<<<< HEAD
     branches:
       - main
       - "releases/**"
+=======
+    branches:  
+      - master
+      - 'releases/**'
+>>>>>>> a84e17bfd015aa768acbf08c4a4f9a05a2d5752a
 jobs:
   runner-job:
     # You must use a Linux environment when using service containers or container jobs

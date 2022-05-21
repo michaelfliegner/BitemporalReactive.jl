@@ -4,7 +4,11 @@ on:
   #  schedule:
   #    - cron: '0 2 * * *'  # Daily at 2 AM UTC (8 PM CST)
   push:
+<<<<<<< HEAD
     branches: [main]
+=======
+    branches: [ master ]
+>>>>>>> a84e17bfd015aa768acbf08c4a4f9a05a2d5752a
     tags: ["*"]
   pull_request:
 concurrency:
