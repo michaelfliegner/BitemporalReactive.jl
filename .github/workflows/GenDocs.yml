@@ -1,8 +1,8 @@
 name: Documentation
 # Run on master, tags, or any pull request
 on:
-  #  schedule:
-  #    - cron: '0 2 * * *'  # Daily at 2 AM UTC (8 PM CST)
+#  schedule:
+#    - cron: '0 2 * * *'  # Daily at 2 AM UTC (8 PM CST)
   push:
     branches: [master]
     tags: ["*"]
@@ -13,6 +13,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 jobs:
+
   docs:
     name: Documentation
     runs-on: ubuntu-latest
@@ -20,13 +21,14 @@ jobs:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
-          version: "1"
+          version: '1'
       - run: |
           git config --global user.name name
           git config --global user.email email
-          git config --global github.user user.name
-      - name: Build and deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
+          git config --global github.user username
       - working-directory: ./docs
         run: julia --project=$(pwd) -e'using Pkg;Pkg.instantiate(); include("make.jl")'
+        env:
+          JULIA_PKG_SERVER: ""
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
