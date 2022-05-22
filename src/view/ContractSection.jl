@@ -3,6 +3,7 @@ push!(LOAD_PATH, "src/model")
 using DataFrames, Stipple, StippleUI
 
 @reactive mutable struct Model <: ReactiveModel
+  contracts::R{Vector{Integer}} = []
   rolesText::R{Dict{Integer,String}} = Dict{Integer,String}([1 => "Policy Holder", 2 => "Premium Payer"])
   roles::Vector{Integer} = [1, 2]
   modContractRevision::R{Bool} = false
@@ -60,6 +61,24 @@ function contract_version(model)
     ])
 end
 
+function contract_list(model)
+  list(dark=true, bordered=true, separator=true, style="max-width: 318px",
+    template(
+      item(
+        clickable=true,
+        vripple=true,
+        [
+          itemsection("""
+               <a :href="'/history?type=contract&id=' + contracts[index]" > Mutation history contract {{contracts[index]}} </a>
+               """
+          )
+        ], @click("process=true")
+      ),
+      var"v-for"="(id,index) in contracts"
+    )
+  )
+end
+
 function page_content(model)
   join([
     """
@@ -75,9 +94,9 @@ function page_content(model)
             <q-tab-panel name="contracts">
                 <div class="text-h4 q-mb-md">Contracts</div>
     """,
-    "hier kommp COntracts hin",
+    contract_list(model),
     """       
-            </q-tab-panel>
+            </q-tab-panel>b
             <q-tab-panel name="history">
                 <div class="text-h4 q-mb-md">History</div>
     """,

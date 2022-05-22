@@ -1,6 +1,5 @@
 module BitemporalReactive
-import SearchLight
-using Stipple, StippleUI
+using SearchLight, Stipple, StippleUI
 include("model/InsuranceContractsController.jl")
 using .InsuranceContractsController
 include("view/ContractSection.jl")
@@ -69,13 +68,15 @@ function handlers(model::ContractSection.Model)
 end
 
 function run()
+    println("init1")
     model = handlers(Stipple.init(ContractSection.Model))
-    SearchLight.Configuration.load() |> SearchLight.connect
+    println("von contracts init")
+    model.contracts = InsuranceContractsController.get_contract_ids()
     csectDict = InsuranceContractsController.csectionDict(4, 4)
     model.csect = csectDict
-    println("init")
+    println("init2")
+    println(model.contracts)
     println(model)
-
     ContractSection.startup(model)
 end
 

@@ -1,4 +1,3 @@
-ENV["GENIE_ENV"] = "dev"
 using Pkg
 Pkg.add("Revise")
 using Revise

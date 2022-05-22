@@ -139,6 +139,7 @@ function pisection(history_id::Integer, version_id::Integer)::Vector{ProductItem
 end
 
 function csection(history_id::Integer, version_id::Integer)::ContractSection
+    connect()
     ContractSection(
         ref_history=DbId(history_id),
         ref_version=DbId(version_id),
@@ -238,5 +239,20 @@ function historyforest_view(history_id::Int)
         entitytype="Contract",
     )
 end
-end #module
 
+function get_contract_ids()
+    connect()
+    map(find(Contract)) do c
+        c.id.value
+    end
+end
+
+function connect()
+    try
+        SearchLight.connection()
+    catch e
+        SearchLight.Configuration.load() |> SearchLight.connect
+    end
+end
+
+end #module
