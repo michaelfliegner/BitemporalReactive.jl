@@ -4,8 +4,9 @@ using DataFrames, Stipple, StippleUI
 
 @reactive mutable struct Model <: ReactiveModel
   contracts::R{Vector{Integer}} = []
+  history::R{Dict{String,Any}} = Dict{String,Any}(["bubu" => 0])
   rolesText::R{Dict{Integer,String}} = Dict{Integer,String}([1 => "Policy Holder", 2 => "Premium Payer"])
-  roles::Vector{Integer} = [1, 2]
+  roles::R{Vector{Integer}} = [1, 2]
   modContractRevision::R{Bool} = false
   modContractPartnerRefRevision::R{Bool} = false
   modProductitemRevision::R{Bool} = false
@@ -15,7 +16,6 @@ using DataFrames, Stipple, StippleUI
   data_pagination::DataTablePagination = DataTablePagination(rows_per_page=50)
   leftDrawerOpen::R{Bool} = false
   tab::R{String} = "contracts"
-  splitterModel::R{Integer} = 20
 end
 
 function contract_version(model)
@@ -79,6 +79,36 @@ function contract_list(model)
   )
 end
 
+function renderhforest(model)
+  template(
+    item(
+      clickable=true,
+      vripple=true,
+      [
+        itemsection("""
+             <a :href="'/history?type=contract&id=' + contracts[index]" > Mutation history contract {{contracts[index]}} </a>
+             """
+        )
+      ], @click("process=true")
+    ),
+    var"v-for"="(id,index) in contracts"
+  )
+  template(
+    item(
+      clickable=true,
+      vripple=true,
+      [
+        itemsection("""
+             shadowed {{index}}
+             """
+        )
+      ], @click("process=true")
+    ),
+    var"v-for"="index in history['shadowed']"
+  )
+
+end
+
 function page_content(model)
   join([
     """
@@ -96,11 +126,12 @@ function page_content(model)
     """,
     contract_list(model),
     """       
-            </q-tab-panel>b
+            </q-tab-panel>
             <q-tab-panel name="history">
                 <div class="text-h4 q-mb-md">History</div>
     """,
-    "hier kommp History hin",
+    "HIHI",
+    renderhforest(model),
     """ 
             </q-tab-panel>
             <q-tab-panel name="csection">

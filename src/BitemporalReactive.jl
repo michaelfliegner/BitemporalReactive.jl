@@ -11,7 +11,11 @@ newItem = Dict{String,Any}("productitem_revision" => Dict{String,Any}("ref_valid
 function handlers(model::ContractSection.Model)
     on(model.tab) do _
         println("tab = " * model.tab[])
+        if (model.tab[] == "history")
+            println("History=" * string(model.history))
+        end
     end
+
     on(model.leftDrawerOpen) do _
         if (model.leftDrawerOpen[])
             println("Drawer is open ")
@@ -62,6 +66,7 @@ function handlers(model::ContractSection.Model)
     on(model.isready) do _
         println("pushing")
         println(model.csect["contract_partnerref_revision"]["ref_role"])
+        println(model.history["interval"])
         push!(model)
     end
     model
@@ -72,9 +77,10 @@ function run()
     model = handlers(Stipple.init(ContractSection.Model))
     println("von contracts init")
     model.contracts = InsuranceContractsController.get_contract_ids()
-    csectDict = InsuranceContractsController.csectionDict(4, 4)
+    csectDict = InsuranceContractsController.csection_dict(4, 4)
     model.csect = csectDict
-    println("init2")
+    model.history = InsuranceContractsController.history_dict(4)
+    println("init2" * string(model.history))
     println(model.contracts)
     println(model)
     ContractSection.startup(model)

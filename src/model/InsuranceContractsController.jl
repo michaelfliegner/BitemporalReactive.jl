@@ -13,11 +13,14 @@ import BitemporalPostgres
 using BitemporalPostgres
 include("InsuranceContracts.jl")
 using .InsuranceContracts
-export Contract,
+export convert,
+    Contract,
     ContractRevision,
     ContractPartnerRole,
     ContractPartnerRef,
     ContractPartnerRefRevision,
+    csection_dict,
+    history_dict,
     ProductItem,
     ProductItemRevision,
     ProductItemTariffRole,
@@ -160,7 +163,7 @@ function csection(history_id::Integer, version_id::Integer)::ContractSection
     )
 end
 
-function csectionDict(history_id::Integer, version_id::Integer)::Dict{String,Any}
+function csection_dict(history_id::Integer, version_id::Integer)::Dict{String,Any}
     JSON.parse(JSON.json(csection(4, 4)), dicttype=Dict{String,Any})
 end
 
@@ -186,57 +189,60 @@ function tsection(history_id::Integer, version_id::Integer)::Tariffsection
     )
 end
 
-function csection_view(history_id::Int, version_id::Int)
-    html(
-        :insurancecontracts,
-        :insurancecontract,
-        csect=csection(history_id, version_id)
+function history_forest(history_id::Int)
+    connect()
+    BitemporalPostgres.Node(ValidityInterval(), mkforest(DbId(history_id),
+        MaxDate,
+        ZonedDateTime(1900, 1, 1, 0, 0, 0, 0, tz"UTC"),
+        MaxDate,
+    ))
+end
+
+function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
+    i = Dict(string(fn) => getfield(getfield(node, :interval), fn) for fn ∈ fieldnames(ValidityInterval))
+    shdw = length(node.shadowed) == 0 ? [] : map(node.shadowed) do child
+        convert(child)
+    end
+    Dict("interval" => i, "shadowed" => shdw)
+end
+
+function history_dict(history_id::Int)::Dict{String,Any}
+    convert(history_forest(history_id))
+end
+
+function mkhdict(
+    hid::DbId,
+    tsdb_invalidfrom::ZonedDateTime,
+    tsworld_validfrom::ZonedDateTime,
+    tsworld_invalidfrom::ZonedDateTime,
+)
+    map(
+        i::ValidityInterval -> Dict{String,Any}(
+            "interval" => i,
+            "shadowed" => Vector{Dict{String,Any}}(mkforest(hid, i.tsdb_validfrom, i.tsworld_validfrom, i.tsworld_invalidfrom),)
+        ),
+        find(
+            ValidityInterval,
+            SQLWhereExpression(
+                "ref_history=? AND  upper(tsrdb)=? AND tstzrange(?,?) * tsrworld = tsrworld",
+                hid,
+                tsdb_invalidfrom,
+                tsworld_validfrom,
+                tsworld_invalidfrom,
+            ),
+        ),
     )
 end
 
 function renderhistory(history_id::Int)
-    renderhforest(
-        mkforest(
-            DbId(history_id),
-            MaxDate,
-            ZonedDateTime(1900, 1, 1, 0, 0, 0, 0, tz"UTC"),
-            MaxDate,
-        ),
+    renderhforest(BitemporalPostgres.Node(Nothing,
+            mkforest(
+                DbId(history_id),
+                MaxDate,
+                ZonedDateTime(1900, 1, 1, 0, 0, 0, 0, tz"UTC"),
+                MaxDate,
+            )),
         0,
-    )
-end
-
-function renderhforest(f, i)
-    Html.ul() do
-        for_each(f) do node
-            renderhnode(node, i + 1)
-        end
-    end
-end
-
-function renderhnode(node, i)
-    Html.li() do
-        """ Version $(string(node.interval.ref_version.value))
-            <a href="csection?history_id=$(node.interval.ref_history.value)&version_id=$(node.interval.ref_version.value)">as of $(node.interval.tsworld_validfrom) created $(node.interval.tsdb_validfrom)</a>
-        """ *
-        if length(node.shadowed) > 0
-            Html.span(class="caret") * Html.ul(class="nested") do
-                renderhforest(node.shadowed, i + 1)
-            end
-        else
-            ""
-        end
-    end
-
-end
-
-function historyforest_view(history_id::Int)
-    html(
-        :insurancecontracts,
-        :historyforest,
-        hforest=renderhistory(history_id),
-        hid=history_id,
-        entitytype="Contract",
     )
 end
 
