@@ -15,7 +15,7 @@ using DataFrames, Stipple, StippleUI
   data::R{DataTable} = DataTable(DataFrame(rand(100000, 2), ["x1", "x2"]), DataTableOptions(columns=[Column("x1"), Column("x2", align=:right)]))
   data_pagination::DataTablePagination = DataTablePagination(rows_per_page=50)
   leftDrawerOpen::R{Bool} = false
-  tab::R{String} = "contracts"
+  tab::R{String} = "history"
 end
 
 function contract_version(model)
@@ -81,30 +81,32 @@ end
 
 function renderhforest(model)
   template(
-    item(
-      clickable=true,
-      vripple=true,
-      [
-        itemsection("""
-             <a :href="'/history?type=contract&id=' + contracts[index]" > Mutation history contract {{contracts[index]}} </a>
-             """
-        )
-      ], @click("process=true")
-    ),
-    var"v-for"="(id,index) in contracts"
-  )
-  template(
-    item(
-      clickable=true,
-      vripple=true,
-      [
-        itemsection("""
-             shadowed {{index}}
-             """
-        )
-      ], @click("process=true")
-    ),
-    var"v-for"="index in history['shadowed']"
+    ["""<div>Version{{shdw0['interval']['ref_version']['value']}}</div>""",
+      """<div v-if="shdw0['shadowed'].length>0">Has Children{{shdw0['shadowed'].length}}</div>""",
+      expansionitem(expandseparator=true, icon="verified_user",
+        [
+          card([
+            cardsection([
+              p("""
+                 shadowed.children {{shdw0["shadowed"]}} 
+                 """),
+              template(
+                ["""<div>Version{{shdw1['interval']['ref_version']['value']}}</div>""",
+                  expansionitem(expandseparator=true, icon="verified_user", [
+                    card([
+                      cardsection([
+                        p("""
+                           shadowed {{shdw1}} 
+                           """)
+                      ])
+                    ])
+                  ])],
+                var"v-for"="shdw1 in shdw0['shadowed']"
+              )
+            ])
+          ])
+        ])],
+    var"v-for"="shdw0 in history['shadowed']"
   )
 
 end
@@ -130,7 +132,6 @@ function page_content(model)
             <q-tab-panel name="history">
                 <div class="text-h4 q-mb-md">History</div>
     """,
-    "HIHI",
     renderhforest(model),
     """ 
             </q-tab-panel>
