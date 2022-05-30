@@ -3,6 +3,8 @@ push!(LOAD_PATH, "src/model")
 using DataFrames, Stipple, StippleUI
 
 @reactive mutable struct Model <: ReactiveModel
+  selected_version::R{Integer} = 0
+  process::R{Bool} = false
   contracts::R{Vector{Integer}} = []
   history::R{Dict{String,Any}} = Dict{String,Any}(["bubu" => 0])
   rolesText::R{Dict{Integer,String}} = Dict{Integer,String}([1 => "Policy Holder", 2 => "Premium Payer"])
@@ -80,35 +82,36 @@ function contract_list(model)
 end
 
 function renderhforest(model)
-  template(
-    ["""<div>Version{{shdw0['interval']['ref_version']['value']}}</div>""",
-      """<div v-if="shdw0['shadowed'].length>0">Has Children{{shdw0['shadowed'].length}}</div>""",
-      expansionitem(expandseparator=true, icon="verified_user",
-        [
-          card([
-            cardsection([
-              p("""
-                 shadowed.children {{shdw0["shadowed"]}} 
-                 """),
-              template(
-                ["""<div>Version{{shdw1['interval']['ref_version']['value']}}</div>""",
-                  expansionitem(expandseparator=true, icon="verified_user", [
-                    card([
-                      cardsection([
-                        p("""
-                           shadowed {{shdw1}} 
-                           """)
-                      ])
-                    ])
-                  ])],
-                var"v-for"="shdw1 in shdw0['shadowed']"
-              )
+  let shdw0 = "shdw0"
+    template(
+      [
+        #v-on:click="selected_version={{$(shdw0)['interval']['ref_version']['value']}}
+        """
+        <div v-if="$(shdw0)['shadowed'].length==0">
+        <q-btn>"select",v-on:click="selected_version={{$(shdw0)['interval']['ref_version']['value']}}</q-btn>""",
+        btn("select", var"v-on:click"="""selected_version={{$(shdw0)['interval']['ref_version']['value']}}"""),
+        item(clickable=true,
+          itemsection("""<div >Version {{$(shdw0)['interval']['ref_version']['value']}}</div>"""),
+        ),
+        """</div>""",
+        """<div v-else>""",
+        item(clickable=true,
+          itemsection("""<div >Version {{$(shdw0)['interval']['ref_version']['value']}}</div>"""),
+        ),
+        expansionitem(itemsection("HIHI itemsection"), expandseparator=true, icon="verified_user",
+          [
+            card([
+              cardsection([
+                p("""
+                   shadowed.children {{$(shdw0)["shadowed"]}} 
+                   """)
+              ])
             ])
-          ])
-        ])],
-    var"v-for"="shdw0 in history['shadowed']"
-  )
-
+          ]),
+        """</div>"""],
+      var"v-for"="$(shdw0) in history['shadowed']"
+    )
+  end
 end
 
 function page_content(model)
