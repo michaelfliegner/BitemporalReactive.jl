@@ -93,7 +93,7 @@ function run()
     model.contracts = InsuranceContractsController.get_contract_ids()
     csectDict = InsuranceContractsController.csection_dict(4, 4)
     model.csect = csectDict
-    model.history = InsuranceContractsController.history_dict(4)
+    model.history = bbbbbbbbbbbbbbb
     println("init2" * string(model.history))
     println(model.contracts)
     println(model)
@@ -105,7 +105,8 @@ function tree()
 end
 
 function qtree()
-    QTree.run()
+    QTbbb
+    ree.run()
 end
 
 # run()
