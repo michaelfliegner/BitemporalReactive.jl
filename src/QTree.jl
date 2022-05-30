@@ -21,7 +21,7 @@ function ui(model)
     model,
     title="Hello Stipple QTree with selectable Nodes",
     [
-      quasar(:tree, ref="tree", var"node-key"="label", nodes=:props, var"default-expand-all"=true,
+      quasar(:tree, ref="tree", var"node-key"="label", var"children-key"="children", nodes=:props, var"default-expand-all"=true,
         var"selected"=:selectedm, var"@update:selected"="selectNode",
         """
         <template v-slot:default-header="prop">
