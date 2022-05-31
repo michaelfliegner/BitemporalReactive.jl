@@ -105,8 +105,11 @@ function tree()
 end
 
 function qtree()
-    QTbbb
-    ree.run()
+    QTree.run()
+end
+
+function htree()
+    HTree.run()
 end
 
 # run()
