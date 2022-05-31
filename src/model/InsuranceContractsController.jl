@@ -203,7 +203,8 @@ function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
     shdw = length(node.shadowed) == 0 ? [] : map(node.shadowed) do child
         convert(child)
     end
-    Dict("label" => string(i["id"]), "interval" => i, "children" => shdw)
+    Dict("label" => string(i["id"]), "interval" => i, "children" => shdw,
+        "time_committed" => string(i["tsdb_validfrom"]), "time_valid_asof" => string(i["tsworld_validfrom"]))
 end
 
 function history_dict(history_id::Int)::Dict{String,Any}
