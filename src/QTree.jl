@@ -16,6 +16,7 @@ js_methods(::Model) = raw"""
     }
   """
 
+
 function ui(model)
   page(
     model,
