@@ -198,15 +198,6 @@ function history_forest(history_id::Int)
     ))
 end
 
-function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
-    i = Dict(string(fn) => getfield(getfield(node, :interval), fn) for fn ∈ fieldnames(ValidityInterval))
-    shdw = length(node.shadowed) == 0 ? [] : map(node.shadowed) do child
-        convert(child)
-    end
-    Dict("label" => string(i["id"]), "interval" => i, "children" => shdw,
-        "time_committed" => string(i["tsdb_validfrom"]), "time_valid_asof" => string(i["tsworld_validfrom"]))
-end
-
 function history_dict(history_id::Int)::Dict{String,Any}
     convert(history_forest(history_id))
 end
@@ -247,10 +238,10 @@ function renderhistory(history_id::Int)
     )
 end
 
-function get_contract_ids()
+function get_contract_history_ids()
     connect()
     map(find(Contract)) do c
-        c.id.value
+        c.ref_history.value
     end
 end
 

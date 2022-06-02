@@ -1,24 +1,28 @@
 module ContractSection
 push!(LOAD_PATH, "src/model")
-using DataFrames, Stipple, StippleUI
+using DataFrames, Stipple, StippleUI, TimeZones
 
 @reactive mutable struct Model <: ReactiveModel
+  selected_history::R{Integer} = 0
   selected_version::R{Integer} = 0
   process::R{Bool} = false
   contracts::R{Vector{Integer}} = []
-  history::R{Dict{String,Any}} = Dict{String,Any}(["bubu" => 0])
+  selectedm::R{String} = ""
+  history::R{Vector{Dict{String}}} = []
   rolesText::R{Dict{Integer,String}} = Dict{Integer,String}([1 => "Policy Holder", 2 => "Premium Payer"])
   roles::R{Vector{Integer}} = [1, 2]
   modContractRevision::R{Bool} = false
   modContractPartnerRefRevision::R{Bool} = false
   modProductitemRevision::R{Bool} = false
   addProductItem::R{Bool} = false
-  csect::R{Dict{String,Any}} = Dict{String,Any}("contract_revision" => 1)
-  data::R{DataTable} = DataTable(DataFrame(rand(100000, 2), ["x1", "x2"]), DataTableOptions(columns=[Column("x1"), Column("x2", align=:right)]))
+  csect::R{Dict{String,Any}} = Dict{String,Any}("Dummy" => "Dummy")
+  data::R{DataTable} = DataTable(DataFrame(rand(100, 2), ["x1", "x2"]), DataTableOptions(columns=[Column("x1"), Column("x2", align=:right)]))
   data_pagination::DataTablePagination = DataTablePagination(rows_per_page=50)
   leftDrawerOpen::R{Bool} = false
-  tab::R{String} = "history"
+  tab::R{String} = "contracts"
 end
+
+TreeDict = Dict{String,Any}[Dict("label" => "7", "interval" => Dict{String,Any}("tsworld_validfrom" => TimeZones.ZonedDateTime(2015, 5, 30, 20, 0, 1, 1, tz"UTC"), "tsdb_validfrom" => TimeZones.ZonedDateTime(2022, 5, 21, 17, 49, 58, 742, tz"UTC"), "tsdb_invalidfrom" => TimeZones.ZonedDateTime(2038, 1, 19, 3, 14, 6, 999, tz"UTC"), "ref_history" => 4, "id" => 7, "tsworld_invalidfrom" => TimeZones.ZonedDateTime(2038, 1, 19, 3, 14, 6, 999, tz"UTC"), "is_committed" => 1, "ref_version" => 6), "time_committed" => "2022-05-21T17:49:58.742+00:00", "time_valid_asof" => "2015-05-30T20:00:01.001+00:00", "children" => Dict{String,Any}[Dict("label" => "5", "interval" => Dict{String,Any}("tsworld_validfrom" => TimeZones.ZonedDateTime(2016, 5, 30, 20, 0, 1, 1, tz"UTC"), "tsdb_validfrom" => TimeZones.ZonedDateTime(2022, 5, 21, 17, 49, 58, 506, tz"UTC"), "tsdb_invalidfrom" => TimeZones.ZonedDateTime(2022, 5, 21, 17, 49, 58, 742, tz"UTC"), "ref_history" => 4, "id" => 5, "tsworld_invalidfrom" => TimeZones.ZonedDateTime(2038, 1, 19, 3, 14, 6, 999, tz"UTC"), "is_committed" => 1, "ref_version" => 5), "time_committed" => "2022-05-21T17:49:58.506+00:00", "time_valid_asof" => "2016-05-30T20:00:01.001+00:00", "children" => Any[])]), Dict("label" => "8", "interval" => Dict{String,Any}("tsworld_validfrom" => TimeZones.ZonedDateTime(2014, 5, 30, 20, 0, 1, 1, tz"UTC"), "tsdb_validfrom" => TimeZones.ZonedDateTime(2022, 5, 21, 17, 49, 58, 742, tz"UTC"), "tsdb_invalidfrom" => TimeZones.ZonedDateTime(2038, 1, 19, 3, 14, 6, 999, tz"UTC"), "ref_history" => 4, "id" => 8, "tsworld_invalidfrom" => TimeZones.ZonedDateTime(2015, 5, 30, 20, 0, 1, 1, tz"UTC"), "is_committed" => 1, "ref_version" => 4), "time_committed" => "2022-05-21T17:49:58.742+00:00", "time_valid_asof" => "2014-05-30T20:00:01.001+00:00", "children" => Any[])]
 
 function contract_version(model)
   list(dark=true, bordered=true, separator=true, style="max-width: 318px",
@@ -70,48 +74,50 @@ function contract_list(model)
         clickable=true,
         vripple=true,
         [
-          itemsection("""
-               <a :href="'/history?type=contract&id=' + contracts[index]" > Mutation history contract {{contracts[index]}} </a>
-               """
+          itemsection(
+            """<q-field outlined label="History ID" stack-label>
+                    <template v-slot:control>
+                        <div class="self-center no-outline" tabindex="0">{{id}}</div>
+                    </template>
+                </q-field>"""
           )
-        ], @click("process=true")
+        ], @click("selected_history=id")
       ),
-      var"v-for"="(id,index) in contracts"
+      @recur(:"(id,index) in contracts")
     )
   )
 end
 
 function renderhforest(model)
-  let shdw0 = "shdw0"
-    template(
-      [
-        #v-on:click="selected_version={{$(shdw0)['interval']['ref_version']['value']}}
-        """
-        <div v-if="$(shdw0)['shadowed'].length==0">
-        <q-btn>"select",v-on:click="selected_version={{$(shdw0)['interval']['ref_version']['value']}}</q-btn>""",
-        btn("select", var"v-on:click"="""selected_version={{$(shdw0)['interval']['ref_version']['value']}}"""),
-        item(clickable=true,
-          itemsection("""<div >Version {{$(shdw0)['interval']['ref_version']['value']}}</div>"""),
-        ),
-        """</div>""",
-        """<div v-else>""",
-        item(clickable=true,
-          itemsection("""<div >Version {{$(shdw0)['interval']['ref_version']['value']}}</div>"""),
-        ),
-        expansionitem(itemsection("HIHI itemsection"), expandseparator=true, icon="verified_user",
-          [
-            card([
-              cardsection([
-                p("""
-                   shadowed.children {{$(shdw0)["shadowed"]}} 
-                   """)
-              ])
-            ])
-          ]),
-        """</div>"""],
-      var"v-for"="$(shdw0) in history['shadowed']"
-    )
-  end
+  quasar(:tree, ref="tree", var"node-key"="label", var"children-key"="children", nodes=:history, var"default-expand-all"=false,
+    var"selected"=:selectedm,
+    """
+    <template v-slot:default-header="prop">
+    <div class="row items-center">
+      <div v-if="prop.node.icon">
+      <q-icon :name="prop.node.icon" size="28px" class="q-mr-sm" />
+      </div>
+          <q-field color="grey-3" label-color="primary" outlined>
+            <template v-slot:control>
+              <div class="self-center full-width no-outline" tabindex="0"><b>{{prop.node.label}}</b></div>
+            </template>
+          </q-field>
+          <q-field label="valid as of" stack-label outlined :dense="dense">
+            <template v-slot:control>
+              <div class="self-center full-width no-outline" tabindex="4">{{prop.node.time_valid_asof}}</div>
+            </template>
+          </q-field> 
+          <q-field label="committed" stack-label outlined :dense="dense">
+            <template v-slot:control>
+              <div class="self-center full-width no-outline" tabindex="2">{{prop.node.time_committed}}</div>
+            </template>
+          </q-field>     
+        </div>
+    </div>
+  </template>
+  <template v-slot:default-body="prop">
+  </template>
+    """)
 end
 
 function page_content(model)
@@ -221,7 +227,6 @@ function ui(model)
     )))
 
 end
-
 
 function routeContractSection(model)
   route("/csection") do

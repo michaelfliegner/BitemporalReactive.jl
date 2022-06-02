@@ -1,18 +1,17 @@
 module Listing
-using Stipple, StippleUI
+using InsuranceContractsController, Stipple, StippleUI
 using SearchLight, InsuranceContracts
 
 @reactive mutable struct Model <: ReactiveModel
-    process::R{Bool} = false
+    selected_history::R{Integer} = 0
     contracts::R{Vector{Integer}} = []
 end
+
 
 function ui(model)
     page(
         model,
-        class="container",
-        
-        list(
+        class="container", list(
             bordered=true,
             separator=true,
             template(
@@ -20,11 +19,14 @@ function ui(model)
                     clickable=true,
                     vripple=true,
                     [
-                        itemsection("""
-                             <a :href="'/history?type=contract&id=' + contracts[index]" > Mutation history contract {{contracts[index]}} </a>
-                             """
+                        itemsection(
+                            """<q-field outlined label="History ID" stack-label>
+                                    <template v-slot:control>
+                                        <div class="self-center no-outline" tabindex="0">{{id}}</div>
+                                    </template>
+                                </q-field>"""
                         )
-                    ], @click("process=true")
+                    ], @click("selected_history=id")
                 ),
                 @recur(:"(id,index) in contracts")
             )
@@ -33,14 +35,9 @@ function ui(model)
 end
 
 function handlers(model)
-    on(model.process) do _
-        if (model.process[])
-            println("huhuhuhu")
-            println(model.contracts)
-            model.contracts[] = [model.contracts[]; [77]]
-
-            model.process[] = false
-        end
+    on(model.selected_history) do _
+        println("huhuhuhu")
+        println(model.selected_history[])
     end
     on(model.isready) do _
         push!(model)
@@ -49,18 +46,19 @@ function handlers(model)
 end
 
 function routeListing(model)
+
     route("/list") do
         html(ui(model), context=@__MODULE__)
     end
 
-    route("/history") do
-        type = params(:type, "none")
-        id = params(:id, "id")
-        println("PARAMS " * type * "  " * string(id))
-        redirect("/list")
-    end
 end
 
+function run()
+    model = handlers(Stipple.init(Model))
+    model.contracts = InsuranceContractsController.get_contract_history_ids()
+    routeListing(model)
+    Stipple.up()
+end
 
 end #module
 
