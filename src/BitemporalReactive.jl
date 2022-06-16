@@ -13,14 +13,8 @@ function handlers(model::ContractSection.Model)
         println("process event")
         model.process[] = false
     end
-
-    on(model.selectedm) do _
-        if (model.selectedm[] != "")
-            println(model.selectedm[])
-            println(model.selected_version[])
-            model.selectedm[] = ""
-
-        end
+    on(model.selected_contract) do _
+        model.selected_history[] = model.selected_contract["ref_history"]["value"]
     end
 
     on(model.selected_history) do _
@@ -43,10 +37,20 @@ function handlers(model::ContractSection.Model)
         end
     end
     on(model.selected_version) do _
-        println("tab = " * model.selected_version[])
-        if (model.selected_version[] > 0)
-            println("selected_version=" * string(model.model.selected_version))
-
+        if (model.selected_version[] != "")
+            println("selected_version= " * model.selected_version[])
+            model.current_version[] = parse(Int, model.selected_version[])
+            println("current=" * string(model.current_version[]))
+            model.selected_version[] = ""
+            try
+                println("vor csect")
+                model.csect = InsuranceContractsController.csection_dict(model.selected_history[], model.current_version[])
+            catch e
+                println("csect schiefgegangen " * string(e))
+            end
+            println("nach csect")
+            model.tab = "csection"
+            push!(model)
         end
     end
 
@@ -111,8 +115,12 @@ function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
     shdw = length(node.shadowed) == 0 ? [] : map(node.shadowed) do child
         convert(child)
     end
-    Dict("label" => string(i["id"]), "interval" => i, "children" => shdw,
+    Dict("label" => string(i["ref_version"]), "interval" => i, "children" => shdw,
         "time_committed" => string(i["tsdb_validfrom"]), "time_valid_asof" => string(i["tsworld_validfrom"]))
+end
+
+function convert(ContractSection::cs)::Dict{String,Any}
+    cs = Dict(string(fn) => getfield(getfield(cs, :interval), fn) for fn ∈ fieldnames(typeog(cs)))
 end
 
 function run()

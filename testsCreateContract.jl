@@ -78,22 +78,22 @@ end
     c = Contract()
     cr = ContractRevision(description="blue")
     cpr = ContractPartnerRef(ref_super=c.id)
-    cprr = ContractPartnerRefRevision(ref_partner=p.id, ref_role=cpRole["Policy Holder"], description="blue")
+    cprr = ContractPartnerRefRevision(ref_partner=p.ref_history, ref_role=cpRole["Policy Holder"], description="blue")
 
     cpi = ProductItem(ref_super=c.id)
     cpir = ProductItemRevision(position=1, description="blue")
 
     pitr = ProductItemTariffRef(ref_super=cpi.id)
-    pitrr = ProductItemTariffRefRevision(ref_tariff=t.id, ref_role=pitrRole["Main Coverage - Life"], description="blue")
+    pitrr = ProductItemTariffRefRevision(ref_tariff=t.ref_history, ref_role=pitrRole["Main Coverage - Life"], description="blue")
     pipr = ProductItemPartnerRef(ref_super=cpi.id)
-    piprr = ProductItemPartnerRefRevision(ref_partner=p.id, ref_role=piprRole["Insured Person"], description="blue")
+    piprr = ProductItemPartnerRefRevision(ref_partner=p.ref_history, ref_role=piprRole["Insured Person"], description="blue")
 
     cpi2 = ProductItem(ref_super=c.id)
     cpi2r = ProductItemRevision(position=2, description="pink")
     pi2tr = ProductItemTariffRef(ref_super=cpi2.id)
-    pi2trr = ProductItemTariffRefRevision(ref_tariff=t2.id, ref_role=pitrRole["Supplementary Coverage - Occupational Disablity"], description="pink")
+    pi2trr = ProductItemTariffRefRevision(ref_tariff=t2.ref_history, ref_role=pitrRole["Supplementary Coverage - Occupational Disablity"], description="pink")
     pi2pr = ProductItemPartnerRef(ref_super=cpi.id)
-    pi2prr = ProductItemPartnerRefRevision(ref_partner=p.id, ref_role=piprRole["Insured Person"], description="pink")
+    pi2prr = ProductItemPartnerRefRevision(ref_partner=p.ref_history, ref_role=piprRole["Insured Person"], description="pink")
 
     w1 = Workflow(
         tsw_validfrom=ZonedDateTime(2014, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),

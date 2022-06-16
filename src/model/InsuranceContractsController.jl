@@ -13,14 +13,15 @@ import BitemporalPostgres
 using BitemporalPostgres
 include("InsuranceContracts.jl")
 using .InsuranceContracts
-export convert,
-    Contract,
+export Contract,
     ContractRevision,
     ContractPartnerRole,
     ContractPartnerRef,
     ContractPartnerRefRevision,
+    csection,
     csection_dict,
-    history_dict,
+    history_forest,
+    psection,
     ProductItem,
     ProductItemRevision,
     ProductItemTariffRole,
@@ -28,7 +29,10 @@ export convert,
     ProductItemTariffRefRevision,
     ProductItemPartnerRole,
     ProductItemPartnerRef,
-    ProductItemPartnerRefRevision
+    ProductItemPartnerRefRevision,
+    ProductSection,
+    TariffSection,
+    tsection
 include("InsurancePartners.jl")
 using .InsurancePartners
 
@@ -58,10 +62,8 @@ end
 
 @kwdef mutable struct ProductItemSection
     productitem_revision::ProductItemRevision = ProductItemRevision(position=0)
-    productitem_tariffref_revision::ProductItemTariffRefRevision =
-        ProductItemTariffRefRevision()
-    productitem_partnerref_revision::ProductItemPartnerRefRevision =
-        ProductItemPartnerRefRevision()
+    productitem_tariffrefs::Vector{Tuple{ProductItemTariffRefRevision,TariffSection}} = [Tuple((ProductItemTariffRefRevision(), TariffSection()))]
+    productitem_partnerrefs::Vector{Tuple{ProductItemPartnerRefRevision,PartnerSection}} = [Tuple((ProductItemPartnerRefRevision(), PartnerSection()))]
 end
 
 @kwdef mutable struct ContractSection
@@ -70,14 +72,10 @@ end
     ref_history::SearchLight.DbId = DbId(InfinityKey)
     ref_version::SearchLight.DbId = MaxVersion
     contract_revision::ContractRevision = ContractRevision()
-    contract_partnerref_revision::ContractPartnerRefRevision = ContractPartnerRefRevision()
-    product_items::Vector{ProductItemSection} = []
+    contract_partnerrefs::Vector{Tuple{ContractPartnerRefRevision,PartnerSection}} = [(ContractPartnerRefRevision(), PartnerSection())]
+    product_items::Vector{ProductItemSection} = [Pruct | ItemSection()]
     ref_entities::Dict{DbId,Union{PartnerSection,ContractSection,TariffSection}} =
         Dict{DbId,Union{PartnerSection,ContractSection,TariffSection}}()
-end
-
-function insurancecontracts_view()
-    html(:insurancecontracts, :insurancecontracts, contracts=all(Contract))
 end
 
 function get_revision(
@@ -96,7 +94,7 @@ function get_revision(
     )[1]
 end
 
-function get_revisions(
+function get_revision(
     rtype::Type{RT},
     cid::DbId,
     vid::DbId,
@@ -112,37 +110,57 @@ function get_revisions(
 end
 
 
-function pisection(history_id::Integer, version_id::Integer)::Vector{ProductItemSection}
+function pisection(history_id::Integer, version_id::Integer, tsdb_validfrom, tsworld_validfrom)::Vector{ProductItemSection}
     pis = find(ProductItem, SQLWhereExpression(
         "ref_history = BIGINT ? ", DbId(history_id)))
 
     map(pis) do pi
-        pir = get_revisions(
+        pir = get_revision(
             ProductItemRevision,
             pi.id,
             DbId(version_id),
         )
-        pitr = get_revisions(
-            ProductItemTariffRefRevision,
-            pi.id,
-            DbId(version_id),
-        )
-        pipr = get_revisions(
-            ProductItemPartnerRefRevision,
-            pi.id,
-            DbId(version_id),
-        )
+        pitrs = let trs = find(ProductItemTariffRef, SQLWhereExpression("ref_history = BIGINT ? and ref_super = BIGINT ? ", DbId(history_id), pi.id))
+            map(trs) do tr
+                let trr = get_revision(
+                        ProductItemTariffRefRevision,
+                        tr.id,
+                        DbId(version_id)
+                    ),
+                    ts = tsection(trr.ref_tariff.value, tsdb_validfrom, tsworld_validfrom)
+
+                    Tuple{ProductItemTariffRefRevision,TariffSection}((trr, ts))
+                end
+            end
+        end
+
+        piprs = let prs = find(ProductItemPartnerRef, SQLWhereExpression("ref_history = BIGINT ? ", DbId(history_id)))
+            map(prs) do pr
+                let prr = get_revision(
+                        ProductItemPartnerRefRevision,
+                        pr.id,
+                        DbId(version_id)
+                    ),
+                    ps = psection(prr.ref_partner.value, tsdb_validfrom, tsworld_validfrom)
+
+                    Tuple{ProductItemPartnerRefRevision,PartnerSection}((prr, ps))
+                end
+            end
+        end
+
         ProductItemSection(
             productitem_revision=pir,
-            productitem_tariffref_revision=pitr,
-            productitem_partnerref_revision=pipr
+            productitem_tariffrefs=pitrs,
+            productitem_partnerrefs=piprs
         )
-    end
 
+    end
 end
 
-function csection(history_id::Integer, version_id::Integer)::ContractSection
+function csection(contract_id::Integer, tsdb_validfrom, tsworld_validfrom)::ContractSection
     connect()
+    history_id = find(Contract, SQLWhereExpression("id=?", DbId(contract_id)))[1].ref_history.value
+    version_id = findversion(DbId(history_id), tsdb_validfrom, tsworld_validfrom).value
     ContractSection(
         ref_history=DbId(history_id),
         ref_version=DbId(version_id),
@@ -152,22 +170,33 @@ function csection(history_id::Integer, version_id::Integer)::ContractSection
             DbId(history_id),
             DbId(version_id),
         ),
-        contract_partnerref_revision=get_revision(
-            ContractPartnerRef,
-            ContractPartnerRefRevision,
-            DbId(history_id),
-            DbId(version_id),
-        ),
-        product_items=pisection(history_id, version_id),
+        contract_partnerrefs=
+        let cprrs = find(ContractPartnerRef, SQLWhereExpression("ref_history = BIGINT ? ", DbId(history_id)))
+            map(cprrs) do cprr
+                let cprr = get_revision(
+                        ContractPartnerRefRevision,
+                        cprr.id,
+                        DbId(version_id)
+                    ),
+                    ps = PartnerSection()
+
+                    Tuple{ContractPartnerRefRevision,PartnerSection}((cprr, ps))
+                end
+            end
+        end,
+        product_items=pisection(history_id, version_id, tsdb_validfrom, tsworld_validfrom),
         ref_entities=Dict{DbId,Union{PartnerSection,ContractSection,TariffSection}}(),
     )
 end
 
-function csection_dict(history_id::Integer, version_id::Integer)::Dict{String,Any}
-    JSON.parse(JSON.json(csection(4, 4)), dicttype=Dict{String,Any})
-end
-
-function psection(history_id::Integer, version_id::Integer)::PartnerSection
+#     function csection_dict(history_id::Integer, version_id::Integer)::Dict{String,Any}
+# JSON.parse(JSON.json(csection(history_id, version_id)), dicttype=Dict{String,Any})
+#     end
+# 
+function psection(partner_id::Integer, tsdb_validfrom, tsworld_validfrom)::PartnerSection
+    connect()
+    history_id = find(Partner, SQLWhereExpression("id=?", DbId(partner_id)))[1].ref_history
+    version_id = findversion(history_id, tsdb_validfrom, tsworld_validfrom).value
     PartnerSection(
         partner_revision=get_revision(
             Partner,
@@ -178,7 +207,10 @@ function psection(history_id::Integer, version_id::Integer)::PartnerSection
     )
 end
 
-function tsection(history_id::Integer, version_id::Integer)::Tariffsection
+function tsection(tariff_id::Integer, tsdb_validfrom, tsworld_validfrom)::TariffSection
+    connect()
+    history_id = find(Tariff, SQLWhereExpression("id=?", DbId(tariff_id)))[1].ref_history
+    version_id = findversion(DbId(history_id), tsdb_validfrom, tsworld_validfrom).value
     TariffSection(
         tariff_revision=get_revision(
             Tariff,
@@ -196,10 +228,6 @@ function history_forest(history_id::Int)
         ZonedDateTime(1900, 1, 1, 0, 0, 0, 0, tz"UTC"),
         MaxDate,
     ))
-end
-
-function history_dict(history_id::Int)::Dict{String,Any}
-    convert(history_forest(history_id))
 end
 
 function mkhdict(
@@ -238,11 +266,10 @@ function renderhistory(history_id::Int)
     )
 end
 
-function get_contract_history_ids()
+
+function get_contracts()
     connect()
-    map(find(Contract)) do c
-        c.ref_history.value
-    end
+    map(find(Contract))
 end
 
 function connect()
