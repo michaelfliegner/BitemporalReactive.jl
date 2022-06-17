@@ -47,7 +47,7 @@ end
 
     # create Partner
     p = InsuranceContractsController.Partner()
-    pr = InsuranceContractsController.PartnerRevision(description="blue")
+    pr = InsuranceContractsController.PartnerRevision(description="Partner 1")
     w = Workflow(
         tsw_validfrom=ZonedDateTime(2014, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),
     )
@@ -57,7 +57,7 @@ end
 
     # create Tariffs
     t = InsuranceContractsController.Tariff()
-    tr = InsuranceContractsController.TariffRevision(description="blue")
+    tr = InsuranceContractsController.TariffRevision(description="Life Risk Insurance")
     w0 = Workflow(
         tsw_validfrom=ZonedDateTime(2014, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),
     )
@@ -66,33 +66,44 @@ end
     commit_workflow!(w0)
 
     t2 = Tariff()
-    tr = TariffRevision(description="blue")
+    tr2 = TariffRevision(description="Terminal Illness")
     w0 = Workflow(
         tsw_validfrom=ZonedDateTime(2014, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),
     )
     create_entity!(w0)
-    create_component!(t2, tr, w0)
+    create_component!(t2, tr2, w0)
     commit_workflow!(w0)
+
+    t3 = Tariff()
+    tr3 = TariffRevision(description="Occupational Disability")
+    w0 = Workflow(
+        tsw_validfrom=ZonedDateTime(2014, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),
+    )
+    create_entity!(w0)
+    create_component!(t3, tr3, w0)
+    commit_workflow!(w0)
+
+
 
     # create Contract
     c = Contract()
-    cr = ContractRevision(description="blue")
+    cr = ContractRevision(description="contract creation properties")
     cpr = ContractPartnerRef(ref_super=c.id)
-    cprr = ContractPartnerRefRevision(ref_partner=p.ref_history, ref_role=cpRole["Policy Holder"], description="blue")
+    cprr = ContractPartnerRefRevision(ref_partner=p.ref_history, ref_role=cpRole["Policy Holder"], description="policiyholder ref properties")
 
     cpi = ProductItem(ref_super=c.id)
-    cpir = ProductItemRevision(position=1, description="blue")
+    cpir = ProductItemRevision(position=1, description="Item 1")
 
     pitr = ProductItemTariffRef(ref_super=cpi.id)
-    pitrr = ProductItemTariffRefRevision(ref_tariff=t.ref_history, ref_role=pitrRole["Main Coverage - Life"], description="blue")
-    pipr = ProductItemPartnerRef(ref_super=cpi.id)
-    piprr = ProductItemPartnerRefRevision(ref_partner=p.ref_history, ref_role=piprRole["Insured Person"], description="blue")
+    pitrr = ProductItemTariffRefRevision(ref_tariff=t.ref_history, ref_role=pitrRole["Main Coverage - Life"], description="Life Risk tariff parameters")
+    pipr = ProductItemPartnerRef(ref_super=pitr.id)
+    piprr = ProductItemPartnerRefRevision(ref_partner=p.ref_history, ref_role=piprRole["Insured Person"], description="partner 1 ref properties")
 
     cpi2 = ProductItem(ref_super=c.id)
     cpi2r = ProductItemRevision(position=2, description="pink")
     pi2tr = ProductItemTariffRef(ref_super=cpi2.id)
-    pi2trr = ProductItemTariffRefRevision(ref_tariff=t2.ref_history, ref_role=pitrRole["Supplementary Coverage - Occupational Disablity"], description="pink")
-    pi2pr = ProductItemPartnerRef(ref_super=cpi.id)
+    pi2trr = ProductItemTariffRefRevision(ref_tariff=t2.ref_history, ref_role=pitrRole["Supplementary Coverage - Occupational Disablity"], description="Occupational Disability tariff parameters")
+    pi2pr = ProductItemPartnerRef(ref_super=pi2tr.id)
     pi2prr = ProductItemPartnerRefRevision(ref_partner=p.ref_history, ref_role=piprRole["Insured Person"], description="pink")
 
     w1 = Workflow(
@@ -116,7 +127,7 @@ end
     # update Contract yellow
     # @testset "UpdateContractYellow" begin
 
-    cr1 = ContractRevision(ref_component=c.id, description="yellow")
+    cr1 = ContractRevision(ref_component=c.id, description="contract 1, 2nd mutation")
     w2 = Workflow(
         ref_history=w1.ref_history,
         tsw_validfrom=ZonedDateTime(2016, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),
@@ -130,7 +141,7 @@ end
 
     # update Contract red
     # @testset "UpdateContractRed" begin
-    cr2 = ContractRevision(ref_component=c.id, description="red")
+    cr2 = ContractRevision(ref_component=c.id, description="contract 1, 3rd mutation retrospective")
     w3 = Workflow(
         ref_history=w2.ref_history,
         tsw_validfrom=ZonedDateTime(2015, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),

@@ -5,7 +5,8 @@ cs = Dict{String,Any}("tsdb_validfrom" => "2022-06-16T16:27:21.510+00:00", "ref_
 @reactive mutable struct Model <: ReactiveModel
   tab::R{String} = ""
   productitems::R{Vector{Dict{String,Any}}} = cs["product_items"]
-  rolesTextPartner::R{Dict{Integer,String}} = Dict{Integer,String}([1 => "Policy Holder", 2 => "Premium Payer"])
+  rolesTextPartner::R{Dict{Integer,String}} = Dict{Integer,String}([1 => "Insured Person"])
+  rolesTextTariff::R{Dict{Integer,String}} = Dict{Integer,String}([1 => "Death", 2 => "Occupational Disability"])
 end
 
 
@@ -16,15 +17,17 @@ function ui(model)
     Html.div(id="q-app", style="min-height: 100vh;",
       Html.div(class="q-pa-md",
         card(class="my-card",
-          [card_section([Html.div(class="text-h6", "Product Items Stipple"),
-              Html.div(class="text-subtitle2", "??? Stipple"),
+          [card_section([Html.div(class="text-h6", "Product Items"),
             ]),
             """
               <q-markup-table>
                 <template>
                   <thead>
                     <tr>
-                      <th class="text-left">Coverage</th>
+                      <th class="text-left">Partner</th>
+                      <th class="text-right">Role</th>
+                      <th class="text-right">Id</th>
+                      <th class="text-right">Coverage</th>
                       <th class="text-right">Role</th>
                       <th class="text-right">Id</th>
                     </tr>
@@ -37,6 +40,9 @@ function ui(model)
                       <td class="text-left">{{productitems[index]['productitem_partnerrefs'][0][0]['description']}}</td>
                       <td class="text-right">{{rolesTextPartner[productitems[index]['productitem_partnerrefs'][0][0]['ref_role']['value']]}}</td>
                       <td class="text-right">{{productitems[index]['productitem_partnerrefs'][0][0]['id']['value']}}</td>
+                      <td class="text-right">{{productitems[index]['productitem_tariffrefs'][0][0]['description']}}</td>
+                      <td class="text-right">{{rolesTextTariff[productitems[index]['productitem_tariffrefs'][0][0]['ref_role']['value']]}}</td>
+                      <td class="text-right">{{productitems[index]['productitem_tariffrefs'][0][0]['id']['value']}}</td>
                     </tr>
                   </template>
                   </tbody>
