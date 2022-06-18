@@ -1,11 +1,11 @@
 drop table schema_migrations;
-drop table productitemtariffrefrevisions;
-drop table productitemtariffrefs;
-drop table productitempartnerrefrevisions;
-drop table productitempartnerrefs;
+drop table tariffitemrevisions;
+drop table tariffitempartnerrefrevisions;
+drop table tariffitempartnerrefs;
+drop table tariffitems;
 drop table productitemrevisions;
-drop table productitemtariffroles;
-drop table productitempartnerroles;
+drop table tariffitemroles;
+drop table tariffitempartnerroles;
 drop table productitems;
 drop table contractpartnerrefrevisions;
 drop table contractpartnerrefs;

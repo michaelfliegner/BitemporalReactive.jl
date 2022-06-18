@@ -24,12 +24,12 @@ export Contract,
     psection,
     ProductItem,
     ProductItemRevision,
-    ProductItemTariffRole,
-    ProductItemTariffRef,
-    ProductItemTariffRefRevision,
-    ProductItemPartnerRole,
-    ProductItemPartnerRef,
-    ProductItemPartnerRefRevision,
+    TariffItemRole,
+    TariffItem,
+    TariffItemRevision,
+    TariffItemPartnerRole,
+    TariffItemPartnerRef,
+    TariffItemPartnerRefRevision,
     ProductSection,
     TariffSection,
     tsection
@@ -60,14 +60,14 @@ end
     tariff_revision::TariffRevision = TariffRevision()
 end
 
-@kwdef mutable struct TariffRefSection
-    tariffref::Tuple{ProductItemTariffRefRevision,TariffSection} = Tuple((ProductItemTariffRefRevision(), TariffSection()))
-    partnerrefs::Vector{Tuple{ProductItemPartnerRefRevision,PartnerSection}} = [Tuple((ProductItemPartnerRefRevision(), PartnerSection()))]
+@kwdef mutable struct TariffItemSection
+    tariffref::Tuple{TariffItemRevision,TariffSection} = Tuple((TariffItemRevision(), TariffSection()))
+    partnerrefs::Vector{Tuple{TariffItemPartnerRefRevision,PartnerSection}} = [Tuple((TariffItemPartnerRefRevision(), PartnerSection()))]
 end
 
 @kwdef mutable struct ProductItemSection
     productitem_revision::ProductItemRevision = ProductItemRevision(position=0)
-    productitem_tariffrefs::Vector{TariffRefSection} = [TariffRefSection]
+    tariff_items::Vector{TariffItemSection} = [TariffItemSection]
 end
 
 @kwdef mutable struct ContractSection
@@ -122,34 +122,34 @@ function pisection(history_id::Integer, version_id::Integer, tsdb_validfrom, tsw
                 pi.id,
                 DbId(version_id),
             ),
-            trs = find(ProductItemTariffRef, SQLWhereExpression("ref_history = BIGINT ? and ref_super = BIGINT ? ", DbId(history_id), pi.id)),
+            trs = find(TariffItem, SQLWhereExpression("ref_history = BIGINT ? and ref_super = BIGINT ? ", DbId(history_id), pi.id)),
             pitrs = map(trs) do tr
                 let trr = get_revision(
-                        ProductItemTariffRefRevision,
+                        TariffItemRevision,
                         tr.id,
                         DbId(version_id)
                     ),
                     ts = tsection(trr.ref_tariff.value, tsdb_validfrom, tsworld_validfrom),
-                    pitrprs = find(ProductItemPartnerRef, SQLWhereExpression("ref_history = BIGINT ? and ref_super = BIGINT ? ", DbId(history_id), tr.id)),
+                    pitrprs = find(TariffItemPartnerRef, SQLWhereExpression("ref_history = BIGINT ? and ref_super = BIGINT ? ", DbId(history_id), tr.id)),
                     pitrprrs = map(pitrprs) do pr
                         let prr = get_revision(
-                                ProductItemPartnerRefRevision,
+                                TariffItemPartnerRefRevision,
                                 pr.id,
                                 DbId(version_id)
                             ),
                             ps = psection(prr.ref_partner.value, tsdb_validfrom, tsworld_validfrom)
 
-                            Tuple{ProductItemPartnerRefRevision,PartnerSection}((prr, ps))
+                            Tuple{TariffItemPartnerRefRevision,PartnerSection}((prr, ps))
                         end
                     end
 
-                    TariffRefSection(Tuple{ProductItemTariffRefRevision,TariffSection}((trr, ts)), pitrprrs)
+                    TariffItemSection(Tuple{TariffItemRevision,TariffSection}((trr, ts)), pitrprrs)
                 end
             end
 
             ProductItemSection(
                 productitem_revision=pir,
-                productitem_tariffrefs=pitrs
+                tariff_items=pitrs
             )
 
 

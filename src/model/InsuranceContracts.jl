@@ -2,7 +2,7 @@ module InsuranceContracts
 import BitemporalPostgres
 import SearchLight: DbId, AbstractModel
 import Base: @kwdef
-export Contract, ContractRevision, ContractPartnerRole, ContractPartnerRef, ContractPartnerRefRevision, ProductItem, ProductItemTariffRole, ProductItemRevision, ProductItemTariffRef, ProductItemTariffRefRevision, ProductItemPartnerRole, ProductItemPartnerRef, ProductItemPartnerRefRevision
+export Contract, ContractRevision, ContractPartnerRole, ContractPartnerRef, ContractPartnerRefRevision, ProductItem, TariffItemRole, ProductItemRevision, TariffItem, TariffItemRevision, TariffItemPartnerRole, TariffItemPartnerRef, TariffItemPartnerRefRevision
 using BitemporalPostgres
 
 """
@@ -120,24 +120,24 @@ ContractPartnerRefRevision
 end
 
 """
-ProductItemTariffRole
+TariffItemRole
 
   role e.g. main or supplemental risk like life and occupational disabilty
 
 """
-@kwdef mutable struct ProductItemTariffRole <: Role
+@kwdef mutable struct TariffItemRole <: Role
   id::DbId = DbId()
-  domain::String = "ProductItemTariff"
+  domain::String = "TariffItem"
   value::String = ""
 end
 
 """
-ProductItemTariffRef
+TariffItem
 
-  a reference to a tariff of a productitem
+  a reference to a tariff with contractual parameters
 
 """
-@kwdef mutable struct ProductItemTariffRef <: BitemporalPostgres.SubComponent
+@kwdef mutable struct TariffItem <: BitemporalPostgres.SubComponent
   id::DbId = DbId()
   ref_history::DbId = InfinityKey
   ref_version::DbId = InfinityKey
@@ -145,12 +145,12 @@ ProductItemTariffRef
 end
 
 """
-ProductItemTariffRefRevision
+TariffItemRevision
 
-  a revision of a productitem's reference to a tariff
+  a revision of a tariffitem
 
 """
-@kwdef mutable struct ProductItemTariffRefRevision <: BitemporalPostgres.ComponentRevision
+@kwdef mutable struct TariffItemRevision <: BitemporalPostgres.ComponentRevision
   id::DbId = DbId()
   ref_component::DbId = InfinityKey
   ref_role::DbId = InfinityKey
@@ -161,24 +161,24 @@ ProductItemTariffRefRevision
 end
 
 """
-ProductItemPartnerRole
+TariffItemPartnerRole
 
-  role e.g. main or supplemental risk like life and occupational disabilty
+  role of Partner for tariffitem, 1. or 2. insured person
 
 """
-@kwdef mutable struct ProductItemPartnerRole <: Role
+@kwdef mutable struct TariffItemPartnerRole <: Role
   id::DbId = DbId()
-  domain::String = "ProductItemPartner"
+  domain::String = "TariffItemPartner"
   value::String = ""
 end
 
 """
-ProductItemPartnerRef
+TariffItemPartnerRef
 
-  a reference to a partner of a productitem, i.e. insured person
+  a reference to a partner of a tariffitem, i.e. insured person
 
 """
-@kwdef mutable struct ProductItemPartnerRef <: BitemporalPostgres.SubComponent
+@kwdef mutable struct TariffItemPartnerRef <: BitemporalPostgres.SubComponent
   id::DbId = DbId()
   ref_history::DbId = InfinityKey
   ref_version::DbId = InfinityKey
@@ -186,12 +186,12 @@ ProductItemPartnerRef
 end
 
 """
-ProductItemPartnerRefRevision
+TariffItemPartnerRefRevision
 
   a revision of a productItem's partner reference
 
 """
-@kwdef mutable struct ProductItemPartnerRefRevision <: BitemporalPostgres.ComponentRevision
+@kwdef mutable struct TariffItemPartnerRefRevision <: BitemporalPostgres.ComponentRevision
   id::DbId = DbId()
   ref_component::DbId = InfinityKey
   ref_role::DbId = InfinityKey

@@ -176,7 +176,7 @@ function up()
         :tariffRevisions,
     )
 
-    create_table(:productItemTariffRoles) do
+    create_table(:TariffItemRoles) do
         [
             column(:id, :bigserial, "PRIMARY KEY")
             column(:domain, :string)
@@ -184,7 +184,7 @@ function up()
         ]
     end
 
-    create_table(:productItemTariffRefs) do
+    create_table(:TariffItems) do
         [
             column(:id, :bigserial, "PRIMARY KEY")
             column(:ref_history, :bigint, "REFERENCES histories(id) ON DELETE CASCADE")
@@ -193,11 +193,11 @@ function up()
         ]
     end
 
-    create_table(:productItemTariffRefRevisions) do
+    create_table(:TariffItemRevisions) do
         [
             column(:id, :bigserial, "PRIMARY KEY")
-            column(:ref_component, :bigint, "REFERENCES productItemTariffRefs(id) ON DELETE CASCADE",)
-            column(:ref_role, :bigint, "REFERENCES productitemtariffroles(id) ON DELETE CASCADE")
+            column(:ref_component, :bigint, "REFERENCES tariffitems(id) ON DELETE CASCADE",)
+            column(:ref_role, :bigint, "REFERENCES tariffitemroles(id) ON DELETE CASCADE")
             column(:ref_validfrom, :bigint, "REFERENCES versions(id) ON DELETE CASCADE")
             column(:ref_invalidfrom, :bigint, "REFERENCES versions(id) ON DELETE CASCADE")
             column(:ref_valid, :int8range)
@@ -209,10 +209,10 @@ function up()
     createRevisionsTriggerAndConstraint(
         :pitrr_versions_trig,
         :pitrr_versionrange,
-        :productItemTariffRefRevisions,
+        :TariffItemRevisions,
     )
 
-    create_table(:productItemPartnerRoles) do
+    create_table(:TariffItemPartnerRoles) do
         [
             column(:id, :bigserial, "PRIMARY KEY")
             column(:domain, :string)
@@ -220,24 +220,24 @@ function up()
         ]
     end
 
-    create_table(:productItemPartnerRefs) do
+    create_table(:TariffItemPartnerRefs) do
         [
             column(:id, :bigserial, "PRIMARY KEY")
             column(:ref_history, :bigint, "REFERENCES histories(id) ON DELETE CASCADE")
             column(:ref_version, :bigint, "REFERENCES versions(id) ON DELETE CASCADE")
-            column(:ref_super, :bigint, "REFERENCES productItemTariffRefs(id) ON DELETE CASCADE")
+            column(:ref_super, :bigint, "REFERENCES tariffitems(id) ON DELETE CASCADE")
         ]
     end
 
-    create_table(:productItemPartnerRefRevisions) do
+    create_table(:TariffItemPartnerRefRevisions) do
         [
             column(:id, :bigserial, "PRIMARY KEY")
             column(
                 :ref_component,
                 :bigint,
-                "REFERENCES productItemPartnerRefs(id) ON DELETE CASCADE",
+                "REFERENCES tariffitems(id) ON DELETE CASCADE",
             )
-            column(:ref_role, :bigint, "REFERENCES productitempartnerroles(id) ON DELETE CASCADE")
+            column(:ref_role, :bigint, "REFERENCES tariffitempartnerroles(id) ON DELETE CASCADE")
             column(:ref_validfrom, :bigint, "REFERENCES versions(id) ON DELETE CASCADE")
             column(:ref_invalidfrom, :bigint, "REFERENCES versions(id) ON DELETE CASCADE")
             column(:ref_valid, :int8range)
@@ -249,7 +249,7 @@ function up()
     createRevisionsTriggerAndConstraint(
         :piprr_versions_trig,
         :piprr_versionrange,
-        :productItemPartnerRefRevisions,
+        :TariffItemPartnerRefRevisions,
     )
 
 end
@@ -262,10 +262,10 @@ function down()
     drop_table(:contractProductItemRevisions)
     drop_table(:contractPartnerRefRevisions)
     drop_table(:contractPartnerRefs)
-    drop_table(:productItemTariffRefRevisions)
-    drop_table(:productItemTariffRefs)
-    drop_table(:productItemPartnerRefRevisions)
-    drop_table(:productItemPartnerRefs)
+    drop_table(:tariffitemRevisions)
+    drop_table(:tariffItems)
+    drop_table(:tariffItemPartnerRefRevisions)
+    drop_table(:tariffItemPartnerRefs)
     drop_table(:partnerRevisions)
     drop_table(:partners)
     drop_table(:tariffRevisions)

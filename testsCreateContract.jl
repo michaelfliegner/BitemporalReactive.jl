@@ -25,11 +25,11 @@ end
     contractpartnerroles = map(["Policy Holder" "Premium Payer"]) do val
         save!(ContractPartnerRole(value=val))
     end
-    productitempartnerroles = map(["Insured Person" "2nd Insured Person"]) do val
-        save!(ProductItemPartnerRole(value=val))
+    tariffitempartnerroles = map(["Insured Person" "2nd Insured Person"]) do val
+        save!(TariffItemPartnerRole(value=val))
     end
-    productitemtariffroles = map(["Main Coverage - Life" "Supplementary Coverage - Occupational Disablity"]) do val
-        save!(ProductItemTariffRole(value=val))
+    tariffitemtariffroles = map(["Main Coverage - Life" "Supplementary Coverage - Occupational Disablity"]) do val
+        save!(TariffItemRole(value=val))
     end
 
     cpRole = Dict{String,Int64}()
@@ -37,11 +37,11 @@ end
         cpRole[entry.value] = entry.id.value
     end
     piprRole = Dict{String,Int64}()
-    map(find(InsuranceContractsController.ProductItemPartnerRole)) do entry
+    map(find(InsuranceContractsController.TariffItemPartnerRole)) do entry
         piprRole[entry.value] = entry.id.value
     end
     pitrRole = Dict{String,Int64}()
-    map(find(InsuranceContractsController.ProductItemTariffRole)) do entry
+    map(find(InsuranceContractsController.TariffItemRole)) do entry
         pitrRole[entry.value] = entry.id.value
     end
 
@@ -94,17 +94,17 @@ end
     cpi = ProductItem(ref_super=c.id)
     cpir = ProductItemRevision(position=1, description="Item 1")
 
-    pitr = ProductItemTariffRef(ref_super=cpi.id)
-    pitrr = ProductItemTariffRefRevision(ref_tariff=t.ref_history, ref_role=pitrRole["Main Coverage - Life"], description="Life Risk tariff parameters")
-    pipr = ProductItemPartnerRef(ref_super=pitr.id)
-    piprr = ProductItemPartnerRefRevision(ref_partner=p.ref_history, ref_role=piprRole["Insured Person"], description="partner 1 ref properties")
+    pitr = TariffItem(ref_super=cpi.id)
+    pitrr = TariffItemRevision(ref_tariff=t.ref_history, ref_role=pitrRole["Main Coverage - Life"], description="Life Risk tariff parameters")
+    pipr = TariffItemPartnerRef(ref_super=pitr.id)
+    piprr = TariffItemPartnerRefRevision(ref_partner=p.ref_history, ref_role=piprRole["Insured Person"], description="partner 1 ref properties")
 
     cpi2 = ProductItem(ref_super=c.id)
     cpi2r = ProductItemRevision(position=2, description="pink")
-    pi2tr = ProductItemTariffRef(ref_super=cpi2.id)
-    pi2trr = ProductItemTariffRefRevision(ref_tariff=t2.ref_history, ref_role=pitrRole["Supplementary Coverage - Occupational Disablity"], description="Occupational Disability tariff parameters")
-    pi2pr = ProductItemPartnerRef(ref_super=pi2tr.id)
-    pi2prr = ProductItemPartnerRefRevision(ref_partner=p.ref_history, ref_role=piprRole["Insured Person"], description="pink")
+    pi2tr = TariffItem(ref_super=cpi2.id)
+    pi2trr = TariffItemRevision(ref_tariff=t2.ref_history, ref_role=pitrRole["Supplementary Coverage - Occupational Disablity"], description="Occupational Disability tariff parameters")
+    pi2pr = TariffItemPartnerRef(ref_super=pi2tr.id)
+    pi2prr = TariffItemPartnerRefRevision(ref_partner=p.ref_history, ref_role=piprRole["Insured Person"], description="pink")
 
     w1 = Workflow(
         tsw_validfrom=ZonedDateTime(2014, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),
