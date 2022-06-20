@@ -43,12 +43,13 @@ export Tariff, TariffRevision
 export ContractSection, ProductItemSection, PartnerSection, TariffSection, csection, pisection, tsection, psection
 export insurancecontracts_view
 
+
 @kwdef mutable struct PartnerSection
     tsdb_validfrom::TimeZones.ZonedDateTime = now(tz"UTC")
     tsw_validfrom::TimeZones.ZonedDateTime = now(tz"UTC")
     ref_history::SearchLight.DbId = DbId(InfinityKey)
     ref_version::SearchLight.DbId = MaxVersion
-    partner_revision::PartnerRevision = PartnerRevision()
+    revision::PartnerRevision = PartnerRevision()
 end
 
 
@@ -57,17 +58,32 @@ end
     tsw_validfrom::TimeZones.ZonedDateTime = now(tz"UTC")
     ref_history::SearchLight.DbId = DbId(InfinityKey)
     ref_version::SearchLight.DbId = MaxVersion
-    tariff_revision::TariffRevision = TariffRevision()
+    revision::TariffRevision = TariffRevision()
+end
+
+@kwdef mutable struct TariffItemPartnerReference
+    rev::TariffItemPartnerRefRevision = TariffItemPartnerRefRevision()
+    ref::PartnerSection = PartnerSection()
+end
+
+@kwdef mutable struct TariffItemTariffReference
+    rev::TariffItemRevision = TariffItemRevision()
+    ref::TariffSection = TariffSection()
 end
 
 @kwdef mutable struct TariffItemSection
-    tariffref::Tuple{TariffItemRevision,TariffSection} = Tuple((TariffItemRevision(), TariffSection()))
-    partnerrefs::Vector{Tuple{TariffItemPartnerRefRevision,PartnerSection}} = [Tuple((TariffItemPartnerRefRevision(), PartnerSection()))]
+    tariff_ref::TariffItemTariffReference = TariffItemTariffReference()
+    partner_refs::Vector{TariffItemPartnerReference} = [TariffItemPartnerReference()]
 end
 
 @kwdef mutable struct ProductItemSection
-    productitem_revision::ProductItemRevision = ProductItemRevision(position=0)
+    revision::ProductItemRevision = ProductItemRevision(position=0)
     tariff_items::Vector{TariffItemSection} = [TariffItemSection]
+end
+
+@kwdef mutable struct ContractPartnerReference
+    rev::ContractPartnerRefRevision = TariffItemContractPartnerRefRevision()
+    ref::PartnerSection = PartnerSection()
 end
 
 @kwdef mutable struct ContractSection
@@ -75,9 +91,9 @@ end
     tsw_validfrom::TimeZones.ZonedDateTime = now(tz"UTC")
     ref_history::SearchLight.DbId = DbId(InfinityKey)
     ref_version::SearchLight.DbId = MaxVersion
-    contract_revision::ContractRevision = ContractRevision()
-    contract_partnerrefs::Vector{Tuple{ContractPartnerRefRevision,PartnerSection}} = [(ContractPartnerRefRevision(), PartnerSection())]
-    product_items::Vector{ProductItemSection} = [Pruct | ItemSection()]
+    revision::ContractRevision = ContractRevision()
+    partner_refs::Vector{ContractPartnerReference} = [ContractPartnerReference]
+    product_items::Vector{ProductItemSection} = [ProductItemSection()]
     ref_entities::Dict{DbId,Union{PartnerSection,ContractSection,TariffSection}} =
         Dict{DbId,Union{PartnerSection,ContractSection,TariffSection}}()
 end
@@ -139,16 +155,16 @@ function pisection(history_id::Integer, version_id::Integer, tsdb_validfrom, tsw
                             ),
                             ps = psection(prr.ref_partner.value, tsdb_validfrom, tsworld_validfrom)
 
-                            Tuple{TariffItemPartnerRefRevision,PartnerSection}((prr, ps))
+                            TariffItemPartnerReference(prr, ps)
                         end
                     end
 
-                    TariffItemSection(Tuple{TariffItemRevision,TariffSection}((trr, ts)), pitrprrs)
+                    TariffItemSection(TariffItemTariffReference(trr, ts), pitrprrs)
                 end
             end
 
             ProductItemSection(
-                productitem_revision=pir,
+                revision=pir,
                 tariff_items=pitrs
             )
 
@@ -169,13 +185,13 @@ function csection(contract_id::Integer, tsdb_validfrom, tsworld_validfrom)::Cont
     ContractSection(
         ref_history=DbId(history_id),
         ref_version=DbId(version_id),
-        contract_revision=get_revision(
+        revision=get_revision(
             Contract,
             ContractRevision,
             DbId(history_id),
             DbId(version_id),
         ),
-        contract_partnerrefs=
+        partner_refs=
         let cprrs = find(ContractPartnerRef, SQLWhereExpression("ref_history = BIGINT ? ", DbId(history_id)))
             map(cprrs) do cprr
                 let cprr = get_revision(
@@ -185,7 +201,7 @@ function csection(contract_id::Integer, tsdb_validfrom, tsworld_validfrom)::Cont
                     ),
                     ps = PartnerSection()
 
-                    Tuple{ContractPartnerRefRevision,PartnerSection}((cprr, ps))
+                    ContractPartnerReference(cprr, ps)
                 end
             end
         end,
@@ -203,7 +219,7 @@ function psection(partner_id::Integer, tsdb_validfrom, tsworld_validfrom)::Partn
     history_id = find(Partner, SQLWhereExpression("id=?", DbId(partner_id)))[1].ref_history
     version_id = findversion(history_id, tsdb_validfrom, tsworld_validfrom).value
     PartnerSection(
-        partner_revision=get_revision(
+        revision=get_revision(
             Partner,
             PartnerRevision,
             DbId(history_id),
@@ -217,7 +233,7 @@ function tsection(tariff_id::Integer, tsdb_validfrom, tsworld_validfrom)::Tariff
     history_id = find(Tariff, SQLWhereExpression("id=?", DbId(tariff_id)))[1].ref_history
     version_id = findversion(DbId(history_id), tsdb_validfrom, tsworld_validfrom).value
     TariffSection(
-        tariff_revision=get_revision(
+        revision=get_revision(
             Tariff,
             TariffRevision,
             DbId(history_id),
