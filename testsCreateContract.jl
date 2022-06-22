@@ -2,8 +2,7 @@ push!(LOAD_PATH, "src")
 push!(LOAD_PATH, "src/model")
 import Base: @kwdef
 using Test
-include("src/model/InsuranceContractsController.jl")
-using .InsuranceContractsController
+using InsuranceContractsController
 using BitemporalPostgres
 using SearchLight
 using SearchLightPostgreSQL
@@ -13,8 +12,9 @@ using JSON
 using HTTP
 
 if (haskey(ENV, "GENIE_ENV") && ENV["GENIE_ENV"] == "dev")
-    run(```sudo -u postgres psql -f ../sqlsnippets/droptables.sql```)
+    run(```sudo -u postgres psql -f sqlsnippets/droptables.sql```)
 end
+
 
 @testset "CreateContract" begin
 
@@ -28,7 +28,7 @@ end
     tariffitempartnerroles = map(["Insured Person" "2nd Insured Person"]) do val
         save!(TariffItemPartnerRole(value=val))
     end
-    tariffitemtariffroles = map(["Main Coverage - Life" "Supplementary Coverage - Occupational Disablity"]) do val
+    tariffitemtariffroles = map(["Main Coverage - Life" "Supplementary Coverage - Occupational Disablity" "Supplementary Coverage - Terminal Illness" "Profit participation"]) do val
         save!(TariffItemRole(value=val))
     end
 
@@ -79,47 +79,57 @@ end
     w0 = Workflow(
         tsw_validfrom=ZonedDateTime(2014, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),
     )
+
     create_entity!(w0)
     create_component!(t3, tr3, w0)
+    commit_workflow!(w0)
+
+    t4 = Tariff()
+    tr4 = TariffRevision(description="Profit participation")
+    w0 = Workflow(
+        tsw_validfrom=ZonedDateTime(2014, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),
+    )
+    create_entity!(w0)
+    create_component!(t4, tr4, w0)
     commit_workflow!(w0)
 
 
 
     # create Contract
-    c = Contract()
-    cr = ContractRevision(description="contract creation properties")
-    cpr = ContractPartnerRef(ref_super=c.id)
-    cprr = ContractPartnerRefRevision(ref_partner=p.ref_history, ref_role=cpRole["Policy Holder"], description="policiyholder ref properties")
-
-    cpi = ProductItem(ref_super=c.id)
-    cpir = ProductItemRevision(position=1, description="Item 1")
-
-    pitr = TariffItem(ref_super=cpi.id)
-    pitrr = TariffItemRevision(ref_tariff=t.ref_history, ref_role=pitrRole["Main Coverage - Life"], description="Life Risk tariff parameters")
-    pipr = TariffItemPartnerRef(ref_super=pitr.id)
-    piprr = TariffItemPartnerRefRevision(ref_partner=p.ref_history, ref_role=piprRole["Insured Person"], description="partner 1 ref properties")
-
-    cpi2 = ProductItem(ref_super=c.id)
-    cpi2r = ProductItemRevision(position=2, description="pink")
-    pi2tr = TariffItem(ref_super=cpi2.id)
-    pi2trr = TariffItemRevision(ref_tariff=t2.ref_history, ref_role=pitrRole["Supplementary Coverage - Occupational Disablity"], description="Occupational Disability tariff parameters")
-    pi2pr = TariffItemPartnerRef(ref_super=pi2tr.id)
-    pi2prr = TariffItemPartnerRefRevision(ref_partner=p.ref_history, ref_role=piprRole["Insured Person"], description="pink")
-
     w1 = Workflow(
         tsw_validfrom=ZonedDateTime(2014, 5, 30, 21, 0, 1, 1, tz"Africa/Porto-Novo"),
     )
+
     create_entity!(w1)
+    c = Contract()
+    cr = ContractRevision(description="contract creation properties")
     create_component!(c, cr, w1)
+
+    cpr = ContractPartnerRef(ref_super=c.id)
+    cprr = ContractPartnerRefRevision(ref_partner=p.id, ref_role=cpRole["Policy Holder"], description="policiyholder ref properties")
     create_subcomponent!(c, cpr, cprr, w1)
-
+    # pi 1
+    cpi = ProductItem(ref_super=c.id)
+    cpir = ProductItemRevision(position=1, description="Item 1")
     create_subcomponent!(c, cpi, cpir, w1)
-    create_subcomponent!(cpi, pitr, pitrr, w1)
-    create_subcomponent!(cpi, pipr, piprr, w1)
+    # pi 1 ti 1 
+    pit = TariffItem(ref_super=cpi.id)
+    pitr = TariffItemRevision(ref_tariff=t.id, ref_role=pitrRole["Main Coverage - Life"], description="Life Risk tariff parameters")
+    create_subcomponent!(cpi, pit, pitr, w1)
+    # pi 1 ti 1 p 1
+    pitp = TariffItemPartnerRef(ref_super=pit.id)
+    pitpr = TariffItemPartnerRefRevision(ref_partner=p.id, ref_role=piprRole["Insured Person"], description="partner 1 ref properties")
+    create_subcomponent!(pit, pitp, pitpr, w1)
 
-    create_subcomponent!(c, cpi2, cpi2r, w1)
-    create_subcomponent!(cpi2, pi2tr, pi2trr, w1)
-    create_subcomponent!(cpi2, pi2pr, pi2prr, w1)
+    # pi 1 ti 2 
+    pit = TariffItem(ref_super=cpi.id)
+    pitr = TariffItemRevision(ref_tariff=t4.id, ref_role=pitrRole["Profit participation"], description="Profit participation tariff parameters")
+    create_subcomponent!(cpi, pit, pitr, w1)
+    # pi 1 ti 2 p 1
+    pitp = TariffItemPartnerRef(ref_super=pit.id)
+    pitpr = TariffItemPartnerRefRevision(ref_partner=p.id, ref_role=piprRole["Insured Person"], description="partner 1 ref properties")
+    create_subcomponent!(pit, pitp, pitpr, w1)
+
     commit_workflow!(w1)
 
     # end
