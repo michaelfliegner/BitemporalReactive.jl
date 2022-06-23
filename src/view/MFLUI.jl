@@ -77,6 +77,7 @@ function tariff_items()
                         <th class="text-left text-white">Item</th>
                         <th class="text-left text-white">Role</th>
                         <th class="text-left text-white">Tariff Id</th>
+                        <th class="text-left text-white">Tariff Parameters</th>
                       </tr>
                     </thead>
                   </template>
@@ -87,7 +88,7 @@ function tariff_items()
                          <td class="text-left text-white">{{pindex}},{{tindex}}</td>
                         <td class="text-left text-white"> {{rolesTariffItem[tid['tariff_ref']['rev']['ref_role']['value']]}}</td>
                         <td class="text-left text-white"> {{tid['tariff_ref']['rev']['ref_tariff']['value']}}</td>
-                        <td class="text-left text-white"> {{tid['tariff_ref']['ref']['revision']['description']}}</td>
+                        <td class="text-left text-white"> {{tid['tariff_ref']['rev']['description']}}</td>
                       </tr>
       """,
       tariff_item_partners(),
@@ -164,9 +165,27 @@ function contract_partners()
 end
 function contract()
   card(class="my-card bg-purple-8 text-white",
-    [card_section([Html.div(class="text-h2 text-white", "Product ItemsContract"),
+    [card_section([Html.div(class="text-h2 text-white", "Contract {{cs['revision']['ref_component']['value']}}"),
         btn("Show Contract Partners", @click("show_contract_partners=!show_contract_partners")),
-        btn("Show Product Items", @click("show_product_items=!show_product_items"))
+        btn("Show Product Items", @click("show_product_items=!show_product_items")),
+        """
+        <q-markup-table dark class="bg-deep-purple-5 text-white">
+                  <template>
+                    <thead>
+                      <tr>
+                        <th class="text-left text-white">Description</th>
+                      </tr>
+                    </thead>
+                  </template>
+                  <template>
+                    <tbody>
+                      <tr>
+                        <td class="text-left text-white">{{cs['revision']['description']}}</td>
+                      </tr>
+                    </tbody>
+                   </template>
+                </q-markup-table>
+        """
       ]),
       contract_partners(),
       product_items(),

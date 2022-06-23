@@ -110,7 +110,7 @@ end
     create_subcomponent!(c, cpr, cprr, w1)
     # pi 1
     cpi = ProductItem(ref_super=c.id)
-    cpir = ProductItemRevision(position=1, description="Item 1")
+    cpir = ProductItemRevision(position=1, description="from contract creation")
     create_subcomponent!(c, cpi, cpir, w1)
     # pi 1 ti 1 
     pit = TariffItem(ref_super=cpi.id)
