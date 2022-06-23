@@ -6,6 +6,8 @@ using InsuranceContractsController, JSON, TimeZones
 @reactive mutable struct Model <: ReactiveModel
   cs::Dict{String,Any} = Dict{String,Any}()
   tab::R{String} = ""
+  show_contract_partners::R{Bool} = false
+  show_product_items::R{Bool} = false
   show_tariff_item_partners::R{Bool} = false
   show_tariff_items::R{Bool} = false
   rolesContractPartner::R{Dict{Integer,String}} = Dict{Integer,String}()
@@ -63,7 +65,7 @@ end
 
 function tariff_items()
   card(class="my-card bg-indigo-8 text-white",
-    [card_section([Html.div(class="text-h3 text-white", "Tariff Items"),
+    [card_section([Html.div(class="text-h3 text-white", "Tariff Items"), btn("Show Tariff Item Partners", @click("show_tariff_item_partners=!show_tariff_item_partners"))
       ]),
       """,
               <q-markup-table dark class="bg-indigo-5 text-white">
@@ -96,7 +98,7 @@ end
 
 function product_items()
   card(class="my-card bg-purple-8 text-white",
-    [card_section([Html.div(class="text-h2 text-white", "Product Items"),
+    [card_section([Html.div(class="text-h2 text-white", "Product Items"), btn("Show Tariff Items", @click("show_tariff_items=!show_tariff_items"))
       ]),
       """
         <q-markup-table class="dark bg-purple-5 text-white">
@@ -122,7 +124,48 @@ function product_items()
             </tbody>
           </template>
         </q-markup-table>
-  """])
+  """], var"v-if"="show_product_items")
+end
+
+function contract_partners()
+  card(class="my-card bg-deep-purple-8 text-white",
+    [card_section([
+        Html.div(class="text-h3 text-white", "Contract Partners"),
+      ]),
+      """,
+              <q-markup-table dark class="bg-deep-purple-5 text-white">
+                  <template>
+                    <thead>
+                      <tr>
+                        <th class="text-left text-white">Index</th>
+                        <th class="text-left text-white">Role</th>
+                        <th class="text-left text-white">Partner Id</th>
+                      </tr>
+                    </thead>
+                  </template>
+                  <template>
+                    <tbody>
+                      <template v-for="(cpid,cpindex) in cs['partner_refs']">
+                      <tr>
+                        <td class="text-left text-white">{{cpindex}}</td>
+                        <td class="text-left text-white">{{rolesContractPartner[cpid['rev']['ref_role']['value']]}}</td>
+                        <td class="text-left text-white">{{cpid['rev']['ref_partner']['value']}}</td>
+                      </tr>
+                    </template>
+                    </tbody>
+                  </template>
+                </q-markup-table>
+      """,], var"v-if"="show_contract_partners")
+end
+function contract()
+  card(class="my-card bg-purple-8 text-white",
+    [card_section([Html.div(class="text-h2 text-white", "Product ItemsContract"),
+        btn("Show Contract Partners", @click("show_contract_partners=!show_contract_partners")),
+        btn("Show Product Items", @click("show_product_items=!show_product_items"))
+      ]),
+      contract_partners(),
+      product_items(),
+    ])
 end
 
 function ui(model)
@@ -131,7 +174,7 @@ function ui(model)
     title="Bitemporal Reactive ContractSection",
     Html.div(id="q-app", style="min-height: 100vh;",
       Html.div(class="q-pa-md",
-        product_items(),
+        contract(),
       ))
   )
 end
