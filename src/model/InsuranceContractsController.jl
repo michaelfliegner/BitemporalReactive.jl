@@ -199,7 +199,7 @@ function csection(contract_id::Integer, tsdb_validfrom, tsworld_validfrom)::Cont
                         cprr.id,
                         DbId(version_id)
                     ),
-                    ps = PartnerSection()
+                    ps = psection(cprr.ref_partner.value, tsdb_validfrom, tsworld_validfrom)
 
                     ContractPartnerReference(cprr, ps)
                 end

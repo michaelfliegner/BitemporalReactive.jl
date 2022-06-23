@@ -45,6 +45,7 @@ function tariff_item_partners()
                         <th class="text-left text-white">Item</th>
                         <th class="text-left text-white">Role</th>
                         <th class="text-left text-white">Partner Id</th>
+                        <th class="text-left text-white">Partner Description</th>
                       </tr>
                     </thead>
                   </template>
@@ -55,6 +56,7 @@ function tariff_item_partners()
                         <td class="text-left text-white">{{pindex}},{{tindex}},{{tpindex}}</td>
                         <td class="text-left text-white">{{rolesTariffItemPartner[tpid['rev']['ref_role']['value']]}}</td>
                         <td class="text-left text-white">{{tpid['rev']['ref_partner']['value']}}</td>
+                        <td class="text-left text-white">{{tpid['ref']['revision']['description']}}</td>
                       </tr>
                     </template>
                     </tbody>
@@ -84,7 +86,8 @@ function tariff_items()
                       <tr>
                          <td class="text-left text-white">{{pindex}},{{tindex}}</td>
                         <td class="text-left text-white"> {{rolesTariffItem[tid['tariff_ref']['rev']['ref_role']['value']]}}</td>
-                        <td class="text-left text-white"> {{cs.product_items[pindex]['tariff_items'][tindex]['tariff_ref']['rev']['ref_tariff']['value']}}</td>
+                        <td class="text-left text-white"> {{tid['tariff_ref']['rev']['ref_tariff']['value']}}</td>
+                        <td class="text-left text-white"> {{tid['tariff_ref']['ref']['revision']['description']}}</td>
                       </tr>
       """,
       tariff_item_partners(),
@@ -140,6 +143,7 @@ function contract_partners()
                         <th class="text-left text-white">Index</th>
                         <th class="text-left text-white">Role</th>
                         <th class="text-left text-white">Partner Id</th>
+                        <th class="text-left text-white">Partner Description</th>
                       </tr>
                     </thead>
                   </template>
@@ -150,10 +154,11 @@ function contract_partners()
                         <td class="text-left text-white">{{cpindex}}</td>
                         <td class="text-left text-white">{{rolesContractPartner[cpid['rev']['ref_role']['value']]}}</td>
                         <td class="text-left text-white">{{cpid['rev']['ref_partner']['value']}}</td>
+                        <td class="text-left text-white">{{cpid['ref']['revision']['description']}}</td>
                       </tr>
                     </template>
                     </tbody>
-                  </template>
+                   </template>
                 </q-markup-table>
       """,], var"v-if"="show_contract_partners")
 end
