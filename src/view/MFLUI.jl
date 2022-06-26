@@ -1,14 +1,17 @@
 module MFLUI
 using SearchLight, Stipple, Stipple.Html, StippleUI
 
-using InsuranceContractsController, JSON, TimeZones
+using BitemporalPostgres, InsuranceContractsController, JSON, TimeZones
 
 @reactive mutable struct Model <: ReactiveModel
   contracts::R{Vector{Contract}} = []
-  selected_contract_idx::R{Integer} = 0
+  current_contract::R{Contract} = Contract()
+  selected_contract_idx::R{Integer} = -1
   process::R{Bool} = false
   selected_history::R{Integer} = 0
-  cs::Dict{String,Any} = Dict{String,Any}()
+  selected_version::R{Integer} = 0
+  history::R{Vector{Dict{String}}} = Dict{String,Any}[]
+  cs::Dict{String,Any} = Dict{String,Any}("loaded" => "false")
   tab::R{String} = "contracts"
   leftDrawerOpen::R{Bool} = false
   show_contract_partners::R{Bool} = false
@@ -56,6 +59,38 @@ function contract_list()
       @recur(:"(c,index) in contracts")
     )
   )
+end
+
+function renderhforest(model)
+  quasar(:tree, ref="tree", var"node-key"="label", var"children-key"="children", nodes=:history, var"default-expand-all"=false,
+    var"selected"=:selected_version,
+    """
+    <template v-slot:default-header="prop">
+    <div class="row items-center">
+      <div v-if="prop.node.icon">
+      <q-icon :name="prop.node.icon" size="28px" class="q-mr-sm" />
+      </div>
+          <q-field color="grey-3" label-color="primary" outlined>
+            <template v-slot:control>
+              <div class="self-center full-width no-outline" tabindex="0"><b>{{prop.node.label}}</b></div>
+            </template>
+          </q-field>
+          <q-field label="valid as of" stack-label outlined :dense="dense">
+            <template v-slot:control>
+              <div class="self-center full-width no-outline" tabindex="4">{{prop.node.time_valid_asof}}</div>
+            </template>
+          </q-field> 
+          <q-field label="committed" stack-label outlined :dense="dense">
+            <template v-slot:control>
+              <div class="self-center full-width no-outline" tabindex="2">{{prop.node.time_committed}}</div>
+            </template>
+          </q-field>     
+        </div>
+    </div>
+  </template>
+  <template v-slot:default-body="prop">
+  </template>
+    """)
 end
 
 function tariff_item_partners()
@@ -216,7 +251,7 @@ function contract()
       ]),
       contract_partners(),
       product_items(),
-    ])
+    ], var"v-if"="cs['loaded'] == 'true'")
 end
 
 function page_content(model)
@@ -252,7 +287,7 @@ function page_content(model)
             <q-tab-panel name="history">
                 <div class="text-h4 q-mb-md">History</div>
     """,
-    " renderhforest(model),",
+    renderhforest(model),
     """ 
             </q-tab-panel>
             <q-tab-panel name="csection">
@@ -333,25 +368,53 @@ function ui(model)
 
 end
 
+function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
+  i = Dict(string(fn) => getfield(getfield(node, :interval), fn) for fn ∈ fieldnames(ValidityInterval))
+  shdw = length(node.shadowed) == 0 ? [] : map(node.shadowed) do child
+    convert(child)
+  end
+  Dict("label" => string(i["ref_version"]), "interval" => i, "children" => shdw,
+    "time_committed" => string(i["tsdb_validfrom"]), "time_valid_asof" => string(i["tsworld_validfrom"]))
+end
+
 function handlers(model)
 
   on(model.selected_contract_idx) do _
-    if (model.selected_contract_idx[] == 999999999)
-      println("selected_contract ==99999999")
+    if (model.selected_contract_idx[] == -1)
+      println("selected_contract ==-1")
     else
       println("selected contract")
       println(model.selected_contract_idx[])
       println("sel c obj")
       println(model.contracts[model.selected_contract_idx[]+1])
-      model.selected_contract_idx[] = 999999999
+      model.current_contract[] = model.contracts[model.selected_contract_idx[]+1]
+      model.selected_contract_idx[] = -1
+      model.cs = JSON.parse(JSON.json(csection(model.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
+      model.cs["loaded"] = "true"
+      model.tab[] = "csection"
       push!(model)
     end
 
   end
 
-
   on(model.tab) do _
+    println("tab changed")
     println(model.tab[])
+    if (model.tab[] == "history")
+      println("current contract")
+      println(model.current_contract[])
+      println("history selected")
+      ref_h = model.current_contract[].ref_history.value
+      println(typeof(ref_h))
+      println(ref_h)
+      model.selected_history[] = ref_h
+      println("selected history")
+      println(model.selected_history[])
+      model.history[] = map(convert, InsuranceContractsController.history_forest(model.selected_history[]).shadowed)
+      println(typeof(h))
+      println(h)
+      push(!model)
+    end
   end
 
   on(model.isready) do _
@@ -359,7 +422,8 @@ function handlers(model)
     println("csection")
     model.contracts = InsuranceContractsController.get_contracts()
     model.tab[] = "contracts"
-    model.cs = JSON.parse(JSON.json(csection(1, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
+    model.cs["loaded"] = "false"
+    println()
     load_roles(model)
     push!(model)
     println("model pushed")
