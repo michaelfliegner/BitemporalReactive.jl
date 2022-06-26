@@ -4,8 +4,13 @@ using SearchLight, Stipple, Stipple.Html, StippleUI
 using InsuranceContractsController, JSON, TimeZones
 
 @reactive mutable struct Model <: ReactiveModel
+  contracts::R{Vector{Contract}} = []
+  selected_contract_idx::R{Integer} = 0
+  process::R{Bool} = false
+  selected_history::R{Integer} = 0
   cs::Dict{String,Any} = Dict{String,Any}()
-  tab::R{String} = ""
+  tab::R{String} = "contracts"
+  leftDrawerOpen::R{Bool} = false
   show_contract_partners::R{Bool} = false
   show_product_items::R{Bool} = false
   show_tariff_item_partners::R{Bool} = false
@@ -30,6 +35,27 @@ function load_roles(model)
     model.rolesTariffItemPartner[entry.id.value] = entry.value
   end
 
+end
+
+function contract_list()
+  list(dark=true, bordered=true, separator=true, style="max-width: 318px",
+    template(
+      item(
+        clickable=true,
+        vripple=true,
+        [
+          itemsection(
+            """<q-field outlined label="History ID" stack-label>
+                    <template v-slot:control>
+                        <div class="self-center no-outline" tabindex="0">{{c['id']['value'}}</div>
+                    </template>
+                </q-field>"""
+          )
+        ], @click("process=true")
+      ),
+      @recur(:"(c,index) in contracts")
+    )
+  )
 end
 
 function tariff_item_partners()
@@ -163,6 +189,7 @@ function contract_partners()
                 </q-markup-table>
       """,], var"v-if"="show_contract_partners")
 end
+
 function contract()
   card(class="my-card bg-purple-8 text-white",
     [card_section([Html.div(class="text-h2 text-white", "Contract {{cs['revision']['ref_component']['value']}}"),
@@ -192,25 +219,146 @@ function contract()
     ])
 end
 
+function page_content(model)
+  join([
+    """
+
+          <q-tab-panels
+            v-model="tab"
+            animated
+            swipeable
+            horizontal
+            transition-prev="jump-up"
+            transition-next="jump-up"
+          >
+            <q-tab-panel name="contracts">
+                <div class="text-h4 q-mb-md">Contracts</div>
+    """,
+    """
+      <template v-for="(cid,cindex) in contracts">
+        <div class="q-pa-md" style="max-width: 350px">
+          <q-list dense bordered padding class="rounded-borders">
+            <q-item clickable v-ripple v-on:click="selected_contract_idx=cindex">
+              <q-item-section>
+                {{cid}}
+              </q-item-section>
+            </q-item>   
+          </q-list>
+        </div>
+      </template>
+    """,
+    """       
+            </q-tab-panel>
+            <q-tab-panel name="history">
+                <div class="text-h4 q-mb-md">History</div>
+    """,
+    " renderhforest(model),",
+    """ 
+            </q-tab-panel>
+            <q-tab-panel name="csection">
+    """,
+    contract(),
+    """
+            </q-tab-panel>
+        </q-tab-panels>
+    """
+  ])
+end
+
 function ui(model)
   page(
     model,
-    title="Bitemporal Reactive ContractSection",
-    Html.div(id="q-app", style="min-height: 100vh;",
-      Html.div(class="q-pa-md",
-        contract(),
-      ))
-  )
+    class="container",
+    Genie.Renderer.Html.div(join([
+      """
+        <q-layout view="hHh lpR fFf">
+          <q-header elevated class="bg-primary text-white" >
+            <q-toolbar>
+              <!-- <q-btn dense flat icon="drawer" @click="leftDrawerOpen=!leftDrawerOpen" /></q-btn> -->
+              <q-btn color="primary" icon="menu" >
+                <q-menu>
+                  <q-list style="min-width: 100px">
+                    <q-item clickable v-close-popup>
+                      <q-item-section>New tab</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup>
+                      <q-item-section>New incognito tab</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup>
+                      <q-item-section>Recent tabs</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup>
+                      <q-item-section>History</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup>
+                      <q-item-section>Downloads</q-item-section>
+                    </q-item>
+                    <q-separator />
+                    <q-item clickable v-close-popup>
+                      <q-item-section>Settings</q-item-section>
+                    </q-item>
+                    <q-separator />
+                    <q-item clickable v-close-popup>
+                      <q-item-section>Help &amp; Feedback</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-btn>
+              <q-toolbar-title>
+              BitemporalReactive
+              </q-toolbar-title>
+            </q-toolbar>
+                  <q-tabs
+        v-model="tab"
+        class="bg-primary text-white shadow-2" align="left"
+      >
+        <q-tab name="contracts" icon="format_list_bulleted" label="Search Contract"></q-tab>
+        <q-tab name="history" icon="history" label="Contract History"></q-tab>
+        <q-tab name="csection" icon="verified_user" label="Contract Version"></q-tab>
+      </q-tabs>
+      </q-header>
+          <!-- <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered> -->
+      """,
+      # drawer_content(),
+      """
+      <!--   </q-drawer> -->
+         <q-page-container> 
+     """,
+      page_content(model),
+      """
+          </q-page-container>
+        </q-layout>
+      """]
+    )))
+
 end
 
 function handlers(model)
+
+  on(model.selected_contract_idx) do _
+    if (model.selected_contract_idx[] == 999999999)
+      println("selected_contract ==99999999")
+    else
+      println("selected contract")
+      println(model.selected_contract_idx[])
+      println("sel c obj")
+      println(model.contracts[model.selected_contract_idx[]+1])
+      model.selected_contract_idx[] = 999999999
+      push!(model)
+    end
+
+  end
+
+
   on(model.tab) do _
     println(model.tab[])
   end
 
   on(model.isready) do _
     println("ready")
-    model.tab[] = "csection"
+    println("csection")
+    model.contracts = InsuranceContractsController.get_contracts()
+    model.tab[] = "contracts"
     model.cs = JSON.parse(JSON.json(csection(1, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
     load_roles(model)
     push!(model)

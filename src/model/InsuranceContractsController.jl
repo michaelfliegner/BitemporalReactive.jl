@@ -290,7 +290,7 @@ end
 
 function get_contracts()
     connect()
-    map(find(Contract))
+    find(Contract)
 end
 
 function connect()
