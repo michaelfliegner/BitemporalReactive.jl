@@ -8,9 +8,9 @@ using BitemporalPostgres, InsuranceContractsController, JSON, TimeZones
   current_contract::R{Contract} = Contract()
   selected_contract_idx::R{Integer} = -1
   process::R{Bool} = false
-  selected_history::R{Integer} = 0
-  selected_version::R{Integer} = 0
-  history::R{Vector{Dict{String}}} = Dict{String,Any}[]
+  selected_version::R{String} = ""
+  current_version::R{Integer} = 0
+  histo::R{Vector{Dict{String,Any}}} = Dict{String,Any}[]
   cs::Dict{String,Any} = Dict{String,Any}("loaded" => "false")
   tab::R{String} = "contracts"
   leftDrawerOpen::R{Bool} = false
@@ -62,7 +62,7 @@ function contract_list()
 end
 
 function renderhforest(model)
-  quasar(:tree, ref="tree", var"node-key"="label", var"children-key"="children", nodes=:history, var"default-expand-all"=false,
+  quasar(:tree, ref="tree", var"node-key"="label", var"children-key"="children", nodes=:histo, var"default-expand-all"=false,
     var"selected"=:selected_version,
     """
     <template v-slot:default-header="prop">
@@ -75,12 +75,12 @@ function renderhforest(model)
               <div class="self-center full-width no-outline" tabindex="0"><b>{{prop.node.label}}</b></div>
             </template>
           </q-field>
-          <q-field label="valid as of" stack-label outlined :dense="dense">
+          <q-field label="valid as of" stack-label outlined >
             <template v-slot:control>
               <div class="self-center full-width no-outline" tabindex="4">{{prop.node.time_valid_asof}}</div>
             </template>
           </q-field> 
-          <q-field label="committed" stack-label outlined :dense="dense">
+          <q-field label="committed" stack-label outlined >
             <template v-slot:control>
               <div class="self-center full-width no-outline" tabindex="2">{{prop.node.time_committed}}</div>
             </template>
@@ -377,7 +377,35 @@ function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
     "time_committed" => string(i["tsdb_validfrom"]), "time_valid_asof" => string(i["tsworld_validfrom"]))
 end
 
+function fn(ns::Vector{Dict{String,Any}}, lbl::String)
+  for n in ns
+    if (n["label"] == lbl)
+      return (n)
+    else
+      if (length(n["children"]) > 0)
+        m = fn(n["children"], lbl)
+        if (typeof(m) != Nothing)
+          return m
+        end
+      end
+    end
+  end
+end
+
 function handlers(model)
+  on(model.selected_version) do _
+    if (model.selected_version[] != "")
+      node = fn(model.nodes, model.selected_version[])
+      println("selected_node= " * node)
+      model.current_version[] = parse(Int, model.selected_version[])
+      println("current=" * string(model.current_version[]))
+      model.selected_version[] = ""
+      model.csect = JSON.parse(JSON.json(InsuranceContractsController.csection(model.current_contract.ref_history.value, node.time_committed, node.time_valid_asof)))
+      println("nach csect")
+      model.tab = "csection"
+      push!(model)
+    end
+  end
 
   on(model.selected_contract_idx) do _
     if (model.selected_contract_idx[] == -1)
@@ -400,31 +428,30 @@ function handlers(model)
   on(model.tab) do _
     println("tab changed")
     println(model.tab[])
-    if (model.tab[] == "history")
+    if (model.tab[] == "history" && typeof(model.current_contract[].id.value) != Nothing)
       println("current contract")
       println(model.current_contract[])
-      println("history selected")
-      ref_h = model.current_contract[].ref_history.value
-      println(typeof(ref_h))
-      println(ref_h)
-      model.selected_history[] = ref_h
-      println("selected history")
-      println(model.selected_history[])
-      model.history[] = map(convert, InsuranceContractsController.history_forest(model.selected_history[]).shadowed)
-      println(typeof(h))
-      println(h)
+      model.histo = map(convert, InsuranceContractsController.history_forest(model.current_contract[].ref_history.value).shadowed)
+      #   println("selected history loaded")
+      println("before push")
       push(!model)
+      println("pushed")
+
     end
   end
 
   on(model.isready) do _
     println("ready")
-    println("csection")
+    println("contracts")
     model.contracts = InsuranceContractsController.get_contracts()
-    model.tab[] = "contracts"
+    model.selected_contract_idx[] = 1
+    model.current_contract[] = model.contracts[model.selected_contract_idx[]]
+    model.tab[] = "history"
+    println("histo")
     model.cs["loaded"] = "false"
     println()
     load_roles(model)
+    println("vor push")
     push!(model)
     println("model pushed")
   end

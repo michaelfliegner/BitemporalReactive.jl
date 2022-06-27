@@ -7,7 +7,7 @@ dev:
   username: postgres
   password: pg
   port: 5432
-  config:
+  config: log_queries=false
 
 prod:
   adapter:
