@@ -394,20 +394,29 @@ end
 
 function handlers(model)
   on(model.selected_version) do _
+    println("selected version")
     if (model.selected_version[] != "")
-      node = fn(model.nodes, model.selected_version[])
-      println("selected_node= " * node)
+      println("vor fn ")
+      node = fn(model.histo[], model.selected_version[])
+      println("selected_node= ")
+      println(node)
       model.current_version[] = parse(Int, model.selected_version[])
-      println("current=" * string(model.current_version[]))
-      model.selected_version[] = ""
-      model.csect = JSON.parse(JSON.json(InsuranceContractsController.csection(model.current_contract.ref_history.value, node.time_committed, node.time_valid_asof)))
+      println("current contract")
+      println(model.current_contract)
+      println("vor csect")
+      println(node["interval"]["tsdb_validfrom"])
+      println(node["interval"]["tsworld_validfrom"])
+      model.cs = JSON.parse(JSON.json(InsuranceContractsController.csection(model.current_contract.id.value, node["interval"]["tsdb_validfrom"], node["interval"]["tsworld_validfrom"])))
+      model.cs["loaded"] = "true"
       println("nach csect")
+      println(model.cs)
       model.tab = "csection"
       push!(model)
     end
   end
 
   on(model.selected_contract_idx) do _
+    println("selected contract")
     if (model.selected_contract_idx[] == -1)
       println("selected_contract ==-1")
     else
@@ -417,24 +426,25 @@ function handlers(model)
       println(model.contracts[model.selected_contract_idx[]+1])
       model.current_contract[] = model.contracts[model.selected_contract_idx[]+1]
       model.selected_contract_idx[] = -1
+      model.histo = map(convert, InsuranceContractsController.history_forest(model.current_contract[].ref_history.value).shadowed)
       model.cs = JSON.parse(JSON.json(csection(model.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
       model.cs["loaded"] = "true"
       model.tab[] = "csection"
       push!(model)
     end
-
   end
 
   on(model.tab) do _
+
     println("tab changed")
     println(model.tab[])
-    if (model.tab[] == "history" && typeof(model.current_contract[].id.value) != Nothing)
+    if (model.tab[] == "history") #  && typeof(model.current_contract[].id.value) != Nothing)
+
       println("current contract")
       println(model.current_contract[])
       model.histo = map(convert, InsuranceContractsController.history_forest(model.current_contract[].ref_history.value).shadowed)
-      #   println("selected history loaded")
       println("before push")
-      push(!model)
+      push!(model)
       println("pushed")
 
     end
@@ -444,12 +454,8 @@ function handlers(model)
     println("ready")
     println("contracts")
     model.contracts = InsuranceContractsController.get_contracts()
-    model.selected_contract_idx[] = 1
-    model.current_contract[] = model.contracts[model.selected_contract_idx[]]
-    model.tab[] = "history"
-    println("histo")
+    model.tab[] = "contracts"
     model.cs["loaded"] = "false"
-    println()
     load_roles(model)
     println("vor push")
     push!(model)

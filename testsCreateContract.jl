@@ -11,7 +11,7 @@ using ToStruct
 using JSON
 using HTTP
 
-if (haskey(ENV, "GENIE_ENV") && ENV["GENIE_ENV"] == "dev")
+if (haskey(ENV, "GENIE_ENV") && ENV["GENIE_ENV"] == "dev" && false)
     run(```sudo -u postgres psql -f sqlsnippets/droptables.sql```)
 end
 
@@ -19,8 +19,8 @@ end
 @testset "CreateContract" begin
 
     SearchLight.Configuration.load() |> SearchLight.connect
-    SearchLight.Migrations.create_migrations_table()
-    SearchLight.Migrations.up()
+    #SearchLight.Migrations.create_migrations_table()
+    #SearchLight.Migrations.up()
 
     contractpartnerroles = map(["Policy Holder" "Premium Payer"]) do val
         save!(ContractPartnerRole(value=val))
