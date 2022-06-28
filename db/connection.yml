@@ -7,7 +7,7 @@ dev:
   username: postgres
   password: pg
   port: 5432
-  config: log_queries=false
+  config: log_queries=false, log_level=Error
 
 prod:
   adapter:

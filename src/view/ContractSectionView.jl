@@ -1,4 +1,4 @@
-module MFLUI
+module ContractSectionView
 using Stipple, Stipple.Html, StippleUI
 using BitemporalPostgres, InsuranceContractsController, TimeZones
 
@@ -23,23 +23,6 @@ using BitemporalPostgres, InsuranceContractsController, TimeZones
   rolesTariffItem::R{Dict{Integer,String}} = Dict{Integer,String}()
   rolesTariffItemPartner::R{Dict{Integer,String}} = Dict{Integer,String}()
 end
-
-# function load_roles(model)
-#   map(find(InsuranceContractsController.ContractPartnerRole)) do entry
-#     model.rolesContractPartner[entry.id.value] = entry.value
-#   end
-#   println(model.rolesContractPartner)
-# 
-# 
-#   map(find(InsuranceContractsController.TariffItemRole)) do entry
-#     model.rolesTariffItem[entry.id.value] = entry.value
-#   end
-# 
-#   map(find(InsuranceContractsController.TariffItemPartnerRole)) do entry
-#     model.rolesTariffItemPartner[entry.id.value] = entry.value
-#   end
-# 
-# end
 
 function contract_list()
   """
@@ -124,7 +107,7 @@ end
 
 function tariff_items()
   card(class="my-card bg-indigo-8 text-white",
-    [card_section([Html.div(class="text-h3 text-white", "Tariff Items"), btn("Show Tariff Item Partners", color="primary", outline=true, @click("show_tariff_item_partners=!show_tariff_item_partners"))
+    [card_section([Html.div(class="text-h3 text-white", "Tariff Items"), btn("Show Tariff Item Partners", outline=true, @click("show_tariff_item_partners=!show_tariff_item_partners"))
       ]),
       """,
               <q-markup-table dark class="bg-indigo-5 text-white">
@@ -160,7 +143,7 @@ end
 
 function product_items()
   card(class="my-card bg-purple-8 text-white",
-    [card_section([Html.div(class="text-h2 text-white", "Product Items"), btn("Show Tariff Items", @click("show_tariff_items=!show_tariff_items"))
+    [card_section([Html.div(class="text-h2 text-white", "Product Items"), btn("Show Tariff Items", outline=true, @click("show_tariff_items=!show_tariff_items"))
       ]),
       """
         <q-markup-table class="dark bg-purple-5 text-white">
@@ -226,8 +209,8 @@ function contract()
   card(class="my-card bg-purple-8 text-white",
     [card_section([Html.div(class="text-h2 text-white", "Contract {{cs['revision']['ref_component']['value']}}"),
         Html.div(class="text-h5 text-white", "valid as of {{ref_time}} transaction time {{txn_time}}"),
-        btn("Show Contract Partners", @click("show_contract_partners=!show_contract_partners")),
-        btn("Show Product Items", @click("show_product_items=!show_product_items")),
+        btn("Show Contract Partners", outline=true, @click("show_contract_partners=!show_contract_partners")),
+        btn("Show Product Items", outline=true, @click("show_product_items=!show_product_items")),
         """
         <q-markup-table dark class="bg-deep-purple-5 text-white">
                   <template>
@@ -353,89 +336,4 @@ function ui(model)
     )))
 
 end
-
-#function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
-#  i = Dict(string(fn) => getfield(getfield(node, :interval), fn) for fn ∈ fieldnames(ValidityInterval))
-#  shdw = length(node.shadowed) == 0 ? [] : map(node.shadowed) do child
-#    convert(child)
-#  end
-#  Dict("label" => string(i["ref_version"]), "interval" => i, "children" => shdw,
-#    "time_committed" => string(i["tsdb_validfrom"]), "time_valid_asof" => string(i["tsworld_validfrom"]))
-#end
-#
-#function fn(ns::Vector{Dict{String,Any}}, lbl::String)
-#  for n in ns
-#    if (n["label"] == lbl)
-#      return (n)
-#    else
-#      if (length(n["children"]) > 0)
-#        m = fn(n["children"], lbl)
-#        if (typeof(m) != Nothing)
-#          return m
-#        end
-#      end
-#    end
-#  end
-#end
-
-# function handlers(model)
-#   on(model.selected_version) do _
-#     println("selected version")
-#     if (model.selected_version[] != "")
-#       node = fn(model.histo[], model.selected_version[])
-#       model.txn_time[] = node["interval"]["tsdb_validfrom"]
-#       model.ref_time[] = node["interval"]["tsworld_validfrom"]
-#       model.current_version[] = parse(Int, model.selected_version[])
-#       model.cs = JSON.parse(JSON.json(InsuranceContractsController.csection(model.current_contract.id.value, model.txn_time[], model.ref_time[])))
-#       model.cs["loaded"] = "true"
-#       model.tab = "csection"
-#       push!(model)
-#     end
-#   end
-# 
-#   on(model.selected_contract_idx) do _
-#     println(model.selected_contract_idx[])
-#     println(model.contracts[model.selected_contract_idx[]+1])
-#     model.current_contract[] = model.contracts[model.selected_contract_idx[]+1]
-#     model.histo = map(convert, InsuranceContractsController.history_forest(model.current_contract[].ref_history.value).shadowed)
-#     model.cs = JSON.parse(JSON.json(csection(model.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
-#     model.cs["loaded"] = "true"
-#     model.tab[] = "csection"
-#     push!(model)
-#   end
-# 
-#   on(model.tab) do _
-#     println(model.tab[])
-#     if (model.tab[] == "history")
-#       println("current contract")
-#       println(model.current_contract[])
-#       model.histo = map(convert, InsuranceContractsController.history_forest(model.current_contract[].ref_history.value).shadowed)
-#       push!(model)
-#       println("MODEL pushed")
-#     end
-#   end
-# 
-#   on(model.isready) do _
-#     model.contracts = InsuranceContractsController.get_contracts()
-#     model.tab[] = "contracts"
-#     model.cs["loaded"] = "false"
-#     load_roles(model)
-#     push!(model)
-#     println("model pushed")
-#   end
-#   model
-# end
-# 
-# function routeTree(model)
-#   route("/MFLUI") do
-#     html(ui(model), context=@__MODULE__)
-#   end
-# end
-# 
-# function run()
-#   model = handlers(Stipple.init(Model))
-#   routeTree(model)
-#   Stipple.up()
-# end
-
 end

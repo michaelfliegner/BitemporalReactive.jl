@@ -2,5 +2,5 @@
 
 [![Documentation](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/Documentation.yml/badge.svg)](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/Documentation.yml)
 
-This is intended to become a life insurance contract management prototype based on [a Julia bitemporal data management server](https://github.com/michaelfliegner/BitemporalPostgres.jl) and a QUASAR Framework based UI
-![image](https://user-images.githubusercontent.com/12422482/168877410-361414d1-a4ef-4c68-8e56-400d372159aa.png)
+This is a prototype reactive webapp for bitemporal data management based on [a Julia bitemporal data management API](https://github.com/michaelfliegner/BitemporalPostgres.jl) and a UI based on [Stipple](https://github.com/GenieFramework/StippleUI.jl) and [QUASAR (where Stipple did not yet provide a solution, or I didn't find one)](https://quasar.dev/) 
+
