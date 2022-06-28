@@ -1,7 +1,6 @@
 module MFLUI
-using SearchLight, Stipple, Stipple.Html, StippleUI
-
-using BitemporalPostgres, InsuranceContractsController, JSON, TimeZones
+using Stipple, Stipple.Html, StippleUI
+using BitemporalPostgres, InsuranceContractsController, TimeZones
 
 @reactive mutable struct Model <: ReactiveModel
   contracts::R{Vector{Contract}} = []
@@ -10,6 +9,8 @@ using BitemporalPostgres, InsuranceContractsController, JSON, TimeZones
   process::R{Bool} = false
   selected_version::R{String} = ""
   current_version::R{Integer} = 0
+  txn_time::R{ZonedDateTime} = now(tz"Africa/Porto-Novo")
+  ref_time::R{ZonedDateTime} = now(tz"Africa/Porto-Novo")
   histo::R{Vector{Dict{String,Any}}} = Dict{String,Any}[]
   cs::Dict{String,Any} = Dict{String,Any}("loaded" => "false")
   tab::R{String} = "contracts"
@@ -23,42 +24,37 @@ using BitemporalPostgres, InsuranceContractsController, JSON, TimeZones
   rolesTariffItemPartner::R{Dict{Integer,String}} = Dict{Integer,String}()
 end
 
-function load_roles(model)
-  map(find(InsuranceContractsController.ContractPartnerRole)) do entry
-    model.rolesContractPartner[entry.id.value] = entry.value
-  end
-  println(model.rolesContractPartner)
-
-
-  map(find(InsuranceContractsController.TariffItemRole)) do entry
-    model.rolesTariffItem[entry.id.value] = entry.value
-  end
-
-  map(find(InsuranceContractsController.TariffItemPartnerRole)) do entry
-    model.rolesTariffItemPartner[entry.id.value] = entry.value
-  end
-
-end
+# function load_roles(model)
+#   map(find(InsuranceContractsController.ContractPartnerRole)) do entry
+#     model.rolesContractPartner[entry.id.value] = entry.value
+#   end
+#   println(model.rolesContractPartner)
+# 
+# 
+#   map(find(InsuranceContractsController.TariffItemRole)) do entry
+#     model.rolesTariffItem[entry.id.value] = entry.value
+#   end
+# 
+#   map(find(InsuranceContractsController.TariffItemPartnerRole)) do entry
+#     model.rolesTariffItemPartner[entry.id.value] = entry.value
+#   end
+# 
+# end
 
 function contract_list()
-  list(dark=true, bordered=true, separator=true, style="max-width: 318px",
-    template(
-      item(
-        clickable=true,
-        vripple=true,
-        [
-          itemsection(
-            """<q-field outlined label="History ID" stack-label>
-                    <template v-slot:control>
-                        <div class="self-center no-outline" tabindex="0">{{c['id']['value'}}</div>
-                    </template>
-                </q-field>"""
-          )
-        ], @click("process=true")
-      ),
-      @recur(:"(c,index) in contracts")
-    )
-  )
+  """
+    <template v-for="(cid,cindex) in contracts">
+      <div class="q-pa-md" style="max-width: 350px">
+        <q-list dense bordered padding class="rounded-borders">
+          <q-item clickable v-ripple v-on:click="selected_contract_idx=cindex">
+            <q-item-section>
+              {{cid['id']['value']}}
+            </q-item-section>
+          </q-item>   
+        </q-list>
+      </div>
+    </template>
+  """
 end
 
 function renderhforest(model)
@@ -128,7 +124,7 @@ end
 
 function tariff_items()
   card(class="my-card bg-indigo-8 text-white",
-    [card_section([Html.div(class="text-h3 text-white", "Tariff Items"), btn("Show Tariff Item Partners", @click("show_tariff_item_partners=!show_tariff_item_partners"))
+    [card_section([Html.div(class="text-h3 text-white", "Tariff Items"), btn("Show Tariff Item Partners", color="primary", outline=true, @click("show_tariff_item_partners=!show_tariff_item_partners"))
       ]),
       """,
               <q-markup-table dark class="bg-indigo-5 text-white">
@@ -137,6 +133,7 @@ function tariff_items()
                       <tr>
                         <th class="text-left text-white">Item</th>
                         <th class="text-left text-white">Role</th>
+                        
                         <th class="text-left text-white">Tariff Id</th>
                         <th class="text-left text-white">Tariff Parameters</th>
                       </tr>
@@ -228,6 +225,7 @@ end
 function contract()
   card(class="my-card bg-purple-8 text-white",
     [card_section([Html.div(class="text-h2 text-white", "Contract {{cs['revision']['ref_component']['value']}}"),
+        Html.div(class="text-h5 text-white", "valid as of {{ref_time}} transaction time {{txn_time}}"),
         btn("Show Contract Partners", @click("show_contract_partners=!show_contract_partners")),
         btn("Show Product Items", @click("show_product_items=!show_product_items")),
         """
@@ -269,19 +267,7 @@ function page_content(model)
             <q-tab-panel name="contracts">
                 <div class="text-h4 q-mb-md">Contracts</div>
     """,
-    """
-      <template v-for="(cid,cindex) in contracts">
-        <div class="q-pa-md" style="max-width: 350px">
-          <q-list dense bordered padding class="rounded-borders">
-            <q-item clickable v-ripple v-on:click="selected_contract_idx=cindex">
-              <q-item-section>
-                {{cid}}
-              </q-item-section>
-            </q-item>   
-          </q-list>
-        </div>
-      </template>
-    """,
+    contract_list(),
     """       
             </q-tab-panel>
             <q-tab-panel name="history">
@@ -348,8 +334,8 @@ function ui(model)
         class="bg-primary text-white shadow-2" align="left"
       >
         <q-tab name="contracts" icon="format_list_bulleted" label="Search Contract"></q-tab>
-        <q-tab name="history" icon="history" label="Contract History"></q-tab>
         <q-tab name="csection" icon="verified_user" label="Contract Version"></q-tab>
+        <q-tab name="history" icon="history" label="Contract History"></q-tab>
       </q-tabs>
       </q-header>
           <!-- <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered> -->
@@ -368,112 +354,88 @@ function ui(model)
 
 end
 
-function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
-  i = Dict(string(fn) => getfield(getfield(node, :interval), fn) for fn ∈ fieldnames(ValidityInterval))
-  shdw = length(node.shadowed) == 0 ? [] : map(node.shadowed) do child
-    convert(child)
-  end
-  Dict("label" => string(i["ref_version"]), "interval" => i, "children" => shdw,
-    "time_committed" => string(i["tsdb_validfrom"]), "time_valid_asof" => string(i["tsworld_validfrom"]))
-end
+#function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
+#  i = Dict(string(fn) => getfield(getfield(node, :interval), fn) for fn ∈ fieldnames(ValidityInterval))
+#  shdw = length(node.shadowed) == 0 ? [] : map(node.shadowed) do child
+#    convert(child)
+#  end
+#  Dict("label" => string(i["ref_version"]), "interval" => i, "children" => shdw,
+#    "time_committed" => string(i["tsdb_validfrom"]), "time_valid_asof" => string(i["tsworld_validfrom"]))
+#end
+#
+#function fn(ns::Vector{Dict{String,Any}}, lbl::String)
+#  for n in ns
+#    if (n["label"] == lbl)
+#      return (n)
+#    else
+#      if (length(n["children"]) > 0)
+#        m = fn(n["children"], lbl)
+#        if (typeof(m) != Nothing)
+#          return m
+#        end
+#      end
+#    end
+#  end
+#end
 
-function fn(ns::Vector{Dict{String,Any}}, lbl::String)
-  for n in ns
-    if (n["label"] == lbl)
-      return (n)
-    else
-      if (length(n["children"]) > 0)
-        m = fn(n["children"], lbl)
-        if (typeof(m) != Nothing)
-          return m
-        end
-      end
-    end
-  end
-end
-
-function handlers(model)
-  on(model.selected_version) do _
-    println("selected version")
-    if (model.selected_version[] != "")
-      println("vor fn ")
-      node = fn(model.histo[], model.selected_version[])
-      println("selected_node= ")
-      println(node)
-      model.current_version[] = parse(Int, model.selected_version[])
-      println("current contract")
-      println(model.current_contract)
-      println("vor csect")
-      println(node["interval"]["tsdb_validfrom"])
-      println(node["interval"]["tsworld_validfrom"])
-      model.cs = JSON.parse(JSON.json(InsuranceContractsController.csection(model.current_contract.id.value, node["interval"]["tsdb_validfrom"], node["interval"]["tsworld_validfrom"])))
-      model.cs["loaded"] = "true"
-      println("nach csect")
-      println(model.cs)
-      model.tab = "csection"
-      push!(model)
-    end
-  end
-
-  on(model.selected_contract_idx) do _
-    println("selected contract")
-    if (model.selected_contract_idx[] == -1)
-      println("selected_contract ==-1")
-    else
-      println("selected contract")
-      println(model.selected_contract_idx[])
-      println("sel c obj")
-      println(model.contracts[model.selected_contract_idx[]+1])
-      model.current_contract[] = model.contracts[model.selected_contract_idx[]+1]
-      model.selected_contract_idx[] = -1
-      model.histo = map(convert, InsuranceContractsController.history_forest(model.current_contract[].ref_history.value).shadowed)
-      model.cs = JSON.parse(JSON.json(csection(model.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
-      model.cs["loaded"] = "true"
-      model.tab[] = "csection"
-      push!(model)
-    end
-  end
-
-  on(model.tab) do _
-
-    println("tab changed")
-    println(model.tab[])
-    if (model.tab[] == "history") #  && typeof(model.current_contract[].id.value) != Nothing)
-
-      println("current contract")
-      println(model.current_contract[])
-      model.histo = map(convert, InsuranceContractsController.history_forest(model.current_contract[].ref_history.value).shadowed)
-      println("before push")
-      push!(model)
-      println("pushed")
-
-    end
-  end
-
-  on(model.isready) do _
-    println("ready")
-    println("contracts")
-    model.contracts = InsuranceContractsController.get_contracts()
-    model.tab[] = "contracts"
-    model.cs["loaded"] = "false"
-    load_roles(model)
-    println("vor push")
-    push!(model)
-    println("model pushed")
-  end
-  model
-end
-
-function routeTree(model)
-  route("/MFLUI") do
-    html(ui(model), context=@__MODULE__)
-  end
-end
-
-function run()
-  model = handlers(Stipple.init(Model))
-  routeTree(model)
-  Stipple.up()
-end
+# function handlers(model)
+#   on(model.selected_version) do _
+#     println("selected version")
+#     if (model.selected_version[] != "")
+#       node = fn(model.histo[], model.selected_version[])
+#       model.txn_time[] = node["interval"]["tsdb_validfrom"]
+#       model.ref_time[] = node["interval"]["tsworld_validfrom"]
+#       model.current_version[] = parse(Int, model.selected_version[])
+#       model.cs = JSON.parse(JSON.json(InsuranceContractsController.csection(model.current_contract.id.value, model.txn_time[], model.ref_time[])))
+#       model.cs["loaded"] = "true"
+#       model.tab = "csection"
+#       push!(model)
+#     end
+#   end
+# 
+#   on(model.selected_contract_idx) do _
+#     println(model.selected_contract_idx[])
+#     println(model.contracts[model.selected_contract_idx[]+1])
+#     model.current_contract[] = model.contracts[model.selected_contract_idx[]+1]
+#     model.histo = map(convert, InsuranceContractsController.history_forest(model.current_contract[].ref_history.value).shadowed)
+#     model.cs = JSON.parse(JSON.json(csection(model.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
+#     model.cs["loaded"] = "true"
+#     model.tab[] = "csection"
+#     push!(model)
+#   end
+# 
+#   on(model.tab) do _
+#     println(model.tab[])
+#     if (model.tab[] == "history")
+#       println("current contract")
+#       println(model.current_contract[])
+#       model.histo = map(convert, InsuranceContractsController.history_forest(model.current_contract[].ref_history.value).shadowed)
+#       push!(model)
+#       println("MODEL pushed")
+#     end
+#   end
+# 
+#   on(model.isready) do _
+#     model.contracts = InsuranceContractsController.get_contracts()
+#     model.tab[] = "contracts"
+#     model.cs["loaded"] = "false"
+#     load_roles(model)
+#     push!(model)
+#     println("model pushed")
+#   end
+#   model
+# end
+# 
+# function routeTree(model)
+#   route("/MFLUI") do
+#     html(ui(model), context=@__MODULE__)
+#   end
+# end
+# 
+# function run()
+#   model = handlers(Stipple.init(Model))
+#   routeTree(model)
+#   Stipple.up()
+# end
 
 end
