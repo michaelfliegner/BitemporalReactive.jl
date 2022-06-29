@@ -1,5 +1,3 @@
-push!(LOAD_PATH, "src")
-push!(LOAD_PATH, "src/model")
 import Base: @kwdef
 using Test
 using InsuranceContractsController

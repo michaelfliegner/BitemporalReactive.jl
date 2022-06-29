@@ -1,6 +1,2 @@
-push!(LOAD_PATH, "../src/model")
-using InsuranceContractsController
-push!(LOAD_PATH, "../src/view")
-using ContractSectionView
-using Test
+push!(LOAD_PATH, "../src")
 include("../testsCreateContract.jl")

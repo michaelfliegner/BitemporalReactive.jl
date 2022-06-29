@@ -1,7 +1,8 @@
 module BitemporalReactive
 using BitemporalPostgres, JSON, SearchLight, Stipple, StippleUI, TimeZones
-using InsuranceContractsController
-using ContractSectionView
+import InsuranceContractsController
+import ContractSectionView
+using .ContractSectionView
 
 function load_roles(model)
     map(find(InsuranceContractsController.ContractPartnerRole)) do entry
@@ -64,7 +65,7 @@ function handlers(model)
         println(model.contracts[model.selected_contract_idx[]+1])
         model.current_contract[] = model.contracts[model.selected_contract_idx[]+1]
         model.histo = map(convert, InsuranceContractsController.history_forest(model.current_contract[].ref_history.value).shadowed)
-        model.cs = JSON.parse(JSON.json(csection(model.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
+        model.cs = JSON.parse(JSON.json(InsuranceContractsController.csection(model.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
         model.cs["loaded"] = "true"
         model.tab[] = "csection"
         push!(model)
