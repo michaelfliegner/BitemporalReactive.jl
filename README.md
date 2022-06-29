@@ -10,3 +10,5 @@ Features are:
 - displaying contract versions and history
 
 ![UML Model](docs/src/BitemporalModel.uxf.png)
+
+  
