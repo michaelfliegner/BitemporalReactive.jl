@@ -128,12 +128,6 @@ git-tree-sha1 = "b19534d1895d702889b219c382a6e18010797f0b"
 uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 version = "0.8.6"
 
-[[Documenter]]
-deps = ["ANSIColoredPrinters", "Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "f7809f532671564e48cd81627ddcfb1ba670f87d"
-uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.27.19"
-
 [[Downloads]]
 deps = ["ArgTools", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
@@ -333,7 +327,7 @@ uuid = "94ce4f54-9a6c-5748-9c1c-f9c7231a4531"
 version = "1.16.1+1"
 
 [[LifeInsuranceDataModel]]
-deps = ["BitemporalPostgres", "DataFrames", "Documenter", "Intervals", "JSON", "Revise", "SearchLight", "SearchLightPostgreSQL", "Test", "TimeZones", "ToStruct"]
+deps = ["BitemporalPostgres", "DataFrames", "Intervals", "JSON", "Revise", "SearchLight", "SearchLightPostgreSQL", "Test", "TimeZones", "ToStruct"]
 git-tree-sha1 = "0114ffe423bc3ff38f18b38191be7be8668a789f"
 repo-rev = "main"
 repo-url = "https://github.com/michaelfliegner/LifeInsuranceDataModel.jl"
