@@ -1,21 +1,21 @@
 module BitemporalReactive
 using BitemporalPostgres, JSON, SearchLight, Stipple, StippleUI, TimeZones
-import InsuranceContractsController
+using LifeInsuranceDataModel
 import ContractSectionView
 using .ContractSectionView
 
 function load_roles(model)
-    map(find(InsuranceContractsController.ContractPartnerRole)) do entry
+    map(find(LifeInsuranceDataModel.ContractPartnerRole)) do entry
         model.rolesContractPartner[entry.id.value] = entry.value
     end
     println(model.rolesContractPartner)
 
 
-    map(find(InsuranceContractsController.TariffItemRole)) do entry
+    map(find(LifeInsuranceDataModel.TariffItemRole)) do entry
         model.rolesTariffItem[entry.id.value] = entry.value
     end
 
-    map(find(InsuranceContractsController.TariffItemPartnerRole)) do entry
+    map(find(LifeInsuranceDataModel.TariffItemPartnerRole)) do entry
         model.rolesTariffItemPartner[entry.id.value] = entry.value
     end
 
@@ -53,7 +53,7 @@ function handlers(model)
             model.txn_time[] = node["interval"]["tsdb_validfrom"]
             model.ref_time[] = node["interval"]["tsworld_validfrom"]
             model.current_version[] = parse(Int, model.selected_version[])
-            model.cs = JSON.parse(JSON.json(InsuranceContractsController.csection(model.current_contract.id.value, model.txn_time[], model.ref_time[])))
+            model.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(model.current_contract.id.value, model.txn_time[], model.ref_time[])))
             model.cs["loaded"] = "true"
             model.tab = "csection"
             push!(model)
@@ -64,8 +64,8 @@ function handlers(model)
         println(model.selected_contract_idx[])
         println(model.contracts[model.selected_contract_idx[]+1])
         model.current_contract[] = model.contracts[model.selected_contract_idx[]+1]
-        model.histo = map(convert, InsuranceContractsController.history_forest(model.current_contract[].ref_history.value).shadowed)
-        model.cs = JSON.parse(JSON.json(InsuranceContractsController.csection(model.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
+        model.histo = map(convert, LifeInsuranceDataModel.history_forest(model.current_contract[].ref_history.value).shadowed)
+        model.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(model.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
         model.cs["loaded"] = "true"
         model.tab[] = "csection"
         push!(model)
@@ -76,14 +76,14 @@ function handlers(model)
         if (model.tab[] == "history")
             println("current contract")
             println(model.current_contract[])
-            model.histo = map(convert, InsuranceContractsController.history_forest(model.current_contract[].ref_history.value).shadowed)
+            model.histo = map(convert, LifeInsuranceDataModel.history_forest(model.current_contract[].ref_history.value).shadowed)
             push!(model)
             println("MODEL pushed")
         end
     end
 
     on(model.isready) do _
-        model.contracts = InsuranceContractsController.get_contracts()
+        model.contracts = LifeInsuranceDataModel.get_contracts()
         model.tab[] = "contracts"
         model.cs["loaded"] = "false"
         load_roles(model)

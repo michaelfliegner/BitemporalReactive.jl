@@ -1,5 +1,5 @@
 
-using BitemporalPostgres, SearchLight, SearchLightPostgreSQL, InsuranceContractsController
+using BitemporalPostgres, SearchLight, SearchLightPostgreSQL, LifeInsuranceDataModel
 
 SearchLight.Configuration.load() |> SearchLight.connect
 
@@ -7,7 +7,7 @@ let th = 2, vc = find(ValidityInterval, SQLWhereExpression("ref_history = BIGINT
   validfromdb = vc.tsdb_validfrom, validfromworld = vc.tsworld_validfrom,
   vt = find(ValidityInterval, SQLWhereExpression("ref_history = BIGINT ? and tsrworld @> TIMESTAMPTZ ? and tsrdb @> TIMESTAMPTZ ?", DbId(th), validfromworld, validfromdb))[1]
 
-  ts = InsuranceContractsController.tsection(vt.ref_history.value, vt.ref_version.value)
+  ts = LifeInsuranceDataModel.tsection(vt.ref_history.value, vt.ref_version.value)
   println(ts)
 end
 
