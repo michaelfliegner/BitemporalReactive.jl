@@ -1,6 +1,6 @@
 module ContractSectionView
 using Stipple, Stipple.Html, StippleUI
-using BitemporalPostgres, LifeInsuranceDataModel, TimeZones
+using BitemporalPostgres, TimeZones
 
 @reactive mutable struct Model <: ReactiveModel
   contracts::R{Vector{Contract}} = []
