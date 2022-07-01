@@ -2,6 +2,12 @@ module ContractSectionView
 using Stipple, Stipple.Html, StippleUI
 using BitemporalPostgres, LifeInsuranceDataModel, TimeZones
 
+"""
+Model
+
+  reactive data model for UI (Stipple/Quasar/Vue)
+  synched between Julia Server and Browser
+"""
 @reactive mutable struct Model <: ReactiveModel
   contracts::R{Vector{Contract}} = []
   current_contract::R{Contract} = Contract()

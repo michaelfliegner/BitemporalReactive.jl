@@ -1,11 +1,15 @@
 push!(LOAD_PATH, "../src/")
 using Documenter
-import BitemporalReactive
+import BitemporalReactive, BitemporalReactive.ContractSectionView
 makedocs(
     sitename="BitemporalReactive",
     format=Documenter.HTML(),
     pages=[
-        "Home" => "index.md"
+        "Home" => "index.md",
+        "BitemporalReactive API" => [
+            "BitemporalReactive" => "api/BitemporalReactive.md",
+            "ContractSectionView" => "api/ContractSectionView.md"
+        ]
     ]
 )
 

@@ -4,6 +4,11 @@ using LifeInsuranceDataModel
 import ContractSectionView
 using .ContractSectionView
 
+"""
+load_roles(model)
+
+    load role tables
+"""
 function load_roles(model)
     map(find(LifeInsuranceDataModel.ContractPartnerRole)) do entry
         model.rolesContractPartner[entry.id.value] = entry.value
