@@ -334,11 +334,9 @@ version = "1.16.1+1"
 
 [[LifeInsuranceDataModel]]
 deps = ["BitemporalPostgres", "DataFrames", "Intervals", "JSON", "Revise", "SearchLight", "SearchLightPostgreSQL", "Test", "TimeZones", "ToStruct"]
-git-tree-sha1 = "0114ffe423bc3ff38f18b38191be7be8668a789f"
-repo-rev = "main"
-repo-url = "https://github.com/michaelfliegner/LifeInsuranceDataModel.jl"
+git-tree-sha1 = "6033d9939969da75b28dd204e0f9d7ac9247c287"
 uuid = "4892898e-25d7-46ce-b5c3-dea2164303ac"
-version = "0.1.0"
+version = "0.1.1"
 
 [[LinearAlgebra]]
 deps = ["Libdl"]

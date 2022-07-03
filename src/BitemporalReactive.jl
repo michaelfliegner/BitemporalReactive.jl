@@ -1,7 +1,7 @@
 module BitemporalReactive
 using BitemporalPostgres, JSON, SearchLight, Stipple, StippleUI, TimeZones
 using LifeInsuranceDataModel
-import ContractSectionView
+include("ContractSectionView.jl")
 using .ContractSectionView
 
 """
