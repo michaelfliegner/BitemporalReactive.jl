@@ -9,5 +9,7 @@ Features are:
 - populating the database 
 - displaying contract versions and history
 
-
+Demo: Opening this project in GITPOD using the gitpod Button on the repo page You get
+an environment with a running database populated with sample data, the Webapp running a browser window opening.
+[gitpod Button on the repo page](docs/src/assets/GitpodButton.PNG)
   
