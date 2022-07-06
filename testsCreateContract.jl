@@ -10,7 +10,11 @@ using JSON
 using HTTP
 
 if (haskey(ENV, "GENIE_ENV") && ENV["GENIE_ENV"] == "dev")
-    run(```sudo -u postgres psql -f sqlsnippets/droptables.sql```)
+    if (haskey(ENV, "GITPOD_REPO_ROOT"))
+        run(```sudo -u postgres psql -f sqlsnippets/droptables.sql```)
+    else
+        run(```psql -f sqlsnippets/droptables.sql```)
+    end
 end
 
 

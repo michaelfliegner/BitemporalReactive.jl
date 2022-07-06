@@ -10,4 +10,5 @@ RUN sudo apt-get update && sudo apt-get install -y direnv \
   && echo 'alias runtest="GENIE_ENV=\"dev\" julia --project=test bootstrap_tests.jl"' >> /home/gitpod/.bashrc \
   && mkdir -p .config/direnv \
   && echo '[whitelist]' > .config/direnv/config.toml \
-  && echo 'prefix = [ "/workspace" ]' >> .config/direnv/config.toml
+  && echo 'prefix = [ "/workspace" ]' >> .config/direnv/config.toml 
+  

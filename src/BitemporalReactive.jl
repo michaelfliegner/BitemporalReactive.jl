@@ -99,7 +99,11 @@ function handlers(model)
 end
 
 function run()
-    model = handlers(Stipple.init(ContractSectionView.Model))
+    if (haskey(ENV, "GITPOD_REPO_ROOT"))
+        model = handlers(Stipple.init(ContractSectionView.Model), transport=Genie.WebThreads)
+    else
+        model = handlers(Stipple.init(ContractSectionView.Model))
+    end
     route("/ContractSection") do
         html(ContractSectionView.ui(model), context=@__MODULE__)
     end
