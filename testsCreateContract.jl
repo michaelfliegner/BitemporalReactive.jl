@@ -11,28 +11,16 @@ using HTTP
 
 if (haskey(ENV, "GENIE_ENV") && ENV["GENIE_ENV"] == "dev")
     if (haskey(ENV, "GITPOD_REPO_ROOT"))
-        run(```sudo -u postgres psql -f sqlsnippets/droptables.sql```)
-    else
         run(```psql -f sqlsnippets/droptables.sql```)
+    else
+        run(```sudo -u postgres psql -f sqlsnippets/droptables.sql```)
     end
 end
 
 
 @testset "CreateContract" begin
 
-    SearchLight.Configuration.load() |> SearchLight.connect
-    SearchLight.Migrations.create_migrations_table()
-    SearchLight.Migrations.up()
-
-    contractpartnerroles = map(["Policy Holder" "Premium Payer"]) do val
-        save!(ContractPartnerRole(value=val))
-    end
-    tariffitempartnerroles = map(["Insured Person" "2nd Insured Person"]) do val
-        save!(TariffItemPartnerRole(value=val))
-    end
-    tariffitemtariffroles = map(["Main Coverage - Life" "Supplementary Coverage - Occupational Disablity" "Supplementary Coverage - Terminal Illness" "Profit participation"]) do val
-        save!(TariffItemRole(value=val))
-    end
+    LifeInsuranceDataModel.load_model()
 
     cpRole = Dict{String,Int64}()
     map(find(LifeInsuranceDataModel.ContractPartnerRole)) do entry

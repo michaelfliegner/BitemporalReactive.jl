@@ -107,6 +107,9 @@ function run()
     route("/ContractSection") do
         html(ContractSectionView.ui(model), context=@__MODULE__)
     end
+    route("//ContractSection") do
+        redirect()
+    end
     Stipple.up()
 end
 
