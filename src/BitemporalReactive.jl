@@ -100,15 +100,15 @@ end
 
 function run()
     if (haskey(ENV, "GITPOD_REPO_ROOT"))
-        model = handlers(Stipple.init(ContractSectionView.Model), transport=Genie.WebThreads)
+        model = handlers(Stipple.init(ContractSectionView.Model, transport=Genie.WebThreads))
     else
         model = handlers(Stipple.init(ContractSectionView.Model))
     end
     route("/ContractSection") do
         html(ContractSectionView.ui(model), context=@__MODULE__)
     end
-    route("//ContractSection") do
-        redirect()
+    route("/") do
+        redirect("/ContractSection")
     end
     Stipple.up()
 end

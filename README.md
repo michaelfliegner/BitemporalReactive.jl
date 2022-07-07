@@ -9,6 +9,24 @@ Features are:
 - populating the database 
 - displaying contract versions and history
 
-![UML Model](docs/src/BitemporalModel.uxf.png)
+Demo: Opening this project in GITPOD using the gitpod Button on the repo page ![gitpod Button on the repo page](docs/src/assets/GitpodButton.PNG)
 
-  
+You get an environment with a running database populated with sample data, the Webapp running and link to open a browser window.
+![Port8000Open](docs/src/assets/Port8000open.PNG)
+
+The Browser shows the ContractSection page with Contracts Tab open and a list of one contract number.
+![ContractsTab](docs/src/assets/ContractsTab.PNG)
+
+Clicking this gives You the initial Contract Version Tab
+![ContractSectionInitial](docs/src/assets/ContractSectionInitial.PNG)
+
+Clicking the various show buttons give the expanded view of the current contract version
+![ContractSectionExpanded](docs/src/assets/ContractSectionExpanded.PNG)
+
+Clicking Contract History opens a tree view of the contract's mutation history, where mutations that were retrospectively altered by a mutation appear as subnodes of that mutation's node. Clicking a nodes show the respective version of the contract.
+![MutationHistory](docs/src/assets/MutationHistory.PNG)
+
+ 
+
+
+
