@@ -9,6 +9,8 @@ Features are:
 - populating the database 
 - displaying contract versions and history
 
+![work in progress](docs/src/assets/wip.png) To populate the database use the notebook: populateAndTest.ipynb
+
 Demo: Opening this project in GITPOD using the gitpod Button on the repo page ![gitpod Button on the repo page](docs/src/assets/GitpodButton.PNG)
 
 You get an environment with a running database populated with sample data, the Webapp running and link to open a browser window.
