@@ -1,4 +1,4 @@
-[![CI](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/CI.yml)
+I[![CI](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/CI.yml)
 
 [![Documentation](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/GenDocs.yml/badge.svg)](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/GenDocs.yml)
 
@@ -6,7 +6,7 @@ This is a prototype reactive webapp for bitemporal data management based on [a J
 
 Architecture is [MVVM](https://012.vuejs.org/guide/)
 
-* BitemporalReactive connects the business model to the view model. 
+* BitemporalReactive connects the business model to the view model and provides event handling. 
 * ContractSectionView defines the view model, the ui elements and their data bindings.
 * LifeInsuranceDataModel - an imported package - provides the business model and logic
 
