@@ -2,9 +2,15 @@
 
 [![Documentation](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/GenDocs.yml/badge.svg)](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/GenDocs.yml)
 
-This is a prototype reactive webapp for bitemporal data management based on [a Julia bitemporal data management API](https://github.com/michaelfliegner/BitemporalPostgres.jl) and a UI based on [Stipple](https://github.com/GenieFramework/StippleUI.jl) and [QUASAR (where Stipple did not yet provide a solution, or I didn't find one)](https://quasar.dev/) 
+This is a prototype reactive webapp for bitemporal data management based on [a Julia bitemporal data management API](https://github.com/michaelfliegner/BitemporalPostgres.jl) and a UI based on [Stipple](https://github.com/GenieFramework/StippleUI.jl) and [QUASAR (where Stipple did not yet provide a solution, or I didn't find one)](https://quasar.dev/). 
 
-[The Data Model of this prototype](https://github.com/michaelfliegner/LifeInsuranceDataModel.jl/blob/main/src/LifeInsuranceDataModel.jl) is - as of now - all about versioning of entities and relationships for a Life Insurance app - domain specific attributes will be added when calculations will come into play.
+Architecture is [MVVVM](https://012.vuejs.org/guide/)
+
+* BitemporalReactive connects the business model to the view model. 
+* ContractSectionView defines the view model, the ui elements and their data bindings.
+* LifeInsuranceDataModel - an imported package - provides the business model and logic
+
+[LifeInsuranceDataModel - the Data Model of this prototype -](https://github.com/michaelfliegner/LifeInsuranceDataModel.jl/blob/main/src/LifeInsuranceDataModel.jl) is - as of now - all about versioning of entities and relationships for a Life Insurance app - domain specific attributes will be added when calculations will come into play.
 Features are: 
 - populating the database 
 - displaying contract versions and history

@@ -7,7 +7,7 @@ using .ContractSectionView
 """
 load_roles(model)
 
-    load role tables
+    loads role tables, that provide texts for integer role keys
 """
 function load_roles(model)
     map(find(LifeInsuranceDataModel.ContractPartnerRole)) do entry
@@ -26,6 +26,11 @@ function load_roles(model)
 
 end
 
+"""
+convert(node::BitemporalPostgres.Node)::Dict{String,Any}
+
+provides the view model for the history forest from tree data the model delivers
+"""
 function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
     i = Dict(string(fn) => getfield(getfield(node, :interval), fn) for fn ∈ fieldnames(ValidityInterval))
     shdw = length(node.shadowed) == 0 ? [] : map(node.shadowed) do child
@@ -34,6 +39,11 @@ function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
     Dict("label" => string(i["ref_version"]), "interval" => i, "children" => shdw,
         "time_committed" => string(i["tsdb_validfrom"]), "time_valid_asof" => string(i["tsworld_validfrom"]))
 end
+
+"""
+fn
+retrieves a history node from its label 
+"""
 
 function fn(ns::Vector{Dict{String,Any}}, lbl::String)
     for n in ns
@@ -49,6 +59,12 @@ function fn(ns::Vector{Dict{String,Any}}, lbl::String)
         end
     end
 end
+
+"""
+handlers(model)
+
+Event handling and synching of the view model between UI and model server
+"""
 
 function handlers(model)
     on(model.selected_version) do _
@@ -98,6 +114,11 @@ function handlers(model)
     model
 end
 
+"""
+run
+
+creating the route
+"""
 function run()
     if (haskey(ENV, "GITPOD_REPO_ROOT"))
         model = handlers(Stipple.init(ContractSectionView.Model, transport=Genie.WebThreads))

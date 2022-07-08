@@ -5,7 +5,7 @@ using BitemporalPostgres, LifeInsuranceDataModel, TimeZones
 """
 Model
 
-  reactive data model for UI (Stipple/Quasar/Vue)
+  reactive data view model (Stipple/Quasar/Vue)
   synched between Julia Server and Browser
 """
 @reactive mutable struct Model <: ReactiveModel
@@ -30,6 +30,10 @@ Model
   rolesTariffItemPartner::R{Dict{Integer,String}} = Dict{Integer,String}()
 end
 
+"""
+contract_list
+Display the contracts selection tab
+"""
 function contract_list()
   """
     <template v-for="(cid,cindex) in contracts">
@@ -46,6 +50,10 @@ function contract_list()
   """
 end
 
+"""
+renderhforest
+Display the tree of versions, history tab
+"""
 function renderhforest(model)
   quasar(:tree, ref="tree", var"node-key"="label", var"children-key"="children", nodes=:histo, var"default-expand-all"=false,
     var"selected"=:selected_version,
@@ -78,6 +86,10 @@ function renderhforest(model)
     """)
 end
 
+"""
+tariff_item_partners
+Display the partners referenced by a tarif item, insured person(s) typically
+"""
 function tariff_item_partners()
   card(class="my-card bg-deep-purple-8 text-white",
     [card_section([
@@ -111,6 +123,10 @@ function tariff_item_partners()
       """,], var"v-if"="show_tariff_item_partners")
 end
 
+"""
+tariff_items
+Displays tariff parameters and partners referenced 
+"""
 function tariff_items()
   card(class="my-card bg-indigo-8 text-white",
     [card_section([Html.div(class="text-h3 text-white", "Tariff Items"), btn("Show Tariff Item Partners", outline=true, @click("show_tariff_item_partners=!show_tariff_item_partners"))
@@ -147,6 +163,11 @@ function tariff_items()
   """,], var"v-if"="show_tariff_items")
 end
 
+"""
+product_items
+Displays product items, technically insurance (sub) contracts of which the contract proper can contain several, for instance 
+to represent dynamic increases of the insurance sum, which can be be revoked individually. 
+"""
 function product_items()
   card(class="my-card bg-purple-8 text-white",
     [card_section([Html.div(class="text-h2 text-white", "Product Items"), btn("Show Tariff Items", outline=true, @click("show_tariff_items=!show_tariff_items"))
@@ -178,6 +199,10 @@ function product_items()
   """], var"v-if"="show_product_items")
 end
 
+"""
+contract_partners
+Partners, at least the policy holder, but also premium payer and beneficiaries, if different from policy holder.
+"""
 function contract_partners()
   card(class="my-card bg-deep-purple-8 text-white",
     [card_section([
@@ -211,6 +236,10 @@ function contract_partners()
       """,], var"v-if"="show_contract_partners")
 end
 
+"""
+contract
+contract version tab
+"""
 function contract()
   card(class="my-card bg-purple-8 text-white",
     [card_section([Html.div(class="text-h2 text-white", "Contract {{cs['revision']['ref_component']['value']}}"),
@@ -241,6 +270,10 @@ function contract()
     ], var"v-if"="cs['loaded'] == 'true'")
 end
 
+"""
+page_content(model)
+provides the tab structure slots
+"""
 function page_content(model)
   join([
     """
@@ -275,6 +308,10 @@ function page_content(model)
   ])
 end
 
+"""
+ui(model)
+entry point of the vue app
+"""
 function ui(model)
   page(
     model,
