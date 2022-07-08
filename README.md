@@ -4,7 +4,7 @@
 
 This is a prototype reactive webapp for bitemporal data management based on [a Julia bitemporal data management API](https://github.com/michaelfliegner/BitemporalPostgres.jl) and a UI based on [Stipple](https://github.com/GenieFramework/StippleUI.jl) and [QUASAR (where Stipple did not yet provide a solution, or I didn't find one)](https://quasar.dev/). 
 
-Architecture is [MVVVM](https://012.vuejs.org/guide/)
+Architecture is [MVVM](https://012.vuejs.org/guide/)
 
 * BitemporalReactive connects the business model to the view model. 
 * ContractSectionView defines the view model, the ui elements and their data bindings.
