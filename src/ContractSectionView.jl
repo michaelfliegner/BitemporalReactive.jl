@@ -19,10 +19,13 @@ Model
   ref_time::R{ZonedDateTime} = now(tz"Africa/Porto-Novo")
   histo::R{Vector{Dict{String,Any}}} = Dict{String,Any}[]
   cs::Dict{String,Any} = Dict{String,Any}("loaded" => "false")
-  tab::R{String} = "contracts"
+  prs::Dict{String,Any} = Dict{String,Any}("loaded" => "false")
+  selected_product_part_idx::R{Integer} = 0
+  tab::R{String} = "product"
   leftDrawerOpen::R{Bool} = false
   show_contract_partners::R{Bool} = false
   show_product_items::R{Bool} = false
+  selected_product::R{Integer} = 0
   show_tariff_item_partners::R{Bool} = false
   show_tariff_items::R{Bool} = false
   rolesContractPartner::R{Dict{Integer,String}} = Dict{Integer,String}()
@@ -49,6 +52,40 @@ function contract_list()
     </template>
   """
 end
+
+"""
+selected_product_part_idx
+Display the product tab
+"""
+function product()
+  card(class="my-card bg-purple-8 text-white",
+    [card_section([Html.div(class="text-h2 text-white", "Product {{prs['revision']['ref_component']['value']}}"),
+        Html.div(class="text-h2 text-white", "{{prs['revision']['description']}}"),
+      ]),
+      """
+      <template v-for="(ppid,ppindex) in prs['parts']">
+        <div class="q-pa-md" style="max-width: 350px">
+          <q-list dense bordered padding class="rounded-borders">
+            <q-item clickable v-ripple v-on:click="selected_product_part_idx=ppindex">
+              <q-item-section>
+                {{ppid['revision']['description']}}
+              </q-item-section>
+              <q-item-section>
+                tariff id {{ppid['ref']['revision']['ref_component']['value']}}
+              </q-item-section>
+              <q-item-section>
+                description {{ppid['ref']['revision']['description']}}
+              </q-item-section>
+            </q-item>   
+          </q-list>
+        </div>
+      </template>
+    """
+    ],
+    var"v-if"="prs['loaded'] == 'true'"
+  )
+end
+
 
 """
 renderhforest
@@ -170,7 +207,8 @@ to represent dynamic increases of the insurance sum, which can be be revoked ind
 """
 function product_items()
   card(class="my-card bg-purple-8 text-white",
-    [card_section([Html.div(class="text-h2 text-white", "Product Items"), btn("Show Tariff Items", outline=true, @click("show_tariff_items=!show_tariff_items"))
+    [card_section([Html.div(class="text-h2 text-white", "Product Items"),
+        btn("Show Tariff Items", outline=true, @click("show_tariff_items=!show_tariff_items"))
       ]),
       """
         <q-markup-table class="dark bg-purple-5 text-white">
@@ -179,16 +217,20 @@ function product_items()
               <tr>
                 <th class="text-left text-white">Item</th>
                 <th class="text-left text-white">Description</th>
+                <th class="text-left text-white">Product id</th>
               </tr>
             </thead>
           </template>
           <template>
             <tbody>
               <template v-for="(pid,pindex) in cs['product_items']">
-            <tr>
-              <td class="text-left text-white">{{pindex}}</td>
-              <td class="text-left text-white">{{cs['product_items'][pindex]['revision']['description']}}</td>
-      """,
+        <tr outline=true>
+          <td class="text-left text-white">{{pindex}}</td>
+          <td class="text-left text-white">{{pid['revision']['description']}}</td>
+          <td class="text-left text-white">{{pid['revision']['ref_product']['value']}}</td>
+          <td class="text-left text-white"><q-btn outline icon="functions" @click="selected_product=pid['revision']['ref_product']['value']"></q-btn></td>
+          
+  """,
       tariff_items(),
       """
               </tr>
@@ -303,6 +345,11 @@ function page_content(model)
     contract(),
     """
             </q-tab-panel>
+            <q-tab-panel name="product">
+    """,
+    product(),
+    """
+            </q-tab-panel>
         </q-tab-panels>
     """
   ])
@@ -362,6 +409,7 @@ function ui(model)
         <q-tab name="contracts" icon="format_list_bulleted" label="Search Contract"></q-tab>
         <q-tab name="csection" icon="verified_user" label="Contract Version"></q-tab>
         <q-tab name="history" icon="history" label="Contract History"></q-tab>
+        <q-tab name="product" icon="functions" label="Product"></q-tab>
       </q-tabs>
       </q-header>
           <!-- <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered> -->

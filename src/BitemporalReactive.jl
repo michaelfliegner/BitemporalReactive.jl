@@ -92,12 +92,28 @@ function handlers(model)
         push!(model)
     end
 
+    on(model.selected_product) do _
+        println(model.selected_product[])
+        if (model.selected_product[] > 0)
+            model.tab[] = "product"
+        end
+    end
+
     on(model.tab) do _
         println(model.tab[])
         if (model.tab[] == "history")
             println("current contract")
             println(model.current_contract[])
             model.histo = map(convert, LifeInsuranceDataModel.history_forest(model.current_contract[].ref_history.value).shadowed)
+            push!(model)
+            println("MODEL pushed")
+        end
+        if (model.tab[] == "product")
+            println("selected_product")
+            println(model.selected_product[])
+            model.prs = JSON.parse(JSON.json(LifeInsuranceDataModel.prsection(model.selected_product[], now(tz"UTC"), now(tz"UTC"))))
+            model.selected_product[] = 0
+            model.prs["loaded"] = "true"
             push!(model)
             println("MODEL pushed")
         end
