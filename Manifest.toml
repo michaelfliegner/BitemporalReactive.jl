@@ -318,8 +318,6 @@ version = "1.16.1+1"
 [[LifeInsuranceDataModel]]
 deps = ["BitemporalPostgres", "DataFrames", "Dates", "Intervals", "JSON", "Revise", "SearchLight", "SearchLightPostgreSQL", "Test", "TimeZones", "ToStruct"]
 git-tree-sha1 = "dfe76499c5d4a510a8d956ce1777384549d916db"
-repo-rev = "main"
-repo-url = "https://github.com/michaelfliegner/LifeInsuranceDataModel.jl"
 uuid = "4892898e-25d7-46ce-b5c3-dea2164303ac"
 version = "0.1.7"
 
