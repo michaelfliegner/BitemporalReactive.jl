@@ -1,12 +1,12 @@
-[![CI](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/CI.yml)
+I[![CI](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/CI.yml)
 
 [![Documentation](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/GenDocs.yml/badge.svg)](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/GenDocs.yml)
 
 This is a prototype reactive webapp for bitemporal data management based on [a Julia bitemporal data management API](https://github.com/michaelfliegner/BitemporalPostgres.jl) and a UI based on [Stipple](https://github.com/GenieFramework/StippleUI.jl) and [QUASAR (where Stipple did not yet provide a solution, or I didn't find one)](https://quasar.dev/). 
 
-Architecture is [MVVVM](https://012.vuejs.org/guide/)
+Architecture is [MVVM](https://012.vuejs.org/guide/)
 
-* BitemporalReactive connects the business model to the view model. 
+* BitemporalReactive connects the business model to the view model and provides event handling. 
 * ContractSectionView defines the view model, the ui elements and their data bindings.
 * LifeInsuranceDataModel - an imported package - provides the business model and logic
 
@@ -15,7 +15,7 @@ Features are:
 - populating the database 
 - displaying contract versions and history
 
-![work in progress](docs/src/assets/wip.png) To populate the database use the notebook: populateAndTest.ipynb
+![work in progress](docs/src/assets/wip.png) To populate the database use [this notebook](populateAndTest.ipynb)
 
 Demo: Opening this project in GITPOD using the gitpod Button on the repo page ![gitpod Button on the repo page](docs/src/assets/GitpodButton.PNG)
 
