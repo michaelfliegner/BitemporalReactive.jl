@@ -17,6 +17,9 @@ Features are:
 
 ![work in progress](docs/src/assets/wip.png) To populate the database use [this notebook](populateAndTest.ipynb)
 
+
+# DEMO ON GITPOD NOT WORKING CURRENTLY due to error loading Genie.Webthreads: https://github.com/GenieFramework/Stipple.jl/issues/127 I would appreciate hints, how to use websockets on GITPOD to circumvent this problem
+
 Demo: Opening this project in GITPOD using the gitpod Button on the repo page ![gitpod Button on the repo page](docs/src/assets/GitpodButton.PNG)
 
 You get an environment with a running database populated with sample data, the Webapp running and link to open a browser window.

@@ -6,6 +6,7 @@ version = "0.1.7"
 [deps]
 BitemporalPostgres = "e513cd14-23e6-48df-acf1-d9bc8fa5674b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Genie = "c43c736e-a2d1-11e8-161f-af95117fbd1e"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 Intervals = "d8418881-c3e1-53bb-8760-2df7ec849ed5"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
