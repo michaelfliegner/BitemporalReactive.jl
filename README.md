@@ -2,12 +2,12 @@ I[![CI](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflo
 
 [![Documentation](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/GenDocs.yml/badge.svg)](https://github.com/michaelfliegner/BitemporalReactive.jl/actions/workflows/GenDocs.yml)
 
-This is a prototype reactive webapp for bitemporal data management based on [a Julia bitemporal data management API](https://github.com/michaelfliegner/BitemporalPostgres.jl) and a UI based on [Stipple](https://github.com/GenieFramework/StippleUI.jl) and [QUASAR (where Stipple did not yet provide a solution, or I didn't find one)](https://quasar.dev/). 
+This is a prototype reactive web app for bitemporal data management based on [a Julia bitemporal data management API](https://github.com/michaelfliegner/BitemporalPostgres.jl) and a UI based on [Stipple](https://github.com/GenieFramework/StippleUI.jl) and [QUASAR (where Stipple did not yet provide a solution, or I didn't find one)](https://quasar.dev/). 
 
 Architecture is [MVVM](https://012.vuejs.org/guide/)
 
 * BitemporalReactive connects the business model to the view model and provides event handling. 
-* ContractSectionView defines the view model, the ui elements and their data bindings.
+* ContractSectionView defines the view model, the UI elements, and their data bindings.
 * LifeInsuranceDataModel - an imported package - provides the business model and logic
 
 [LifeInsuranceDataModel - the Data Model of this prototype -](https://github.com/michaelfliegner/LifeInsuranceDataModel.jl/blob/main/src/LifeInsuranceDataModel.jl) is - as of now - all about versioning of entities and relationships for a Life Insurance app - domain specific attributes will be added when calculations will come into play.
@@ -18,7 +18,7 @@ Features are:
 ![work in progress](docs/src/assets/wip.png) To populate the database use [this notebook](populateAndTest.ipynb)
 
 
-# DEMO ON GITPOD NOT WORKING CURRENTLY due to error loading Genie.Webthreads: https://github.com/GenieFramework/Stipple.jl/issues/127 I would appreciate hints, how to use websockets on GITPOD to circumvent this problem
+# DEMO ON GITPOD NOT WORKING CURRENTLY due to error loading Genie.Webthreads: https://github.com/GenieFramework/Stipple.jl/issues/127 I would appreciate hints, on how to use WebSockets on GITPOD to circumvent this problem
 
 Demo: Opening this project in GITPOD using the gitpod Button on the repo page ![gitpod Button on the repo page](docs/src/assets/GitpodButton.PNG)
 
@@ -31,10 +31,10 @@ The Browser shows the ContractSection page with Contracts Tab open and a list of
 Clicking this gives You the initial Contract Version Tab
 ![ContractSectionInitial](docs/src/assets/ContractSectionInitial.PNG)
 
-Clicking the various show buttons give the expanded view of the current contract version
+Clicking the various show buttons give an expanded view of the current contract version
 ![ContractSectionExpanded](docs/src/assets/ContractSectionExpanded.PNG)
 
-Clicking Contract History opens a tree view of the contract's mutation history, where mutations that were retrospectively altered by a mutation appear as subnodes of that mutation's node. Clicking a nodes show the respective version of the contract.
+Clicking Contract History opens a tree view of the contract's mutation history, where mutations that were retrospectively altered by a mutation appear as subnodes of that mutation's node. Clicking a node show the respective version of the contract.
 ![MutationHistory](docs/src/assets/MutationHistory.PNG)
 
  
