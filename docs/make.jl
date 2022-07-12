@@ -17,5 +17,5 @@ makedocs(
 # See "Hosting Documentation" and deploydocs() in the Documenter manual
 # for more information.
 deploydocs(
-    repo="Actuarial-Sciences-for-Africa-ASA/BitemporalReactive.jl"
+    repo="github.com/Actuarial-Sciences-for-Africa-ASA/BitemporalReactive.jl"
 )
