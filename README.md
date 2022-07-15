@@ -37,7 +37,5 @@ Clicking the various show buttons give an expanded view of the current contract 
 Clicking Contract History opens a tree view of the contract's mutation history, where mutations that were retrospectively altered by a mutation appear as subnodes of that mutation's node. Clicking a node show the respective version of the contract.
 ![MutationHistory](docs/src/assets/MutationHistory.PNG)
 
- 
-
-
+Dummy change
 
