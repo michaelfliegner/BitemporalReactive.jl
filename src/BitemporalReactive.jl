@@ -137,9 +137,9 @@ creating the route
 """
 function run()
     if (haskey(ENV, "GITPOD_REPO_ROOT"))
-        model = handlers(Stipple.init(ContractSectionView.Model, transport=Genie.WebThreads))
+        model = handlers(Stipple.init(ContractSectionView.Model, transport=Genie.WebChannels))
     else
-        model = handlers(Stipple.init(ContractSectionView.Model))
+        model = handlers(Stipple.init(ContractSectionView.Model, transport=Genie.WebChannels))
     end
     route("/ContractSection") do
         html(ContractSectionView.ui(model), context=@__MODULE__)
@@ -147,7 +147,7 @@ function run()
     route("/") do
         redirect("/ContractSection")
     end
-    Stipple.up()
+    Stipple.up(ws_port=8001)
 end
 
 end
