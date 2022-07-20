@@ -137,9 +137,9 @@ creating the route
 """
 function run()
     if (haskey(ENV, "GITPOD_REPO_ROOT"))
-        model = handlers(Stipple.init(ContractSectionView.Model, transport=Genie.WebChannels))
+        model = handlers(Stipple.init(ContractSectionView.Model, transport=Genie.WebThreads))
     else
-        model = handlers(Stipple.init(ContractSectionView.Model, transport=Genie.WebChannels))
+        model = handlers(Stipple.init(ContractSectionView.Model, transport=Genie.WebThreads))
     end
     route("/ContractSection") do
         html(ContractSectionView.ui(model), context=@__MODULE__)
