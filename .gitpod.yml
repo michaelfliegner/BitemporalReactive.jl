@@ -8,3 +8,13 @@ tasks:
   - command: cat db/connectionGITPOD.yml >db/connection.yml
   - command: julia --project=. -i demo.jl
  
+ports:
+  - name: Web App
+    description: The main application web server
+    port: 8000
+    onOpen: open-browser
+
+  - name: WebSockets
+    description: websockets
+    port: 8001
+    onOpen: notify
