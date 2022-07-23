@@ -28,9 +28,9 @@ uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[BitemporalPostgres]]
 deps = ["AbstractTrees", "Dates", "Intervals", "SearchLight", "SearchLightPostgreSQL", "Test", "TimeZones", "ToStruct"]
-git-tree-sha1 = "5fbae145a5ad66b987a00a6b35fb750b2e3df87f"
+git-tree-sha1 = "f451d65e8b3aa6ce9e8ae0ab1502f0daaa833178"
 uuid = "e513cd14-23e6-48df-acf1-d9bc8fa5674b"
-version = "1.0.6"
+version = "1.0.10"
 
 [[CEnum]]
 git-tree-sha1 = "eb4cb44a499229b3b8426dcfb5dd85333951ff90"
@@ -39,9 +39,9 @@ version = "0.4.2"
 
 [[CSTParser]]
 deps = ["Tokenize"]
-git-tree-sha1 = "dc96b54b68e930db929403c38c08af71dde6e984"
+git-tree-sha1 = "3ddd48d200eb8ddf9cb3e0189fc059fd49b97c1f"
 uuid = "00ebfdb7-1f24-5e51-bd34-a7502290713f"
-version = "3.3.4"
+version = "3.3.6"
 
 [[CodeTracking]]
 deps = ["InteractiveUtils", "UUIDs"]
@@ -169,9 +169,9 @@ uuid = "781609d7-10c4-51f6-84f2-b8444358ff6d"
 
 [[Genie]]
 deps = ["ArgParse", "Dates", "Distributed", "EzXML", "FilePathsBase", "HTTP", "HttpCommon", "Inflector", "JSON3", "JuliaFormatter", "Logging", "Markdown", "MbedTLS", "Millboard", "Nettle", "OrderedCollections", "Pkg", "REPL", "Random", "Reexport", "Revise", "SHA", "Serialization", "Sockets", "UUIDs", "Unicode", "VersionCheck", "YAML"]
-git-tree-sha1 = "c3fa75b1f98dbe5f36c55f5e474171ec2fd2c3fc"
+git-tree-sha1 = "e9ea1417ba34e3889ccfdd951f0ca3f5fdfdd332"
 uuid = "c43c736e-a2d1-11e8-161f-af95117fbd1e"
-version = "4.18.1"
+version = "4.19.0"
 
 [[HTTP]]
 deps = ["Base64", "Dates", "IniFile", "Logging", "MbedTLS", "NetworkOptions", "Sockets", "URIs"]
@@ -253,9 +253,9 @@ version = "1.9.5"
 
 [[JuliaFormatter]]
 deps = ["CSTParser", "CommonMark", "DataStructures", "Pkg", "Tokenize"]
-git-tree-sha1 = "2e9129c034d3b9338d0f77672db5f8b312047689"
+git-tree-sha1 = "6f13ba89febc5c12f882902e1f5dcd11a8913fa5"
 uuid = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
-version = "0.22.11"
+version = "1.0.7"
 
 [[JuliaInterpreter]]
 deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
@@ -317,9 +317,9 @@ version = "1.16.1+1"
 
 [[LifeInsuranceDataModel]]
 deps = ["BitemporalPostgres", "DataFrames", "Dates", "Intervals", "JSON", "Revise", "SearchLight", "SearchLightPostgreSQL", "Test", "TimeZones", "ToStruct"]
-git-tree-sha1 = "dfe76499c5d4a510a8d956ce1777384549d916db"
+git-tree-sha1 = "e1a084ed2df5f463535e41e24c36dfe0b4320da7"
 uuid = "4892898e-25d7-46ce-b5c3-dea2164303ac"
-version = "0.1.7"
+version = "0.1.9"
 
 [[LinearAlgebra]]
 deps = ["Libdl"]
@@ -346,9 +346,9 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
 [[MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "Random", "Sockets"]
-git-tree-sha1 = "891d3b4e8f8415f53108b4918d0183e61e18015b"
+git-tree-sha1 = "9f4f5a42de3300439cb8300236925670f844a555"
 uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
-version = "1.1.0"
+version = "1.1.1"
 
 [[MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -391,9 +391,9 @@ uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
 
 [[Nettle]]
 deps = ["Libdl", "Nettle_jll"]
-git-tree-sha1 = "f96a7485d2404f90c7c5c417e64d231f8edc5f08"
+git-tree-sha1 = "6fa48cbae828267848ee32c1bb31d1652e210d7d"
 uuid = "49dea1ee-f6fa-5aa6-9a11-8816cee7d4b9"
-version = "0.5.2"
+version = "1.0.0"
 
 [[Nettle_jll]]
 deps = ["Artifacts", "GMP_jll", "JLLWrappers", "Libdl", "Pkg"]
@@ -422,9 +422,9 @@ version = "1.12.7"
 
 [[OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "9a36165cf84cff35851809a40a928e1103702013"
+git-tree-sha1 = "e60321e3f2616584ff98f0a4f18d98ae6f89bbb3"
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "1.1.16+0"
+version = "1.1.17+0"
 
 [[OrderedCollections]]
 git-tree-sha1 = "85f8e6578bf1f9ee0d11e7bb1b1456435479d47c"
@@ -515,9 +515,9 @@ version = "0.1.0"
 
 [[Scratch]]
 deps = ["Dates"]
-git-tree-sha1 = "0b4b7f1393cff97c33891da2a0bf69c6ed241fda"
+git-tree-sha1 = "f94f779c94e58bf9ea243e77a37e16d9de9126bd"
 uuid = "6c6a2e73-6563-6170-7368-637461726353"
-version = "1.1.0"
+version = "1.1.1"
 
 [[SearchLight]]
 deps = ["DataFrames", "Dates", "Distributed", "Inflector", "Intervals", "JSON3", "Logging", "Millboard", "OrderedCollections", "Reexport", "SHA", "Unicode", "YAML"]
@@ -557,15 +557,15 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[Stipple]]
 deps = ["FilePathsBase", "Genie", "JSON3", "Logging", "Mixers", "Observables", "OrderedCollections", "Parameters", "Pkg", "Random", "Reexport", "Requires", "StructTypes"]
-git-tree-sha1 = "446f3410632151489836ca31eab329efdb6731f9"
+git-tree-sha1 = "f05e4baaedaa96fe385e9bc85c8d7c8b8a44c981"
 uuid = "4acbeb90-81a0-11ea-1966-bdaff8155998"
-version = "0.24.4"
+version = "0.24.5"
 
 [[StippleUI]]
 deps = ["Colors", "DataFrames", "Dates", "Genie", "Stipple"]
-git-tree-sha1 = "486ec2f7c3dc3b08d8bc3b737cb6b8ab315fb223"
+git-tree-sha1 = "4de2d03e2befc013c0ccc3a8878f67960d083cda"
 uuid = "a3c5d34a-b254-4859-a8fa-b86abb7e84a3"
-version = "0.19.2"
+version = "0.19.4"
 
 [[StringEncodings]]
 deps = ["Libiconv_jll"]
@@ -609,10 +609,10 @@ uuid = "b718987f-49a8-5099-9789-dcd902bef87d"
 version = "1.0.1"
 
 [[TimeZones]]
-deps = ["Dates", "Downloads", "InlineStrings", "LazyArtifacts", "Mocking", "Printf", "RecipesBase", "Serialization", "Unicode"]
-git-tree-sha1 = "0a4d8838dc28b4bcfaa3a20efb8d63975ad6781d"
+deps = ["Dates", "Downloads", "InlineStrings", "LazyArtifacts", "Mocking", "Printf", "RecipesBase", "Scratch", "Unicode"]
+git-tree-sha1 = "d634a3641062c040fc8a7e2a3ea17661cc159688"
 uuid = "f269a46b-ccf7-5d73-abea-4c690281aa53"
-version = "1.8.0"
+version = "1.9.0"
 
 [[ToStruct]]
 git-tree-sha1 = "f96bb06d38c94de6b6d0199fe5e73067c6f46edf"
@@ -631,9 +631,9 @@ uuid = "30578b45-9adc-5946-b283-645ec420af67"
 version = "0.4.1"
 
 [[URIs]]
-git-tree-sha1 = "97bbe755a53fe859669cd907f2d96aee8d2c1355"
+git-tree-sha1 = "e59ecc5a41b000fa94423a578d29290c7266fc10"
 uuid = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
-version = "1.3.0"
+version = "1.4.0"
 
 [[UUIDs]]
 deps = ["Random", "SHA"]
