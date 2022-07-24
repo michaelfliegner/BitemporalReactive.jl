@@ -75,6 +75,8 @@ function product()
               </q-item-section>
               <q-item-section>
                 description {{ppid['ref']['revision']['description']}}
+              </q-item-section><q-item-section>
+                Mortality Table {{ppid['ref']['revision']['mortality_table']}}
               </q-item-section>
             </q-item>   
           </q-list>
@@ -141,6 +143,7 @@ function tariff_item_partners()
                         <th class="text-left text-white">Role</th>
                         <th class="text-left text-white">Partner Id</th>
                         <th class="text-left text-white">Partner Description</th>
+                        <th class="text-left text-white">Date of Birth</th>
                       </tr>
                     </thead>
                   </template>
@@ -152,6 +155,8 @@ function tariff_item_partners()
                         <td class="text-left text-white">{{rolesTariffItemPartner[tpid['rev']['ref_role']['value']]}}</td>
                         <td class="text-left text-white">{{tpid['rev']['ref_partner']['value']}}</td>
                         <td class="text-left text-white">{{tpid['ref']['revision']['description']}}</td>
+                        <td class="text-left text-white">{{tpid['ref']['revision']['date_of_birth']}}</td>
+
                       </tr>
                     </template>
                     </tbody>
@@ -259,6 +264,7 @@ function contract_partners()
                         <th class="text-left text-white">Role</th>
                         <th class="text-left text-white">Partner Id</th>
                         <th class="text-left text-white">Partner Description</th>
+                        <th class="text-left text-white">Partner Date of Birth</th>
                       </tr>
                     </thead>
                   </template>
@@ -270,6 +276,7 @@ function contract_partners()
                         <td class="text-left text-white">{{rolesContractPartner[cpid['rev']['ref_role']['value']]}}</td>
                         <td class="text-left text-white">{{cpid['rev']['ref_partner']['value']}}</td>
                         <td class="text-left text-white">{{cpid['ref']['revision']['description']}}</td>
+                        <td class="text-left text-white">{{cpid['ref']['revision']['date_of_birth']}}</td>
                       </tr>
                     </template>
                     </tbody>
