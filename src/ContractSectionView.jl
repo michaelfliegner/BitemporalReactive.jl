@@ -182,7 +182,11 @@ function tariff_items()
                         <th class="text-left text-white">Role</th>
                         
                         <th class="text-left text-white">Tariff Id</th>
-                        <th class="text-left text-white">Tariff Parameters</th>
+                        <th class="text-left text-white">Description</th>
+                        <th class="text-left text-white">net premium</th>
+                        <th class="text-left text-white">annuity immediate</th>
+                        <th class="text-left text-white">annuity due</th>
+                        <th class="text-left text-white">deferment</th>
                       </tr>
                     </thead>
                   </template>
@@ -194,6 +198,10 @@ function tariff_items()
                         <td class="text-left text-white"> {{rolesTariffItem[tid['tariff_ref']['rev']['ref_role']['value']]}}</td>
                         <td class="text-left text-white"> {{tid['tariff_ref']['rev']['ref_tariff']['value']}}</td>
                         <td class="text-left text-white"> {{tid['tariff_ref']['rev']['description']}}</td>
+                        <td class="text-left text-white"> {{tid['tariff_ref']['rev']['net_premium']}}</td>
+                        <td class="text-left text-white"> {{tid['tariff_ref']['rev']['annuity_immediate']}}</td>
+                        <td class="text-left text-white"> {{tid['tariff_ref']['rev']['annuity_due']}}</td>
+                        <td class="text-left text-white"> {{tid['tariff_ref']['rev']['deferment']}}</td>
                       </tr>
       """,
       tariff_item_partners(),
