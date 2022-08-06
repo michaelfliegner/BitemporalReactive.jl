@@ -26,6 +26,7 @@ ToStruct = "43ec2cc1-0e50-5406-a854-b7ff8fdb8dad"
 [compat]
 BitemporalPostgres = "1"
 DataFrames = "1"
+GMT = "0.42"
 Genie = "4,5"
 HTTP = "0.9.17, 1"
 Intervals = "1.6.0"
