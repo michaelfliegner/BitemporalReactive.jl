@@ -69,11 +69,16 @@ Event handling and synching of the view model between UI and model server
 function handlers(model)
     on(model.selected_version) do _
         println("selected version")
+        println(model.selected_version[])
         if (model.selected_version[] != "")
             node = fn(model.histo[], model.selected_version[])
             model.txn_time[] = node["interval"]["tsdb_validfrom"]
             model.ref_time[] = node["interval"]["tsworld_validfrom"]
             model.current_version[] = parse(Int, model.selected_version[])
+            println(model.txn_time[])
+            println(model.ref_time[])
+            println(model.current_version[])
+            model.ref_time[]
             model.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(model.current_contract.id.value, model.txn_time[], model.ref_time[])))
             model.cs["loaded"] = "true"
             model.tab = "csection"
