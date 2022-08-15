@@ -1,7 +1,7 @@
 name = "BitemporalReactive"
 uuid = "2fc36f50-c0f6-442e-a77c-cf0acc93eef6"
 authors = ["michaelfliegner <michelkannfliegen@gmail.com>"]
-version = "0.1.12"
+version = "0.1.11"
 
 [deps]
 BitemporalPostgres = "e513cd14-23e6-48df-acf1-d9bc8fa5674b"
@@ -24,11 +24,14 @@ TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 ToStruct = "43ec2cc1-0e50-5406-a854-b7ff8fdb8dad"
 
 [compat]
+BitemporalPostgres = "1.2"
 DataFrames = "1"
 Genie = "4,5"
 HTTP = "0.9.17, 1"
 Intervals = "1.6.0"
 JSON = "0.21.3"
+LifeInsuranceDataModel = "0.2.2"
+LifeInsuranceProduct="0.1.3"
 Revise = "3"
 SearchLight = "2"
 SearchLightPostgreSQL = "2"
