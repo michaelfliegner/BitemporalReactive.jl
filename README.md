@@ -19,17 +19,39 @@ Features are:
 
 
 # DEMO ON GITPOD OPERATIONAL AGAIN due to Genie version 5 which allows for proxy configuration of websockets.
-The following snippet does the trick:
-'''
-    if (haskey(ENV, "GITPOD_REPO_ROOT"))
+The following snippets do the trick - 
+in the app's startup code
+```
+     Genie.config.websockets_port = 8001
+     if (haskey(ENV, "GITPOD_REPO_ROOT"))
         Genie.config.websockets_exposed_port = 443
         Genie.config.websockets_exposed_host = "8001-$(replace(ENV["GITPOD_WORKSPACE_URL"],"https://"=> ""))"
     else
-        Genie.config.websockets_port = 8001
         Genie.config.websockets_exposed_port = 8001
     end
     model = handlers(Stipple.init(ContractSectionView.Model))
-'''
+```
+in GITPOD configuration file .gitpod.yml
+```
+ports:
+  - name: postgres
+    description: data base server
+    port: 5432
+    visibility: private
+    onOpen: ignore
+
+  - name: Web App
+    description: The main application web server
+    port: 8000
+    visibility: public
+    onOpen: open-browser
+
+  - name: Web Socket
+    description: Web Socket server UI synching
+    port: 8001
+    visibility: public
+    onOpen: ignore
+```
 
 Demo: Opening this project in GITPOD using the gitpod Button on the repo page ![gitpod Button on the repo page](docs/src/assets/GitpodButton.PNG)
 
