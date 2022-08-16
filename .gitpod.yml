@@ -4,9 +4,7 @@ tasks:
   - init: cd .. &&
       echo 'PATH_add /home/gitpod/julia-1.6.7/bin' > .envrc &&
       julia --project=. -i populateDB.jl &&
-      julia -e'using Pkg; Pkg.add("Genie");using Genie; Genie.Generator.write_secrets_file()'
-  #- command: python3 -m http.server 8080 -d docs/build
-  #- command: gp preview $(gp url 8080)
+      julia -e'using Pkg; Pkg.add("Genie");using Genie; Genie.Generator.write_secrets_file(); Pkg.instantiate();include("testsCreateContract.jl")'
   - command: cat db/connectionGITPOD.yml >db/connection.yml
   - command: julia --project=. -i runWebApp.jl
  
