@@ -142,10 +142,13 @@ creating the route
 """
 function run()
     if (haskey(ENV, "GITPOD_REPO_ROOT"))
-        model = handlers(Stipple.init(ContractSectionView.Model, transport=Genie.WebThreads))
+        Genie.config.websockets_exposed_port = 443
+        Genie.config.websockets_exposed_host = "8000-$(replace(ENV["GITPOD_WORKSPACE_URL"],"https://"=> ""))"
     else
-        model = handlers(Stipple.init(ContractSectionView.Model))
+        Genie.config.websockets_port = 8001
+        Genie.config.websockets_exposed_port = 8001
     end
+    model = handlers(Stipple.init(ContractSectionView.Model))
     route("/ContractSection") do
         html(ContractSectionView.ui(model), context=@__MODULE__)
     end
