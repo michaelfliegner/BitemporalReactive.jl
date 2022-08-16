@@ -18,7 +18,18 @@ Features are:
 ![work in progress](docs/src/assets/wip.png) To populate the database use [this notebook](populateAndTest.ipynb)
 
 
-# DEMO ON GITPOD NOT WORKING CURRENTLY due to error loading Genie.Webthreads: https://github.com/GenieFramework/Stipple.jl/issues/127 I would appreciate hints, on how to use WebSockets on GITPOD to circumvent this problem
+# DEMO ON GITPOD OPERATIONAL AGAIN due to Genie version 5 which allows for proxy configuration of websockets.
+The following snippet does the trick:
+'''
+    if (haskey(ENV, "GITPOD_REPO_ROOT"))
+        Genie.config.websockets_exposed_port = 443
+        Genie.config.websockets_exposed_host = "8001-$(replace(ENV["GITPOD_WORKSPACE_URL"],"https://"=> ""))"
+    else
+        Genie.config.websockets_port = 8001
+        Genie.config.websockets_exposed_port = 8001
+    end
+    model = handlers(Stipple.init(ContractSectionView.Model))
+'''
 
 Demo: Opening this project in GITPOD using the gitpod Button on the repo page ![gitpod Button on the repo page](docs/src/assets/GitpodButton.PNG)
 
@@ -37,5 +48,4 @@ Clicking the various show buttons give an expanded view of the current contract 
 Clicking Contract History opens a tree view of the contract's mutation history, where mutations that were retrospectively altered by a mutation appear as subnodes of that mutation's node. Clicking a node show the respective version of the contract.
 ![MutationHistory](docs/src/assets/MutationHistory.PNG)
 
-Dummy change
 
