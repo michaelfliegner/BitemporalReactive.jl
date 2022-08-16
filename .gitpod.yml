@@ -2,7 +2,7 @@ image:
   file: .gitpod.Dockerfile
 tasks:
   - init: cd .. &&
-      echo 'PATH_add /home/gitpod/julia-1.6.5/bin' > .envrc &&
+      echo 'PATH_add /home/gitpod/julia-1.6.7/bin' > .envrc &&
       julia --project=. -i populateDB.jl &&
       julia -e'using Pkg; Pkg.add("Genie");using Genie; Genie.Generator.write_secrets_file()'
   #- command: python3 -m http.server 8080 -d docs/build
@@ -22,3 +22,9 @@ ports:
     port: 8000
     visibility: public
     onOpen: open-browser
+
+  - name: Web Socket
+    description: Web Socket server UI sznching
+    port: 8001
+    visibility: public
+    onOpen: ignore

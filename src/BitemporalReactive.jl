@@ -143,7 +143,7 @@ creating the route
 function run()
     if (haskey(ENV, "GITPOD_REPO_ROOT"))
         Genie.config.websockets_exposed_port = 443
-        Genie.config.websockets_exposed_host = "8000-$(replace(ENV["GITPOD_WORKSPACE_URL"],"https://"=> ""))"
+        Genie.config.websockets_exposed_host = "8001-$(replace(ENV["GITPOD_WORKSPACE_URL"],"https://"=> ""))"
     else
         Genie.config.websockets_port = 8001
         Genie.config.websockets_exposed_port = 8001
