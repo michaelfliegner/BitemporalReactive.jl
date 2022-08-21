@@ -1,6 +1,6 @@
 module BitemporalReactive
-using BitemporalPostgres, JSON, SearchLight, Stipple, StippleUI, TimeZones
-using LifeInsuranceDataModel
+using BitemporalPostgres, JSON, SearchLight, Stipple, StippleUI, TimeZones, ToStruct
+using LifeInsuranceDataModel, LifeInsuranceProduct
 include("ContractSectionView.jl")
 using .ContractSectionView
 
@@ -82,6 +82,10 @@ function handlers(model)
             model.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(model.current_contract.id.value, model.txn_time[], model.ref_time[])))
             model.cs["loaded"] = "true"
             model.tab = "csection"
+            # ti = LifeInsuranceProduct.calculate!(model.cs["product_items"][1].tariff_items[1])
+            ti = model.cs["product_items"][1]
+            print("ti=")
+            println(ti)
             push!(model)
         end
     end
@@ -94,14 +98,29 @@ function handlers(model)
         model.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(model.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
         model.cs["loaded"] = "true"
         model.tab[] = "csection"
+        ti = model.cs["product_items"][1]["tariff_items"][1]
+
+        print("ti=")
+        println(ti)
+        print("tistruct")
+        println(ToStruct.tostruct(LifeInsuranceDataModel.TariffItemSection, ti))
+        tistruct = ToStruct.tostruct(LifeInsuranceDataModel.TariffItemSection, ti)
+        LifeInsuranceProduct.calculate!(tistruct)
+        model.cs["product_items"][1]["tariff_items"][1] = JSON.parse(JSON.json(tistruct))
         push!(model)
+
     end
 
     on(model.selected_product) do _
+        println("model selected ")
         println(model.selected_product[])
         if (model.selected_product[] > 0)
             model.tab[] = "product"
+            model.prs = JSON.parse(JSON.json(LifeInsuranceDataModel.prsection(model.selected_product[], now(tz"UTC"), now(tz"UTC"))))
+            model.selected_product[] = 0
+            model.prs["loaded"] = "true"
         end
+        push!(model)
     end
 
     on(model.tab) do _
@@ -110,15 +129,6 @@ function handlers(model)
             println("current contract")
             println(model.current_contract[])
             model.histo = map(convert, LifeInsuranceDataModel.history_forest(model.current_contract[].ref_history.value).shadowed)
-            push!(model)
-            println("MODEL pushed")
-        end
-        if (model.tab[] == "product")
-            println("selected_product")
-            println(model.selected_product[])
-            model.prs = JSON.parse(JSON.json(LifeInsuranceDataModel.prsection(model.selected_product[], now(tz"UTC"), now(tz"UTC"))))
-            model.selected_product[] = 0
-            model.prs["loaded"] = "true"
             push!(model)
             println("MODEL pushed")
         end
