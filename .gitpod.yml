@@ -1,10 +1,8 @@
 image:
   file: .gitpod.Dockerfile
 tasks:
-  - init: 
-      cat db/connectionGITPOD.yml >db/connection.yml &&
-      julia -e'using Genie; Genie.Generator.write_secrets_file(); Pkg.instantiate();include("testsCreateContract.jl")'
-  - command: julia --project=. -i runWebApp.jl
+  - init:
+     julia -e 'using Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")'
  
 ports:
   - name: postgres
