@@ -7,5 +7,5 @@ RUN sudo apt-get update && sudo apt-get install -y direnv \
   && direnv hook bash >> /home/gitpod/.bashrc \
   && mkdir -p .config/direnv \
   && echo '[whitelist]' > .config/direnv/config.toml \
-  && echo 'prefix = [ "/workspace" ]' >> .config/direnv/config.toml 
+  && echo 'prefix = [ "/workspace" ]' >> .config/direnv/config.toml \
   && echo 'PATH add /home/gitpod/julia-1.6.7/bin' > /workspace/.direnv
