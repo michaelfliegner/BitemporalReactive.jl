@@ -1,8 +1,8 @@
 image:
   file: .gitpod.Dockerfile
 tasks:
-  - init:
-     julia -e 'using Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")'
+  - init: which julia
+  - command: julia -e 'using Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")'
  
 ports:
   - name: postgres
