@@ -7,7 +7,7 @@ RUN sudo wget https://julialang-s3.julialang.org/bin/linux/x64/1.6/julia-1.6.7-l
 # Install direnv
 RUN sudo apt-get update && sudo apt-get install -y direnv \
   && direnv hook bash >> /home/gitpod/.bashrc \
-  && echo 'PATH_add /home/gitpod/julia-1.6.7/bin' > ../.envrc 
+  && echo 'PATH_add /home/gitpod/julia-1.6.7/bin' > ../.envrc \
   && echo 'alias runjulia="GENIE_ENV=\"dev\" julia --project=$(pwd)"' >> /home/gitpod/.bashrc \
   && echo 'alias runtest="GENIE_ENV=\"dev\" julia --project=test bootstrap_tests.jl"' >> /home/gitpod/.bashrc \
   && mkdir -p .config/direnv \
