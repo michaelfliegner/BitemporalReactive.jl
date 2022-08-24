@@ -8,4 +8,5 @@ RUN sudo apt-get update && sudo apt-get install -y direnv \
   && mkdir -p .config/direnv \
   && echo '[whitelist]' > .config/direnv/config.toml \
   && echo 'prefix = [ "/workspace" ]' >> .config/direnv/config.toml \
-  && echo 'PATH_add /home/gitpod/julia-1.6.7/bin' > /workspace/.envrc
+  && echo 'PATH_add /home/gitpod/julia-1.6.7/bin' > /workspace/.envrc \
+  && echo 'ls -al /workspace/'
