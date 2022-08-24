@@ -1,8 +1,10 @@
 image:
   file: .gitpod.Dockerfile
 tasks:
-  - init: ls -al /workspace/
+  - init: echo 'PATH_add /home/gitpod/julia-1.6.7/bin' > /workspace/.envrc
+          
   - command: julia -e 'using Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")'
+  - command: ls -al /workspace/
  
 ports:
   - name: postgres
