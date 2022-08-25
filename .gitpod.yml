@@ -1,12 +1,9 @@
 image:
   file: .gitpod.Dockerfile
 tasks:
-  - init: cd .. &&
-      echo 'PATH_add /home/gitpod/julia-1.6.7/bin' > .envrc &&
-      julia --project=. -i populateDB.jl &&
-      julia -e'using Pkg; Pkg.add("Genie");using Genie; Genie.Generator.write_secrets_file(); Pkg.instantiate();include("testsCreateContract.jl")'
-  - command: cat db/connectionGITPOD.yml >db/connection.yml
-  - command: julia --project=. -i runWebApp.jl
+  - init: echo 'PATH_add /home/gitpod/julia-1.6.7/bin' > /workspace/.envrc
+  - command: cp -f db/connectionGITPOD.yml db/connection.yml         
+  - command: julia -e 'using Pkg; Pkg.instantiate()'
  
 ports:
   - name: postgres
