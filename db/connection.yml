@@ -3,9 +3,7 @@ env: ENV["GENIE_ENV"]
 dev:
   adapter: PostgreSQL
   database: postgres
-  host: 127.0.0.1
-  username: postgres
-  password: postgres
+  host: 127.0.0.1 
   port: 5432
   config: log_queries=false, log_level=Error
 
@@ -22,7 +20,5 @@ test:
   adapter: PostgreSQL
   database: postgres
   host: 127.0.0.1
-  username: postgres
-  password: postgres
   port: 5432
-  config:
+  config: log_queries=true, log_level=Error
