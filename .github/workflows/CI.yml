@@ -35,5 +35,5 @@ jobs:
         with:
           version: "1.7.1"
 
-      - run: GENIE_ENV="test"; export SEARCHLIGHT_USERNAME="postgres",  export SEARCHLIGHT_PASSWORD="postgres"  julia --project=$(pwd) -e'push!(LOAD_PATH,"src"); using Pkg; Pkg.instantiate(),include("testsCreateContract.jl")'
+      - run: GENIE_ENV="test"; export SEARCHLIGHT_USERNAME="postgres"; export SEARCHLIGHT_PASSWORD="postgres";  julia --project=$(pwd) -e'push!(LOAD_PATH,"src"); using Pkg; Pkg.instantiate(),include("testsCreateContract.jl")'
         shell: bash

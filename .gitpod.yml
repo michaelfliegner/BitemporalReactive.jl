@@ -1,10 +1,12 @@
 image:
   file: .gitpod.Dockerfile
 tasks:
-  - init: echo 'PATH_add /home/gitpod/julia-1.6.7/bin' > /workspace/.envrc
-  - command: cp -f db/connectionGITPOD.yml db/connection.yml         
-  - command: julia -e 'using Pkg; Pkg.instantiate()'
- 
+  - init: echo 'PATH_add /home/gitpod/julia-1.6.7/bin' > /workspace/.envrc \
+          && echo 'PATH_add /home/gitpod/julia-1.6.7/bin' > /workspace/.envrc \
+          && echo 'export SEARCHLIGHT_USERNAME="gitpod"' >> /workspace/.envrc \
+          && direnv allow /workspace
+          
+  - command: julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate();include("testsCreateContract.jl")' 
 ports:
   - name: postgres
     description: data base server
