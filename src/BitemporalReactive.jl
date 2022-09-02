@@ -1,6 +1,7 @@
 module BitemporalReactive
 using BitemporalPostgres, JSON, SearchLight, Stipple, StippleUI, TimeZones, ToStruct
-using LifeInsuranceDataModel, LifeInsuranceProduct
+using LifeInsuranceDataModel
+using LifeInsuranceProduct
 include("ContractSectionView.jl")
 using .ContractSectionView
 
@@ -151,24 +152,23 @@ run
 creating the route
 """
 function run()
-    Genie.config.websockets_port = 8001
-    Genie.config.websockets_host = "127.0.0.1"
-    if (haskey(ENV, "GITPOD_REPO_ROOT"))
-        println("has GITPOD REPO ROOT")
-        Genie.config.websockets_exposed_port = 443
-        Genie.config.websockets_exposed_host = "8001-$(replace(ENV["GITPOD_WORKSPACE_URL"],"https://"=> ""))"
-    else
-        Genie.config.websockets_exposed_port = 8001
-    end
+    # Genie.config.server_port = 8000
+    # Genie.config.server_host = "127.0.0.1"
+    # Genie.config.websockets_port = 8001
+    # Genie.config.websockets_host = "127.0.0.1"
+    # Genie.config.run_as_server = true
+    # if (haskey(ENV, "GITPOD_REPO_ROOT"))
+    #     println("has GITPOD REPO ROOT")
+    #     Genie.config.websockets_exposed_port = 443
+    #     Genie.config.websockets_exposed_host = "8001-$(replace(ENV["GITPOD_WORKSPACE_URL"],"https://"=> ""))"
+    # end
     model = handlers(Stipple.init(ContractSectionView.Model))
     route("/ContractSection") do
         html(ContractSectionView.ui(model), context=@__MODULE__)
     end
-    route("/") do
-        redirect("/ContractSection")
-    end
-    println("huhu")
-    Genie.up()
+
+    Stipple.up(ws_posrt=8001)
 end
 
 end
+
