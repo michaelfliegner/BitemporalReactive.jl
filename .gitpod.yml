@@ -20,8 +20,3 @@ ports:
     visibility: public
     onOpen: open-browser
 
-  - name: Web Socket
-    description: Web Socket server UI sznching
-    port: 8001
-    visibility: public
-    onOpen: ignore
