@@ -151,7 +151,7 @@ run
 
 creating the route
 """
-function run()
+function run(async::Bool = false)
     model = handlers(Stipple.init(ContractSectionView.Model))
     route("/ContractSection") do
         html(ContractSectionView.ui(model), context=@__MODULE__)
@@ -161,7 +161,7 @@ function run()
         redirect("/ContractSection")
     end
 
-    Stipple.up()
+    Stipple.up(async=async)
 end
 
 end
