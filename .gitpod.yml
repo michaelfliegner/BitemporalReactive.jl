@@ -6,7 +6,7 @@ tasks:
           && echo 'export SEARCHLIGHT_USERNAME="gitpod"' >> /workspace/.envrc \
           && direnv allow /workspace
           
-  - command: julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate();include("testsCreateContract.jl")' 
+  - command: julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate();include("testsCreateContract.jl");include("runWebApp.jl")'
 ports:
   - name: postgres
     description: data base server
@@ -20,8 +20,3 @@ ports:
     visibility: public
     onOpen: open-browser
 
-  - name: Web Socket
-    description: Web Socket server UI sznching
-    port: 8001
-    visibility: public
-    onOpen: ignore

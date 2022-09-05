@@ -151,23 +151,17 @@ run
 
 creating the route
 """
-function run()
-    # Genie.config.server_port = 8000
-    # Genie.config.server_host = "127.0.0.1"
-    # Genie.config.websockets_port = 8001
-    # Genie.config.websockets_host = "127.0.0.1"
-    # Genie.config.run_as_server = true
-    # if (haskey(ENV, "GITPOD_REPO_ROOT"))
-    #     println("has GITPOD REPO ROOT")
-    #     Genie.config.websockets_exposed_port = 443
-    #     Genie.config.websockets_exposed_host = "8001-$(replace(ENV["GITPOD_WORKSPACE_URL"],"https://"=> ""))"
-    # end
+function run(async::Bool = false)
     model = handlers(Stipple.init(ContractSectionView.Model))
     route("/ContractSection") do
         html(ContractSectionView.ui(model), context=@__MODULE__)
     end
 
-    Stipple.up(ws_posrt=8001)
+    route("/") do
+        redirect("/ContractSection")
+    end
+
+    Stipple.up(async=async)
 end
 
 end
