@@ -4,25 +4,26 @@ using LifeInsuranceDataModel
 using LifeInsuranceProduct
 include("ContractSectionView.jl")
 using .ContractSectionView
-
+include("PartnerSectionView.jl")
+using .PartnerSectionView
 """
-load_roles(model)
+load_roles(contractsModel)
 
     loads role tables, that provide texts for integer role keys
 """
-function load_roles(model)
+function load_roles(contractsModel)
     map(find(LifeInsuranceDataModel.ContractPartnerRole)) do entry
-        model.rolesContractPartner[entry.id.value] = entry.value
+        contractsModel.rolesContractPartner[entry.id.value] = entry.value
     end
-    println(model.rolesContractPartner)
+    println(contractsModel.rolesContractPartner)
 
 
     map(find(LifeInsuranceDataModel.TariffItemRole)) do entry
-        model.rolesTariffItem[entry.id.value] = entry.value
+        contractsModel.rolesTariffItem[entry.id.value] = entry.value
     end
 
     map(find(LifeInsuranceDataModel.TariffItemPartnerRole)) do entry
-        model.rolesTariffItemPartner[entry.id.value] = entry.value
+        contractsModel.rolesTariffItemPartner[entry.id.value] = entry.value
     end
 
 end
@@ -30,7 +31,7 @@ end
 """
 convert(node::BitemporalPostgres.Node)::Dict{String,Any}
 
-provides the view model for the history forest from tree data the model delivers
+provides the view contractsModel for the history forest from tree data the contractsModel delivers
 """
 function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
     i = Dict(string(fn) => getfield(getfield(node, :interval), fn) for fn ∈ fieldnames(ValidityInterval))
@@ -62,44 +63,44 @@ function fn(ns::Vector{Dict{String,Any}}, lbl::String)
 end
 
 """
-handlers(model)
+handlers(contractsModel::ContractSectionView.ContractsModel)
 
-Event handling and synching of the view model between UI and model server
+Event handling and synching of the view contractsModel between UI and contractsModel server
 """
 
-function handlers(model)
-    on(model.selected_version) do _
+function handlers(contractsModel::ContractSectionView.ContractsModel)
+    on(contractsModel.selected_version) do _
         println("selected version")
-        println(model.selected_version[])
-        if (model.selected_version[] != "")
-            node = fn(model.histo[], model.selected_version[])
-            model.txn_time[] = node["interval"]["tsdb_validfrom"]
-            model.ref_time[] = node["interval"]["tsworld_validfrom"]
-            model.current_version[] = parse(Int, model.selected_version[])
-            println(model.txn_time[])
-            println(model.ref_time[])
-            println(model.current_version[])
-            model.ref_time[]
-            model.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(model.current_contract.id.value, model.txn_time[], model.ref_time[])))
-            model.cs["loaded"] = "true"
-            model.tab = "csection"
-            # ti = LifeInsuranceProduct.calculate!(model.cs["product_items"][1].tariff_items[1])
-            ti = model.cs["product_items"][1]
+        println(contractsModel.selected_version[])
+        if (contractsModel.selected_version[] != "")
+            node = fn(contractsModel.histo[], contractsModel.selected_version[])
+            contractsModel.txn_time[] = node["interval"]["tsdb_validfrom"]
+            contractsModel.ref_time[] = node["interval"]["tsworld_validfrom"]
+            contractsModel.current_version[] = parse(Int, contractsModel.selected_version[])
+            println(contractsModel.txn_time[])
+            println(contractsModel.ref_time[])
+            println(contractsModel.current_version[])
+            contractsModel.ref_time[]
+            contractsModel.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(contractsModel.current_contract.id.value, contractsModel.txn_time[], contractsModel.ref_time[])))
+            contractsModel.cs["loaded"] = "true"
+            contractsModel.tab = "csection"
+            # ti = LifeInsuranceProduct.calculate!(contractsModel.cs["product_items"][1].tariff_items[1])
+            ti = contractsModel.cs["product_items"][1]
             print("ti=")
             println(ti)
-            push!(model)
+            push!(contractsModel)
         end
     end
 
-    on(model.selected_contract_idx) do _
-        println(model.selected_contract_idx[])
-        println(model.contracts[model.selected_contract_idx[]+1])
-        model.current_contract[] = model.contracts[model.selected_contract_idx[]+1]
-        model.histo = map(convert, LifeInsuranceDataModel.history_forest(model.current_contract[].ref_history.value).shadowed)
-        model.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(model.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
-        model.cs["loaded"] = "true"
-        model.tab[] = "csection"
-        ti = model.cs["product_items"][1]["tariff_items"][1]
+    on(contractsModel.selected_contract_idx) do _
+        println(contractsModel.selected_contract_idx[])
+        println(contractsModel.contracts[contractsModel.selected_contract_idx[]+1])
+        contractsModel.current_contract[] = contractsModel.contracts[contractsModel.selected_contract_idx[]+1]
+        contractsModel.histo = map(convert, LifeInsuranceDataModel.history_forest(contractsModel.current_contract[].ref_history.value).shadowed)
+        contractsModel.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(contractsModel.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
+        contractsModel.cs["loaded"] = "true"
+        contractsModel.tab[] = "csection"
+        ti = contractsModel.cs["product_items"][1]["tariff_items"][1]
 
         print("ti=")
         println(ti)
@@ -107,43 +108,61 @@ function handlers(model)
         println(ToStruct.tostruct(LifeInsuranceDataModel.TariffItemSection, ti))
         tistruct = ToStruct.tostruct(LifeInsuranceDataModel.TariffItemSection, ti)
         LifeInsuranceProduct.calculate!(tistruct)
-        model.cs["product_items"][1]["tariff_items"][1] = JSON.parse(JSON.json(tistruct))
-        push!(model)
+        contractsModel.cs["product_items"][1]["tariff_items"][1] = JSON.parse(JSON.json(tistruct))
+        push!(contractsModel)
 
     end
 
-    on(model.selected_product) do _
-        println("model selected ")
-        println(model.selected_product[])
-        if (model.selected_product[] > 0)
-            model.tab[] = "product"
-            model.prs = JSON.parse(JSON.json(LifeInsuranceDataModel.prsection(model.selected_product[], now(tz"UTC"), now(tz"UTC"))))
-            model.selected_product[] = 0
-            model.prs["loaded"] = "true"
+    on(contractsModel.selected_product) do _
+        println("contractsModel selected ")
+        println(contractsModel.selected_product[])
+        if (contractsModel.selected_product[] > 0)
+            contractsModel.tab[] = "product"
+            contractsModel.prs = JSON.parse(JSON.json(LifeInsuranceDataModel.prsection(contractsModel.selected_product[], now(tz"UTC"), now(tz"UTC"))))
+            contractsModel.selected_product[] = 0
+            contractsModel.prs["loaded"] = "true"
         end
-        push!(model)
+        push!(contractsModel)
     end
 
-    on(model.tab) do _
-        println(model.tab[])
-        if (model.tab[] == "history")
+    on(contractsModel.tab) do _
+        println(contractsModel.tab[])
+        if (contractsModel.tab[] == "history")
             println("current contract")
-            println(model.current_contract[])
-            model.histo = map(convert, LifeInsuranceDataModel.history_forest(model.current_contract[].ref_history.value).shadowed)
-            push!(model)
+            println(contractsModel.current_contract[])
+            contractsModel.histo = map(convert, LifeInsuranceDataModel.history_forest(contractsModel.current_contract[].ref_history.value).shadowed)
+            push!(contractsModel)
             println("MODEL pushed")
         end
     end
 
-    on(model.isready) do _
-        model.contracts = LifeInsuranceDataModel.get_contracts()
-        model.tab[] = "contracts"
-        model.cs["loaded"] = "false"
-        load_roles(model)
-        push!(model)
-        println("model pushed")
+    on(contractsModel.isready) do _
+        contractsModel.contracts = LifeInsuranceDataModel.get_contracts()
+        contractsModel.tab[] = "contracts"
+        contractsModel.cs["loaded"] = "false"
+        load_roles(contractsModel)
+        push!(contractsModel)
+        println("contractsModel pushed")
     end
-    model
+    contractsModel
+end
+"""
+handlers(contractsModel::PartnerSectionView.PartnersModel)
+
+Event handling and synching of the view PartnersModel between UI and partnersModel server
+"""
+
+function handlers(partnersModel::PartnerSectionView.PartnersModel)
+    on(partnersModel.isready) do _
+        #contractsModel.tab[] = "contracts"
+        #contractsModel.cs["loaded"] = "false"
+        #load_roles(contractsModel)
+        partnersModel.ps = JSON.parse(JSON.json(LifeInsuranceDataModel.psection(1, now(tz"UTC"), now(tz"UTC"))))
+        partnersModel.ps["loaded"] = "false"
+        push!(partnersModel)
+        println("partnersModel pushed")
+    end
+    partnersModel
 end
 
 """
@@ -151,15 +170,22 @@ run
 
 creating the route
 """
-function run(async::Bool = false)
-    model = handlers(Stipple.init(ContractSectionView.Model))
+function run(async::Bool=false)
+    contractsModel = handlers(Stipple.init(ContractSectionView.ContractsModel))
     route("/ContractSection") do
-        html(ContractSectionView.ui(model), context=@__MODULE__)
+        html(ContractSectionView.ui(contractsModel), context=@__MODULE__)
     end
 
     route("/") do
         redirect("/ContractSection")
     end
+
+    partnersModel = handlers(PartnerSectionView.PartnersModel |> init)
+
+    route("/PartnerSection") do
+        html(PartnerSectionView.ui(partnersModel), context=@__MODULE__)
+    end
+
 
     Stipple.up(async=async)
 end

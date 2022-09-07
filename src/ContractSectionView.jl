@@ -3,12 +3,12 @@ using Stipple, Stipple.Html, StippleUI
 using BitemporalPostgres, LifeInsuranceDataModel, TimeZones
 
 """
-Model
+ContractsModel
 
   reactive data view model (Stipple/Quasar/Vue)
   synched between Julia Server and Browser
 """
-@reactive mutable struct Model <: ReactiveModel
+@reactive mutable struct ContractsModel <: ReactiveModel
   contracts::R{Vector{Contract}} = []
   current_contract::R{Contract} = Contract()
   selected_contract_idx::R{Integer} = -1
