@@ -12,8 +12,9 @@ using .HistoryView
   current_version::R{Integer} = 0
   txn_time::R{ZonedDateTime} = now(tz"Africa/Porto-Novo")
   ref_time::R{ZonedDateTime} = now(tz"Africa/Porto-Novo")
+  histo::R{Vector{Dict{String,Any}}} = Dict{String,Any}[]
   ps::R{Dict{String,Any}} = Dict{String,Any}("tsdb_validfrom" => "2022-09-07T09:00:02.844+00:00", "ref_history" => Dict{String,Any}("value" => 9223372036854775807), "revision" => Dict{String,Any}("ref_validfrom" => Dict{String,Any}("value" => 1), "ref_invalidfrom" => Dict{String,Any}("value" => 9223372036854775807), "date_of_birth" => "", "ref_component" => Dict{String,Any}("value" => 0), "id" => Dict{String,Any}("value" => 0), "description" => ""), "ref_version" => Dict{String,Any}("value" => 9223372036854775807), "tsw_validfrom" => "2022-09-07T09:00:02.844+00:00")
-  tab::R{String} = "psection"
+  tab::R{String} = "partners"
 end
 
 """
@@ -130,7 +131,7 @@ function ui(model::PartnerSectionView.PartnersModel)
                     </q-item>
                     <q-item clickable v-close-popup>
                       <q-item-section>Recent tabs</q-item-section>
-                    </q-item>
+                    </q-item @click="tab[]="'history'">>
                     <q-item clickable v-close-popup>
                       <q-item-section>History</q-item-section>
                     </q-item>

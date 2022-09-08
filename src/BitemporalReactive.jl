@@ -31,7 +31,7 @@ end
 """
 convert(node::BitemporalPostgres.Node)::Dict{String,Any}
 
-provides the view contractsModel for the history forest from tree data the contractsModel delivers
+provides the view for the history forest from tree data the contracts/partnersModel delivers
 """
 function convert(node::BitemporalPostgres.Node)::Dict{String,Any}
     i = Dict(string(fn) => getfield(getfield(node, :interval), fn) for fn ∈ fieldnames(ValidityInterval))
@@ -147,20 +147,49 @@ function handlers(contractsModel::ContractSectionView.ContractsModel)
     contractsModel
 end
 """
-handlers(contractsModel::PartnerSectionView.PartnersModel)
+handlers(cpartnersModel::PartnerSectionView.PartnersModel)
 
 Event handling and synching of the view PartnersModel between UI and partnersModel server
 """
 
 function handlers(partnersModel::PartnerSectionView.PartnersModel)
     on(partnersModel.isready) do _
-        #contractsModel.tab[] = "contracts"
-        #contractsModel.cs["loaded"] = "false"
-        #load_roles(contractsModel)
-        partnersModel.ps = JSON.parse(JSON.json(LifeInsuranceDataModel.psection(1, now(tz"UTC"), now(tz"UTC"))))
-        partnersModel.ps["loaded"] = "false"
+        partnersModel.partners = LifeInsuranceDataModel.get_partners()
+        partnersModel.tab[] = "partners"
         push!(partnersModel)
         println("partnersModel pushed")
+    end
+
+    on(partnersModel.selected_partner_idx) do _
+        println(partnersModel.selected_partner_idx[])
+        println(partnersModel.partners[partnersModel.selected_partner_idx[]+1])
+        partnersModel.current_partner[] = partnersModel.partners[partnersModel.selected_partner_idx[]+1]
+        partnersModel.histo = map(convert, LifeInsuranceDataModel.history_forest(partnersModel.current_partner[].ref_history.value).shadowed)
+        partnersModel.ps = JSON.parse(JSON.json(LifeInsuranceDataModel.psection(partnersModel.current_partner[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
+        partnersModel.ps["loaded"] = "true"
+        partnersModel.tab[] = "psection"
+        println("partner selected to psection")
+        push!(partnersModel)
+
+    end
+
+    on(partnersModel.selected_version) do _
+        println("selected version")
+        println(partnersModel.selected_version[])
+        if (partnersModel.selected_version[] != "")
+            node = fn(partnersModel.histo[], partnersModel.selected_version[])
+            partnersModel.txn_time[] = node["interval"]["tsdb_validfrom"]
+            partnersModel.ref_time[] = node["interval"]["tsworld_validfrom"]
+            partnersModel.current_version[] = parse(Int, partnersModel.selected_version[])
+            println(partnersModel.txn_time[])
+            println(partnersModel.ref_time[])
+            println(partnersModel.current_version[])
+            partnersModel.ref_time[]
+            partnersModel.ps = JSON.parse(JSON.json(LifeInsuranceDataModel.psection(partnersModel.current_partner.id.value, partnersModel.txn_time[], partnersModel.ref_time[])))
+            partnersModel.ps["loaded"] = "true"
+            partnersModel.tab = "psection"
+            push!(partnersModel)
+        end
     end
     partnersModel
 end
