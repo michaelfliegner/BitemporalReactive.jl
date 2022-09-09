@@ -131,8 +131,8 @@ function ui(model::PartnerSectionView.PartnersModel)
                     </q-item>
                     <q-item clickable v-close-popup>
                       <q-item-section>Recent tabs</q-item-section>
-                    </q-item @click="tab[]="'history'">>
-                    <q-item clickable v-close-popup>
+                    </q-item>
+                    <q-item tag="a" href="/ContractSection" clickable>
                       <q-item-section>History</q-item-section>
                     </q-item>
                     <q-item clickable v-close-popup>

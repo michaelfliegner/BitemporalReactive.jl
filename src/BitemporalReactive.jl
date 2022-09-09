@@ -191,6 +191,7 @@ function handlers(partnersModel::PartnerSectionView.PartnersModel)
             push!(partnersModel)
         end
     end
+
     partnersModel
 end
 
