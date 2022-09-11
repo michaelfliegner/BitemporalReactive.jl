@@ -18,16 +18,4 @@ Demo: Opening this project in GITPOD using the gitpod Button on the repo page ![
 You get an environment with a running database populated with sample data, the Webapp running and link to open a browser window.
 ![Port8000Open](docs/src/assets/Port8000open.PNG)
 
-The Browser shows the ContractSection page with Contracts Tab open and a list of one contract number.
-![ContractsTab](docs/src/assets/ContractsTab.PNG)
-
-Clicking this gives You the initial Contract Version Tab
-![ContractSectionInitial](docs/src/assets/ContractSectionInitial.PNG)
-
-Clicking the various show buttons give an expanded view of the current contract version
-![ContractSectionExpanded](docs/src/assets/ContractSectionExpanded.PNG)
-
-Clicking Contract History opens a tree view of the contract's mutation history, where mutations that were retrospectively altered by a mutation appear as subnodes of that mutation's node. Clicking a node show the respective version of the contract.
-![MutationHistory](docs/src/assets/MutationHistory.PNG)
-
-
+[App in action. In the beginning it is quitedue to just in time compiling](/home/mf/dev/BitemporalReactive.jl/docs/src/assets/BitemporalReactive_20220910.mp4)

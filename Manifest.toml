@@ -2,7 +2,7 @@
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "644a67d2e96a2b40d7bb1c459226a691a69b6b2e"
+project_hash = "344b86b610eaac4a837abbb125dc791fe8fc75cc"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "5c0b629df8a5566a06f5fef5100b53ea56e465a0"
@@ -11,9 +11,9 @@ version = "0.4.2"
 
 [[deps.ActuaryUtilities]]
 deps = ["Dates", "Distributions", "FinanceCore", "ForwardDiff", "MuladdMacro", "QuadGK", "Reexport", "SnoopPrecompile", "StatsBase", "Yields"]
-git-tree-sha1 = "8f6fdcc2e7974838e2cd0d16e715ac1e2079e112"
+git-tree-sha1 = "0b90963a1e05d14f5256a3fdf4dcd8caf36f30f9"
 uuid = "bdd23359-8b1c-4f88-b89b-d11982a786f4"
-version = "3.9.0"
+version = "3.10.0"
 
 [[deps.Adapt]]
 deps = ["LinearAlgebra"]
@@ -629,19 +629,15 @@ version = "2.3.0"
 
 [[deps.LifeInsuranceDataModel]]
 deps = ["BitemporalPostgres", "ColorSchemes", "DataFrames", "Dates", "Intervals", "JSON", "LibPQ", "Revise", "SearchLight", "SearchLightPostgreSQL", "Test", "TimeZones", "ToStruct"]
-git-tree-sha1 = "a58858d05d1b4b69bc43d0cab81dfce0b230dcfb"
-repo-rev = "main"
-repo-url = "https://github.com/Actuarial-Sciences-for-Africa-ASA/LifeInsurancedataModel.jl"
+git-tree-sha1 = "7cad00b59acbc2b32671ce8e4bb7a6fc3d4b7bb5"
 uuid = "4892898e-25d7-46ce-b5c3-dea2164303ac"
 version = "0.3.1"
 
 [[deps.LifeInsuranceProduct]]
 deps = ["BitemporalPostgres", "Dates", "LifeContingencies", "LifeInsuranceDataModel", "MortalityTables", "Revise", "SearchLight", "SearchLightPostgreSQL", "TimeZones", "ToStruct", "Yields"]
-git-tree-sha1 = "03e496a1108674b129dbf2b90f1e7054f48ecfea"
-repo-rev = "main"
-repo-url = "https://github.com/Actuarial-Sciences-for-Africa-ASA/LifeInsuranceProduct.jl"
+git-tree-sha1 = "e3cd3653633cdbc42cb3802f28b65ee434f75a9e"
 uuid = "492f22fc-54e6-4f0f-bb9b-bacd199f5046"
-version = "0.2.1"
+version = "0.2.0"
 
 [[deps.LineSearches]]
 deps = ["LinearAlgebra", "NLSolversBase", "NaNMath", "Parameters", "Printf"]
@@ -687,10 +683,10 @@ uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 version = "0.5.9"
 
 [[deps.MarchingCubes]]
-deps = ["StaticArrays"]
-git-tree-sha1 = "3bf4baa9df7d1367168ebf60ed02b0379ea91099"
+deps = ["SnoopPrecompile", "StaticArrays"]
+git-tree-sha1 = "ffc66942498a5f0d02b9e7b1b1af0f5873142cdc"
 uuid = "299715c1-40a9-479a-aaf9-4a633d36f717"
-version = "0.1.3"
+version = "0.1.4"
 
 [[deps.Markdown]]
 deps = ["Base64"]
