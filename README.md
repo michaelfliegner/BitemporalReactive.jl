@@ -18,4 +18,4 @@ Demo: Opening this project in GITPOD using the gitpod Button on the repo page ![
 You get an environment with a running database populated with sample data, the Webapp running and link to open a browser window.
 ![Port8000Open](docs/src/assets/Port8000open.PNG)
 
-[App in action. In the beginning it is quitedue to just in time compiling](/home/mf/dev/BitemporalReactive.jl/docs/src/assets/BitemporalReactive_20220910.mp4)
+[App in action. In the beginning it is quitedue to just in time compiling](docs/src/assets/BitemporalReactive_20220910.mp4)
