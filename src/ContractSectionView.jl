@@ -4,6 +4,8 @@ using BitemporalPostgres, LifeInsuranceDataModel, TimeZones
 include("HistoryView.jl")
 using .HistoryView
 
+activetxn::Integer = 0
+
 """
 ContractsModel
 
@@ -11,6 +13,7 @@ ContractsModel
   synched between Julia Server and Browser
 """
 @reactive mutable struct ContractsModel <: ReactiveModel
+  activetxn::Integer = 0
   contracts::R{Vector{Contract}} = []
   current_contract::R{Contract} = Contract()
   selected_contract_idx::R{Integer} = -1

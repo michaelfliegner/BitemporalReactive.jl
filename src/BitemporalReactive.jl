@@ -6,6 +6,14 @@ include("ContractSectionView.jl")
 using .ContractSectionView
 include("PartnerSectionView.jl")
 using .PartnerSectionView
+
+"""
+Activetxn
+    whether a transaction/workflow is active
+"""
+Activetxn = 0
+
+
 """
 load_roles(contractsModel)
 
@@ -67,8 +75,16 @@ handlers(contractsModel::ContractSectionView.ContractsModel)
 
 Event handling and synching of the view contractsModel between UI and contractsModel server
 """
-
 function handlers(contractsModel::ContractSectionView.ContractsModel)
+    on(contractsModel.isready) do _
+        contractsModel.contracts = LifeInsuranceDataModel.get_contracts()
+        contractsModel.tab[] = "contracts"
+        contractsModel.cs["loaded"] = "false"
+        load_roles(contractsModel)
+        push!(contractsModel)
+        println("contractsModel pushed")
+    end
+
     on(contractsModel.selected_version) do _
         println("selected version")
         println(contractsModel.selected_version[])
@@ -97,7 +113,7 @@ function handlers(contractsModel::ContractSectionView.ContractsModel)
         println(contractsModel.contracts[contractsModel.selected_contract_idx[]+1])
         contractsModel.current_contract[] = contractsModel.contracts[contractsModel.selected_contract_idx[]+1]
         contractsModel.histo = map(convert, LifeInsuranceDataModel.history_forest(contractsModel.current_contract[].ref_history.value).shadowed)
-        contractsModel.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(contractsModel.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"))))
+        contractsModel.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(contractsModel.current_contract[].id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"), contractsModel.activetxn)))
         contractsModel.cs["loaded"] = "true"
         contractsModel.tab[] = "csection"
         ti = contractsModel.cs["product_items"][1]["tariff_items"][1]
@@ -136,14 +152,6 @@ function handlers(contractsModel::ContractSectionView.ContractsModel)
         end
     end
 
-    on(contractsModel.isready) do _
-        contractsModel.contracts = LifeInsuranceDataModel.get_contracts()
-        contractsModel.tab[] = "contracts"
-        contractsModel.cs["loaded"] = "false"
-        load_roles(contractsModel)
-        push!(contractsModel)
-        println("contractsModel pushed")
-    end
     contractsModel
 end
 """
@@ -203,6 +211,11 @@ creating the route
 function run(async::Bool=false)
     contractsModel = handlers(Stipple.init(ContractSectionView.ContractsModel))
     route("/ContractSection") do
+        Activetxn = params(:activetxn, "0")
+        println("from session " * Activetxn)
+        contractsModel.activetxn = parse(Int64, Activetxn)
+        println("contractsModel.activetxn " * string(contractsModel.activetxn))
+        println(params)
         html(ContractSectionView.ui(contractsModel), context=@__MODULE__)
     end
 
