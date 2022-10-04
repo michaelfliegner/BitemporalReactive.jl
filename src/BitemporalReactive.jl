@@ -6,6 +6,71 @@ include("ContractSectionView.jl")
 using .ContractSectionView
 include("PartnerSectionView.jl")
 using .PartnerSectionView
+"""
+compareRevisions(t, previous::Dict{String,Any}, current::Dict{String,Any}) where {T<:BitemporalPostgres.ComponentRevision}
+compare corresponding revision elements and return nothing if equal a pair of both else
+"""
+function compareRevisions(t, previous::Dict{String,Any}, current::Dict{String,Any})
+    let changed = false
+        for (key, previous_value) in previous
+            if !(key in ("ref_validfrom", "ref_invalidfrom", "ref_component"))
+                let current_value = current[key]
+                    if previous_value != current_value
+                        changed = true
+                    end
+                end
+            end
+        end
+        if (changed)
+            (ToStruct.tostruct(t, previous), ToStruct.tostruct(t, current))
+        end
+    end
+end
+"""
+compareModelStateContract(previous::Dict{String,Any}, current::Dict{String,Any})
+    compare viewmodel state for a contract section
+"""
+function compareModelStateContract(previous::Dict{String,Any}, current::Dict{String,Any})
+    diff = []
+    cr = compareRevisions(ContractRevision, previous["revision"], current["revision"])
+    if (cr != nothing)
+        push!(diff, cr)
+    end
+    for i in 1:size(previous["partner_refs"])[1]
+        prev = (previous["partner_refs"][i]["rev"])
+        curr = (current["partner_refs"][i]["rev"])
+        prr = compareRevisions(ContractPartnerRefRevision, prev, curr)
+        if (prr != nothing)
+            push!(diff, prr)
+        end
+
+    end
+    for i in 1:size(previous["product_items"])[1]
+        prevpi = previous["product_items"][i]
+        currpi = current["product_items"][i]
+        pit = compareRevisions(ProductItemRevision, prevpi["revision"], currpi["revision"])
+        if (pit != nothing)
+            push!(diff, pit)
+        end
+        for i in 1:size(prevpi["tariff_items"])[1]
+            prevti = prevpi["tariff_items"][i]
+            currti = currpi["tariff_items"][i]
+            tit = compareRevisions(TariffItemRevision, prevti["tariff_ref"]["rev"], currti["tariff_ref"]["rev"])
+            if (tit != nothing)
+                push!(diff, tit)
+            end
+            for i in 1:size(prevti["partner_refs"])[1]
+                prevtipr = prevti["partner_refs"][i]["rev"]
+                currtipr = currti["partner_refs"][i]["rev"]
+                tiprt = compareRevisions(TariffItemPartnerRefRevision, prevtipr, currtipr)
+                if (tiprt != nothing)
+                    push!(diff, tiprt)
+                end
+            end
+        end
+    end
+    diff
+end
 
 """
 Activetxn
