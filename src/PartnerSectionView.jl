@@ -13,7 +13,7 @@ using .HistoryView
   txn_time::R{ZonedDateTime} = now(tz"Africa/Porto-Novo")
   ref_time::R{ZonedDateTime} = now(tz"Africa/Porto-Novo")
   histo::R{Vector{Dict{String,Any}}} = Dict{String,Any}[]
-  ps::R{Dict{String,Any}} = Dict{String,Any}("tsdb_validfrom" => "2022-09-07T09:00:02.844+00:00", "ref_history" => Dict{String,Any}("value" => 9223372036854775807), "revision" => Dict{String,Any}("ref_validfrom" => Dict{String,Any}("value" => 1), "ref_invalidfrom" => Dict{String,Any}("value" => 9223372036854775807), "date_of_birth" => "", "ref_component" => Dict{String,Any}("value" => 0), "id" => Dict{String,Any}("value" => 0), "description" => ""), "ref_version" => Dict{String,Any}("value" => 9223372036854775807), "tsw_validfrom" => "2022-09-07T09:00:02.844+00:00")
+  ps::R{Dict{String,Any}} = Dict{String,Any}("tsdb_validfrom" => "2022-09-07T09:00:02.844+00:00", "ref_history" => Dict{String,Any}("value" => 2^53 - 1), "revision" => Dict{String,Any}("ref_validfrom" => Dict{String,Any}("value" => 1), "ref_invalidfrom" => Dict{String,Any}("value" => 2^53 - 1), "date_of_birth" => "", "ref_component" => Dict{String,Any}("value" => 0), "id" => Dict{String,Any}("value" => 0), "description" => ""), "ref_version" => Dict{String,Any}("value" => 2^53 - 1), "tsw_validfrom" => "2022-09-07T09:00:02.844+00:00")
   tab::R{String} = "partners"
 end
 
