@@ -14,15 +14,15 @@ ContractsModel
 """
 @reactive mutable struct ContractsModel <: ReactiveModel
   activetxn::Integer = 0
-  contracts::R{Vector{Contract}} = []
-  current_contract::R{Contract} = Contract()
+  contracts::Vector{Contract} = []
+  current_contract::Contract = Contract()
   selected_contract_idx::R{Integer} = -1
   process::R{Bool} = false
   selected_version::R{String} = ""
-  current_version::R{Integer} = 0
-  txn_time::R{ZonedDateTime} = now(tz"Africa/Porto-Novo")
-  ref_time::R{ZonedDateTime} = now(tz"Africa/Porto-Novo")
-  histo::R{Vector{Dict{String,Any}}} = Dict{String,Any}[]
+  current_version::Integer = 0
+  txn_time::ZonedDateTime = now(tz"Africa/Porto-Novo")
+  ref_time::ZonedDateTime = now(tz"Africa/Porto-Novo")
+  histo::Vector{Dict{String,Any}} = Dict{String,Any}[]
   cs::Dict{String,Any} = Dict{String,Any}("loaded" => "false")
   prs::Dict{String,Any} = Dict{String,Any}("loaded" => "false")
   selected_product_part_idx::R{Integer} = 0
