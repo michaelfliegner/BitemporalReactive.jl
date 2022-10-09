@@ -14,6 +14,7 @@ ContractsModel
 """
 @reactive mutable struct ContractsModel <: ReactiveModel
   activetxn::Integer = 0
+  command::R{String}="" 
   contracts::Vector{Contract} = []
   current_contract::Contract = Contract()
   selected_contract_idx::R{Integer} = -1
@@ -284,7 +285,7 @@ function contract()
                   <template>
                     <tbody>
                       <tr>
-                        <td class="text-left text-white">{{cs['revision']['description']}}</td>
+                        <td class="text-left text-white"><q-input standout="bg-teal text-white" v-model="cs['revision']['description']"/>{{cs['revision']['description']}}</td>
                       </tr>
                     </tbody>
                    </template>
@@ -356,8 +357,8 @@ function ui(model)
               <q-btn color="primary" icon="menu" >
                 <q-menu>
                   <q-list style="min-width: 100px">
-                    <q-item clickable v-close-popup>
-                      <q-item-section>Recent tabs</q-item-section>
+                    <q-item clickable v-close-popup @click="command='persist'" />
+                      <q-item-section>Persist</q-item-section>
                     </q-item>
                     <q-item tag="a" href="/PartnerSection" clickable v-close-popup>
                       <q-item-section>Partners</q-item-section>

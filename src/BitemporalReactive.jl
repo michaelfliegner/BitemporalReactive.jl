@@ -141,6 +141,7 @@ handlers(contractsModel::ContractSectionView.ContractsModel)
 Event handling and synching of the view contractsModel between UI and contractsModel server
 """
 function handlers(contractsModel::ContractSectionView.ContractsModel)
+
     on(contractsModel.isready) do _
         contractsModel.contracts = LifeInsuranceDataModel.get_contracts()
         contractsModel.tab[] = "contracts"
@@ -150,27 +151,34 @@ function handlers(contractsModel::ContractSectionView.ContractsModel)
         println("contractsModel pushed")
     end
 
+    on(contractsModel.command) do _
+        if (contractsModel.command[] != "")
+            @info "command= " * contractsModel.command[] * " desc= " * contractsModel.cs["revision"]["description"]
+            # contractsModel.command = ""
+        end
+    end
+
     on(contractsModel.selected_version) do _
         @info "selected version" * contractsModel.selected_version[]
         if (contractsModel.selected_version[] != "")
             try
-            node = fn(contractsModel.histo, contractsModel.selected_version[])
-            contractsModel.txn_time = node["interval"]["tsdb_validfrom"]
-            contractsModel.ref_time = node["interval"]["tsworld_validfrom"]
-            contractsModel.current_version = parse(Int, contractsModel.selected_version[])
-            println(contractsModel.txn_time)
-            println(contractsModel.ref_time)
-            println(contractsModel.current_version)
-            @info "vor csection"
-            contractsModel.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(contractsModel.current_contract.id.value, contractsModel.txn_time, contractsModel.ref_time)))
-            contractsModel.cs["loaded"] = "true"
-            @info "vor tab "
-            contractsModel.tab = "csection"
-            # ti = LifeInsuranceProduct.calculate!(contractsModel.cs["product_items"][1].tariff_items[1])
-            ti = contractsModel.cs["product_items"][1]
-            print("ti=")
-            println(ti)
-            push!(contractsModel)
+                node = fn(contractsModel.histo, contractsModel.selected_version[])
+                contractsModel.txn_time = node["interval"]["tsdb_validfrom"]
+                contractsModel.ref_time = node["interval"]["tsworld_validfrom"]
+                contractsModel.current_version = parse(Int, contractsModel.selected_version[])
+                println(contractsModel.txn_time)
+                println(contractsModel.ref_time)
+                println(contractsModel.current_version)
+                @info "vor csection"
+                contractsModel.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(contractsModel.current_contract.id.value, contractsModel.txn_time, contractsModel.ref_time)))
+                contractsModel.cs["loaded"] = "true"
+                @info "vor tab "
+                contractsModel.tab = "csection"
+                # ti = LifeInsuranceProduct.calculate!(contractsModel.cs["product_items"][1].tariff_items[1])
+                ti = contractsModel.cs["product_items"][1]
+                print("ti=")
+                println(ti)
+                push!(contractsModel)
             catch err
                 println("wassis shief gegangen ")
                 @error "ERROR: " exception = (err, catch_backtrace())
