@@ -152,9 +152,10 @@ function handlers(contractsModel::ContractSectionView.ContractsModel)
     end
 
     on(contractsModel.command) do _
+        @info "command= " * contractsModel.command[]
         if (contractsModel.command[] != "")
             @info "command= " * contractsModel.command[] * " desc= " * contractsModel.cs["revision"]["description"]
-            # contractsModel.command = ""
+            contractsModel.command = ""
         end
     end
 
@@ -188,9 +189,11 @@ function handlers(contractsModel::ContractSectionView.ContractsModel)
     end
 
     on(contractsModel.selected_contract_idx) do _
+        @info "enter selected_contract_idx"
         println(contractsModel.selected_contract_idx[])
         println(contractsModel.contracts[contractsModel.selected_contract_idx[]+1])
         contractsModel.current_contract = contractsModel.contracts[contractsModel.selected_contract_idx[]+1]
+        contractsModel.selected_contract_idx=-1
         contractsModel.histo = map(convert, LifeInsuranceDataModel.history_forest(contractsModel.current_contract.ref_history.value).shadowed)
         contractsModel.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(contractsModel.current_contract.id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"), contractsModel.activetxn)))
         contractsModel.cs["loaded"] = "true"

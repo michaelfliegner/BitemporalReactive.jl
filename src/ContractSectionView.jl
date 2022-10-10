@@ -45,6 +45,11 @@ Display the contracts selection tab
 """
 function contract_list()
   """
+    <div class="q-pa-md">
+      <div class="q-gutter-md" style="max-width: 300px">
+        <q-input standout="bg-teal text-white" v-model="cs['selected_contract_idx']"/>
+      </div>
+    </div>
     <template v-for="(cid,cindex) in contracts">
       <div class="q-pa-md" style="max-width: 350px">
         <q-list dense bordered padding class="rounded-borders">
@@ -285,7 +290,7 @@ function contract()
                   <template>
                     <tbody>
                       <tr>
-                        <td class="text-left text-white"><q-input standout="bg-teal text-white" v-model="cs['revision']['description']"/>{{cs['revision']['description']}}</td>
+                        <td class="text-left text-white"><q-input standout="bg-teal text-white" v-model="cs['revision']['description']"/>description</td>
                       </tr>
                     </tbody>
                    </template>
@@ -359,6 +364,9 @@ function ui(model)
                   <q-list style="min-width: 100px">
                     <q-item clickable v-close-popup @click="command='persist'" />
                       <q-item-section>Persist</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup @click="command='reset'" />
+                      <q-item-section>Reset Command</q-item-section>
                     </q-item>
                     <q-item tag="a" href="/PartnerSection" clickable v-close-popup>
                       <q-item-section>Partners</q-item-section>
