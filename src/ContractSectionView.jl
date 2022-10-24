@@ -14,7 +14,7 @@ ContractsModel
 """
 @reactive mutable struct ContractsModel <: ReactiveModel
   activetxn::Integer = 0
-  command::R{String}="" 
+  command::R{String} = ""
   contracts::Vector{Contract} = []
   current_contract::Contract = Contract()
   selected_contract_idx::R{Integer} = -1
@@ -24,7 +24,7 @@ ContractsModel
   txn_time::ZonedDateTime = now(tz"Africa/Porto-Novo")
   ref_time::ZonedDateTime = now(tz"Africa/Porto-Novo")
   histo::Vector{Dict{String,Any}} = Dict{String,Any}[]
-  cs::Dict{String,Any} = Dict{String,Any}("loaded" => "false")
+  cs::R{Dict{String,Any}} = Dict{String,Any}("loaded" => "false")
   prs::Dict{String,Any} = Dict{String,Any}("loaded" => "false")
   selected_product_part_idx::R{Integer} = 0
   tab::R{String} = "product"
@@ -47,13 +47,17 @@ function contract_list()
   """
     <div class="q-pa-md">
       <div class="q-gutter-md" style="max-width: 300px">
-        <q-input standout="bg-teal text-white" v-model="cs['selected_contract_idx']"/>
+        <q-field filled label="Filled" stack-label>
+        <template v-slot:control>
+          <div class="self-center full-width no-outline" tabindex="0">{{selected_contract_idx}}</div>
+        </template>
+      </q-field>
       </div>
     </div>
     <template v-for="(cid,cindex) in contracts">
       <div class="q-pa-md" style="max-width: 350px">
         <q-list dense bordered padding class="rounded-borders">
-          <q-item clickable v-ripple v-on:click="selected_contract_idx=cindex">
+          <q-item clickable v-on:click="selected_contract_idx=cindex">
             <q-item-section>
               {{cid['id']['value']}}
             </q-item-section>

@@ -190,24 +190,28 @@ function handlers(contractsModel::ContractSectionView.ContractsModel)
 
     on(contractsModel.selected_contract_idx) do _
         @info "enter selected_contract_idx"
-        println(contractsModel.selected_contract_idx[])
-        println(contractsModel.contracts[contractsModel.selected_contract_idx[]+1])
-        contractsModel.current_contract = contractsModel.contracts[contractsModel.selected_contract_idx[]+1]
-        contractsModel.selected_contract_idx=-1
-        contractsModel.histo = map(convert, LifeInsuranceDataModel.history_forest(contractsModel.current_contract.ref_history.value).shadowed)
-        contractsModel.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(contractsModel.current_contract.id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"), contractsModel.activetxn)))
-        contractsModel.cs["loaded"] = "true"
-        contractsModel.tab[] = "csection"
-        ti = contractsModel.cs["product_items"][1]["tariff_items"][1]
-
-        print("ti=")
-        println(ti)
-        print("tistruct")
-        println(ToStruct.tostruct(LifeInsuranceDataModel.TariffItemSection, ti))
-        tistruct = ToStruct.tostruct(LifeInsuranceDataModel.TariffItemSection, ti)
-        LifeInsuranceProduct.calculate!(tistruct)
-        contractsModel.cs["product_items"][1]["tariff_items"][1] = JSON.parse(JSON.json(tistruct))
-        push!(contractsModel)
+        try
+            println(contractsModel.selected_contract_idx[])
+            println(contractsModel.contracts[contractsModel.selected_contract_idx[]+1])
+            contractsModel.current_contract = contractsModel.contracts[contractsModel.selected_contract_idx[]+1]
+            contractsModel.histo = map(convert, LifeInsuranceDataModel.history_forest(contractsModel.current_contract.ref_history.value).shadowed)
+            contractsModel.cs = JSON.parse(JSON.json(LifeInsuranceDataModel.csection(contractsModel.current_contract.id.value, now(tz"Europe/Warsaw"), now(tz"Europe/Warsaw"), contractsModel.activetxn)))
+            contractsModel.cs["loaded"] = "true"
+            ti = contractsModel.cs["product_items"][1]["tariff_items"][1]
+            print("ti=")
+            println(ti)
+            print("tistruct")
+            println(ToStruct.tostruct(LifeInsuranceDataModel.TariffItemSection, ti))
+            tistruct = ToStruct.tostruct(LifeInsuranceDataModel.TariffItemSection, ti)
+            LifeInsuranceProduct.calculate!(tistruct)
+            contractsModel.cs["product_items"][1]["tariff_items"][1] = JSON.parse(JSON.json(tistruct))
+            contractsModel.selected_contract_idx[] = -1
+            contractsModel.tab = "csection"
+            push!(contractsModel)
+        catch err
+            println("wassis shief gegangen ")
+            @error "ERROR: " exception = (err, catch_backtrace())
+        end
 
     end
 
@@ -225,6 +229,9 @@ function handlers(contractsModel::ContractSectionView.ContractsModel)
 
     on(contractsModel.tab) do _
         println(contractsModel.tab[])
+        #       if (contractsModel.tab[] == "contracts")
+        #            contractsModel.selected_contract_idx = -1
+        #        end
         if (contractsModel.tab[] == "history")
             println("current contract")
             println(contractsModel.current_contract)
