@@ -47,7 +47,6 @@ function contract_list()
   """
     <div class="q-pa-md">
   	<div class="q-gutter-md" style="max-width: 300px">
-  	  <q-field filled label="Filled" stack-label>
   	  <template v-slot:control>
   		<div class="self-center full-width no-outline" tabindex="0">{{selected_contract_idx}}</div>
   	  </template>
@@ -101,177 +100,6 @@ function product()
   )
 end
 
-
-"""
-tariff_item_partners
-Display the partners referenced by a tarif item, insured person(s) typically
-"""
-function tariff_item_partners()
-  card(
-    class="my-card bg-deep-purple-8 text-white",
-    [
-      card_section([Html.div(class="text-h3 text-white", "Tariff Item Partners")]),
-      """,
-      		<q-markup-table dark class="bg-deep-purple-5 text-white">
-      			  <thead>
-      				<tr>
-      				  <th class="text-left text-white">Item</th>
-      				  <th class="text-left text-white">Role</th>
-      				  <th class="text-left text-white">Partner Id</th>
-      				  <th class="text-left text-white">Partner Description</th>
-      				  <th class="text-left text-white">Date of Birth</th>
-      				</tr>
-      			  </thead>
-      			  <tbody>
-      				<tr v-for="(tpid,tpindex) in cs['product_items'][pindex]['tariff_items'][tindex]['partner_refs']" >
-      				  <td class="text-left text-white">{{pindex}},{{tindex}},{{tpindex}}</td>
-      				  <td class="text-left text-white">{{rolesTariffItemPartner[tpid['rev']['ref_role']['value']]}}</td>
-      				  <td class="text-left text-white">{{tpid['rev']['ref_partner']['value']}}</td>
-      				  <td class="text-left text-white">{{tpid['ref']['revision']['description']}}</td>
-      				  <td class="text-left text-white">{{tpid['ref']['revision']['date_of_birth']}}</td>
-      				</tr>
-      			  </tbody>
-      		  </q-markup-table>
-      """,
-    ],
-    var"v-if"="show_tariff_item_partners",
-  )
-end
-
-"""
-tariff_items
-Displays tariff parameters and partners referenced 
-"""
-function tariff_items()
-  card(
-    class="my-card bg-indigo-8 text-white",
-    [
-      card_section([Html.div(class="text-h3 text-white", "Tariff Items"), btn("Show Tariff Item Partners", outline=true, @click("show_tariff_item_partners=!show_tariff_item_partners"))]),
-      """,
-      		<q-markup-table dark class="bg-indigo-5 text-white">
-      			  <thead>
-      				<tr>
-      				  <th class="text-left text-white">Item</th>
-      				  <th class="text-left text-white">Role</th>
-      				  <th class="text-left text-white">Tariff Id</th>
-      				  <th class="text-left text-white">Description</th>
-      				  <th class="text-left text-white">net premium</th>
-      				  <th class="text-left text-white">annuity immediate</th>
-      				  <th class="text-left text-white">annuity due</th>
-      				  <th class="text-left text-white">deferment</th>
-      				</tr>
-      			  </thead>
-      			  <tbody>
-      				<template v-for="(tid,tindex) in cs['product_items'][pindex]['tariff_items']">
-      				<tr>
-      				   <td class="text-left text-white">{{pindex}},{{tindex}}</td>
-      				  <td class="text-left text-white"> {{rolesTariffItem[tid['tariff_ref']['rev']['ref_role']['value']]}}</td>
-      				  <td class="text-left text-white"> {{tid['tariff_ref']['rev']['ref_tariff']['value']}}</td>
-      				  <td class="text-left text-white"> {{tid['tariff_ref']['rev']['description']}}</td>
-      				  <td class="text-left text-white"> {{tid['tariff_ref']['rev']['net_premium']}}</td>
-      				  <td class="text-left text-white"> {{tid['tariff_ref']['rev']['annuity_immediate']}}</td>
-      				  <td class="text-left text-white"> {{tid['tariff_ref']['rev']['annuity_due']}}</td>
-      				  <td class="text-left text-white"> {{tid['tariff_ref']['rev']['deferment']}}</td>
-      				</tr>
-      """,
-      tariff_item_partners(),
-      """
-        		
-      		   </template>
-        		</tbody>
-        		</q-markup-table>
-        """,
-    ],
-    var"v-if"="show_tariff_items",
-  )
-end
-
-"""
-product_items
-Displays product items, technically insurance (sub) contracts of which the contract proper can contain several, for instance 
-to represent dynamic increases of the insurance sum, which can be be revoked individually. 
-"""
-function product_items()
-  card(
-    class="my-card bg-purple-8 text-white",
-    [
-      card_section([Html.div(class="text-h2 text-white", "Product Items"), btn("Show Tariff Items", outline=true, @click("show_tariff_items=!show_tariff_items"))]),
-      """
-        	  <q-markup-table class="dark bg-purple-5 text-white">
-        		<template>
-        		  <thead>
-        			<tr>
-        			  <th class="text-left text-white">Item</th>
-        			  <th class="text-left text-white">Description</th>
-        			  <th class="text-left text-white">Product id</th>
-        			</tr>
-        		  </thead>
-        		</template>
-        		<template>
-        		  <tbody>
-        			<template v-for="(pid,pindex) in cs['product_items']">
-        	  <tr outline=true>
-        		<td class="text-left text-white">{{pindex}}</td>
-        		<td class="text-left text-white">{{pid['revision']['description']}}</td>
-        		<td class="text-left text-white">{{pid['revision']['ref_product']['value']}}</td>
-        		<td class="text-left text-white"><q-btn outline icon="functions" @click="selected_product=pid['revision']['ref_product']['value']"></q-btn></td>
-        		
-        """,
-      tariff_items(),
-      """
-        			</tr>
-        		  </template>
-        		  </tbody>
-        		</template>
-        	  </q-markup-table>
-        """,
-    ],
-    var"v-if"="show_product_items",
-  )
-end
-
-"""
-contract_partners
-Partners, at least the policy holder, but also premium payer and beneficiaries, if different from policy holder.
-"""
-function contract_partners()
-  card(
-    class="my-card bg-deep-purple-8 text-white",
-    [
-      card_section([Html.div(class="text-h3 text-white", "Contract Partners")]),
-      """,
-      		<q-markup-table dark class="bg-deep-purple-5 text-white">
-      			<template>
-      			  <thead>
-      				<tr>
-      				  <th class="text-left text-white">Index</th>
-      				  <th class="text-left text-white">Role</th>
-      				  <th class="text-left text-white">Partner Id</th>
-      				  <th class="text-left text-white">Partner Description</th>
-      				  <th class="text-left text-white">Partner Date of Birth</th>
-      				</tr>
-      			  </thead>
-      			</template>
-      			<template>
-      			  <tbody>
-      				<template v-for="(cpid,cpindex) in cs['partner_refs']">
-      				<tr>
-      				  <td class="text-left text-white">{{cpindex}}</td>
-      				  <td class="text-left text-white">{{rolesContractPartner[cpid['rev']['ref_role']['value']]}}</td>
-      				  <td class="text-left text-white">{{cpid['rev']['ref_partner']['value']}}</td>
-      				  <td class="text-left text-white">{{cpid['ref']['revision']['description']}}</td>
-      				  <td class="text-left text-white">{{cpid['ref']['revision']['date_of_birth']}}</td>
-      				</tr>
-      			  </template>
-      			  </tbody>
-      			 </template>
-      		  </q-markup-table>
-      """,
-    ],
-    var"v-if"="show_contract_partners",
-  )
-end
-
 """
 contract
 contract version tab
@@ -283,8 +111,6 @@ function contract()
       card_section([
         Html.div(class="text-h2 text-white", "Contract {{cs['revision']['ref_component']['value']}}"),
         Html.div(class="text-h5 text-white", "valid as of {{ref_time}} transaction time {{txn_time}}"),
-        btn("Show Contract Partners", outline=true, @click("show_contract_partners=!show_contract_partners")),
-        btn("Show Product Items", outline=true, @click("show_product_items=!show_product_items")),
         """
         <q-markup-table dark class="bg-deep-purple-5 text-white">div
         			<thead>
@@ -358,7 +184,8 @@ function contract()
                 </div>
             </div>
             <hr />
-            <q-card class="q-mt-md q-mr-sm bg-purple text-white">tariff items
+            <q-expansion-item label="tariff items">
+            <q-list class="q-mt-md q-mr-sm bg-purple text-white">
                 <div v-for="ti in pi['tariff_items']" class="q-pa-md">
                     <div class="row">
                         <div class="col">
@@ -381,11 +208,12 @@ function contract()
                         </div>
                     </div>
                     <hr />
-                    <q-card class="q-mt-md q-mr-sm bg-deep-purple-8 text-white">tariff item partners
+                    <q-expansion-item label="tariff_item_partners">
+                    <q-list class="q-mt-md q-mr-sm bg-deep-purple-8 text-white">
                         <div v-for="tipr in ti['partner_refs']" class="q-pa-md">
                             <div class="row">
                                 <div class="col">
-                                    <q-input bg-color="white" label="ref_component"
+                                      <q-field filled label="Filled" stack-label><q-input bg-color="white" label="ref_component"
                                         v-model="tipr['rev']['ref_component']['value']">
                                     </q-input bg-color="white">
                                 </div>
@@ -396,20 +224,20 @@ function contract()
                                 <q-input bg-color="white" label="ref_role" v-model="tipr['rev']['ref_role']['value']">
                                 </q-input bg-color="white">
                                 <q-input bg-color="white" label="ref_partner"
-                                    v-model="tipr['rev']['ref_partner']['value']">
+                                    v-card="tipr['rev']['ref_partner']['value']">
                                 </q-input bg-color="white">
                             </div>
                         </div>
-                    </q-card>
+                    </q-list>
+                    </q-expansion-item>
                 </div>
-            </q-card>
+            </q-list>
+            </q-expansion-item>
         </div>
     </q-expansion-item>
 </q-list>				
 			   	""",
       ]),
-      contract_partners(),
-      product_items(),
     ],
     var"v-if"="cs['loaded'] == 'true'",
   )
