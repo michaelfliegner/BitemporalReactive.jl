@@ -153,7 +153,7 @@ function contract()
             <div class="row">
                 <div class="col">
                     <q-input bg-color="white" label="ref_component" v-model="pr['rev']['ref_component']['value']">
-                 </section>   </q-input bg-color="white">
+                 </section>   </q-input>
                 </div>
                 <div class="col">
                     <q-input bg-color="white" label="description" v-model="pr['rev']['description']"></q-input
@@ -172,11 +172,12 @@ function contract()
     </q-expansion-item >
     <hr/>
     <q-expansion-item label="product items" class="q-mt-md q-mr-sm bg-deep-purple-8 text-white">
+      <q-btn label="add" v-on:click="command='add productitem'"></q-btn>
         <div v-for="pi in cs['product_items']" class="q-pa-md">
             <div class="row">
                 <div class="col">
                     <q-input bg-color="white" label="description" v-model="pi['revision']['ref_component']['value']">
-                    </q-input bg-color="white">
+                    </q-input>
                 </div>
                 <div class="col">
                     <q-input bg-color="white" label="description" v-model="pi['revision']['description']"></q-input
@@ -190,42 +191,54 @@ function contract()
                     <div class="row">
                         <div class="col">
                             <q-input bg-color="white" label="description"
-                                v-model="ti['tariff_ref']['rev']['description']"></q-input bg-color="white">
+                                v-model="ti['tariff_ref']['rev']['description']"></q-input>
                         </div>
                         <div class="col">
                             <q-input bg-color="white" label="ref_tariff"
                                 v-model="ti['tariff_ref']['rev']['ref_tariff']['value']">
-                            </q-input bg-color="white">
+                            </q-input>
                         </div>
                         <div class="col">
                             <q-input bg-color="white" label="deferment" v-model="ti['tariff_ref']['rev']['deferment']">
-                            </q-input bg-color="white">
+                            </q-input>
                         </div>
                         <div class="col">
                             <q-input bg-color="white" label="annuity_due"
                                 v-model="ti['tariff_ref']['rev']['annuity_due']">
-                            </q-input bg-color="white">
+                            </q-input>
                         </div>
                     </div>
                     <hr />
                     <q-expansion-item label="tariff_item_partners">
                     <q-list class="q-mt-md q-mr-sm bg-deep-purple-8 text-white">
                         <div v-for="tipr in ti['partner_refs']" class="q-pa-md">
+                        <p>description {{tipr['rev']['description']}}
+                        </p>
+                        <p>ref_partner {{tipr['rev']['ref_partner']['value']}}
+                        </p>
                             <div class="row">
                                 <div class="col">
-                                      <q-field filled label="Filled" stack-label><q-input bg-color="white" label="ref_component"
-                                        v-model="tipr['rev']['ref_component']['value']">
-                                    </q-input bg-color="white">
+                                    <q-input bg-color="white" label="ref_component" v-model="tipr['rev']['ref_component']['value']">
+                                    </q-input>
                                 </div>
+                                <div class="col">
                                 <q-input bg-color="white" label="id" v-model="tipr['rev']['id']['value']">
-                                </q-input bg-color="white">
+                                </q-input>
+                                </div>
+                                <div class="col">
                                 <q-input bg-color="white" label="description" v-model="tipr['rev']['description']">
-                                </q-input bg-color="white">
+                                </q-input>
+                                </div>
+                                <div class="col">
                                 <q-input bg-color="white" label="ref_role" v-model="tipr['rev']['ref_role']['value']">
-                                </q-input bg-color="white">
+                                </q-input>
+                                </div>
+                                <div class="col">
                                 <q-input bg-color="white" label="ref_partner"
-                                    v-card="tipr['rev']['ref_partner']['value']">
-                                </q-input bg-color="white">
+                                    v-model="tipr['rev']['ref_partner']['value']">
+                                </q-input>
+                                </div>
+
                             </div>
                         </div>
                     </q-list>
