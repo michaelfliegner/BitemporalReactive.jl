@@ -33,14 +33,14 @@ compareModelStateContract(previous::Dict{String,Any}, current::Dict{String,Any})
 function compareModelStateContract(previous::Dict{String,Any}, current::Dict{String,Any})
     diff = []
     cr = compareRevisions(ContractRevision, previous["revision"], current["revision"])
-    if (cr != nothing)
+    if (!isnothing(cr))
         push!(diff, cr)
     end
     for i in 1:size(previous["partner_refs"])[1]
         prev = (previous["partner_refs"][i]["rev"])
         curr = (current["partner_refs"][i]["rev"])
         prr = compareRevisions(ContractPartnerRefRevision, prev, curr)
-        if (prr != nothing)
+        if (!isnothing(prr))
             push!(diff, prr)
         end
 
@@ -49,21 +49,21 @@ function compareModelStateContract(previous::Dict{String,Any}, current::Dict{Str
         prevpi = previous["product_items"][i]
         currpi = current["product_items"][i]
         pit = compareRevisions(ProductItemRevision, prevpi["revision"], currpi["revision"])
-        if (pit != nothing)
+        if (!isnothing(pit))
             push!(diff, pit)
         end
         for i in 1:size(prevpi["tariff_items"])[1]
             prevti = prevpi["tariff_items"][i]
             currti = currpi["tariff_items"][i]
             tit = compareRevisions(TariffItemRevision, prevti["tariff_ref"]["rev"], currti["tariff_ref"]["rev"])
-            if (tit != nothing)
+            if (!isnothing(tit))
                 push!(diff, tit)
             end
             for i in 1:size(prevti["partner_refs"])[1]
                 prevtipr = prevti["partner_refs"][i]["rev"]
                 currtipr = currti["partner_refs"][i]["rev"]
                 tiprt = compareRevisions(TariffItemPartnerRefRevision, prevtipr, currtipr)
-                if (tiprt != nothing)
+                if (!isnoting(tiprt))
                     push!(diff, tiprt)
                 end
             end
